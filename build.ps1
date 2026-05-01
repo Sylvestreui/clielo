@@ -47,6 +47,12 @@ $exclude = @(
     "lib\composer.json"
 )
 
+# Version free WP.org : exclure lib/ (Stripe PHP SDK — premium uniquement)
+# Version premium : lib/ est inclus (Stripe requis)
+if (-not $Premium) {
+    $exclude += "lib"
+}
+
 # Nettoyer (dossier de build temporaire uniquement, pas les autres zips)
 if (Test-Path $buildDir) { Remove-Item $buildDir -Recurse -Force }
 if (Test-Path $zipPath)  { Remove-Item $zipPath -Force }
@@ -75,12 +81,11 @@ foreach ($exc in $exclude) {
     }
 }
 
-# Pour le zip premium : activer is_premium + wp_org_gatekeeper dans clielo.php
+# Pour le zip premium : activer is_premium dans clielo.php
 $mainFile = Join-Path $buildDir "clielo.php"
 if ($Premium -and (Test-Path $mainFile)) {
     (Get-Content $mainFile -Raw) `
-        -replace "'is_premium'\s+=>\s+false,", "'is_premium'          => true," `
-        -replace "// 'wp_org_gatekeeper'", "'wp_org_gatekeeper'" |
+        -replace "'is_premium'\s+=>\s+false,", "'is_premium'          => true," |
         Set-Content $mainFile -NoNewline
     Write-Host "Premium mode applied to clielo.php" -ForegroundColor Yellow
 }
