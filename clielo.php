@@ -31,7 +31,7 @@ if ( ! function_exists( 'clielo_fs' ) ) {
         global $clielo_fs;
 
         if ( ! isset( $clielo_fs ) ) {
-            require_once dirname( __FILE__ ) . '/vendor/freemius/start.php';
+            require_once dirname( __FILE__ ) . '/vendor/freemius/wordpress-sdk/start.php';
 
             $clielo_fs = fs_dynamic_init( array(
                 'id'                  => '24444',
@@ -40,13 +40,9 @@ if ( ! function_exists( 'clielo_fs' ) ) {
                 'type'                => 'plugin',
                 'public_key'          => 'pk_b46863119a89c13fd6d225cc981e1',
                 'is_premium'          => false,
-                'premium_suffix'      => 'Pro',
-                'has_premium_version' => true,
                 'has_addons'          => false,
                 'has_paid_plans'      => true,
                 'is_org_compliant'    => true,
-                // PREMIUM ONLY — uncomment for premium zip (remove before uploading to wp.org):
-                // 'wp_org_gatekeeper' => 'OA7#BoRiBNqdf52FvzEf!!074aRLPs8fspif$7K1#4u4Csys1fQlCecVcUTOs2mcpeVHi#C2j9d09fOTvbC0HloPT7fFee5WdS3G',
                 'trial'               => array(
                     'days'               => 14,
                     'is_require_payment' => false,
@@ -70,7 +66,7 @@ if ( ! function_exists( 'clielo_fs' ) ) {
  * Vérifie si le plan premium est actif.
  */
 function clielo_is_premium(): bool {
-    return clielo_fs()->is__premium_only() && clielo_fs()->can_use_premium_code();
+    return clielo_fs()->can_use_premium_code();
 }
 
 // Stripe PHP SDK
