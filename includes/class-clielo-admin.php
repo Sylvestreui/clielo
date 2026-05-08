@@ -44,7 +44,7 @@ class Clielo_Admin {
             return;
         }
 
-        $connect_url  = $fs->is_registered() ? $fs->get_account_url() : admin_url( 'admin.php?page=clielo-account' );
+        $connect_url  = $fs->is_registered() ? $fs->get_account_url() : $fs->get_activation_url();
         $upgrade_url  = $fs->get_upgrade_url();
         ?>
         <div class="wrap">
@@ -57,7 +57,7 @@ class Clielo_Admin {
                 </a>
                 <hr style="margin:24px 0">
                 <h2 style="margin-top:0"><?php esc_html_e( 'Pas encore de licence ?', 'clielo' ); ?></h2>
-                <a href="<?php echo esc_url( $upgrade_url ); ?>" class="button button-secondary button-large">
+                <a href="<?php echo esc_url( $upgrade_url ); ?>" class="button button-secondary button-large" target="_blank" rel="noopener">
                     <?php esc_html_e( 'Voir les plans premium', 'clielo' ); ?>
                 </a>
             </div>
