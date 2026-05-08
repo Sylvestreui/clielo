@@ -44,22 +44,24 @@ class Clielo_Admin {
             return;
         }
 
-        $connect_url  = $fs->is_registered() ? $fs->get_account_url() : $fs->get_activation_url();
-        $upgrade_url  = $fs->get_upgrade_url();
+        $reconnect_url = $fs->get_reconnect_url();
+        $upgrade_url   = $fs->is_registered() ? $fs->get_upgrade_url() : null;
         ?>
         <div class="wrap">
             <h1><?php esc_html_e( 'Activer votre licence Clielo', 'clielo' ); ?></h1>
             <div style="max-width:560px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:28px 32px;margin-top:16px">
                 <h2 style="margin-top:0"><?php esc_html_e( 'Vous avez déjà une licence ?', 'clielo' ); ?></h2>
-                <p><?php esc_html_e( 'Connectez-vous à votre compte Freemius pour activer les fonctionnalités premium (Stripe, Factures, Todos, Emails…).', 'clielo' ); ?></p>
-                <a href="<?php echo esc_url( $connect_url ); ?>" class="button button-primary button-large">
+                <p><?php esc_html_e( 'Cliquez ci-dessous pour connecter votre compte Freemius et activer les fonctionnalités premium (Stripe, Factures, Todos, Emails…).', 'clielo' ); ?></p>
+                <a href="<?php echo esc_url( $reconnect_url ); ?>" class="button button-primary button-large">
                     <?php esc_html_e( 'Connecter mon compte &amp; activer la licence', 'clielo' ); ?>
                 </a>
+                <?php if ( $upgrade_url ) : ?>
                 <hr style="margin:24px 0">
                 <h2 style="margin-top:0"><?php esc_html_e( 'Pas encore de licence ?', 'clielo' ); ?></h2>
                 <a href="<?php echo esc_url( $upgrade_url ); ?>" class="button button-secondary button-large" target="_blank" rel="noopener">
                     <?php esc_html_e( 'Voir les plans premium', 'clielo' ); ?>
                 </a>
+                <?php endif; ?>
             </div>
         </div>
         <?php
