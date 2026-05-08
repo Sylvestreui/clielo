@@ -21,50 +21,6 @@ class Clielo_Admin {
             [ __CLASS__, 'render_settings_page' ]
         );
 
-        if ( function_exists( 'clielo_fs' ) && ! clielo_fs()->is_paying() ) {
-            add_submenu_page(
-                'clielo',
-                __( 'Activer la licence', 'clielo' ),
-                '🔑 ' . __( 'Activer la licence', 'clielo' ),
-                'manage_options',
-                'clielo-activate',
-                [ __CLASS__, 'render_activate_page' ]
-            );
-        }
-    }
-
-    public static function render_activate_page(): void {
-        if ( ! function_exists( 'clielo_fs' ) ) {
-            return;
-        }
-        $fs = clielo_fs();
-
-        if ( $fs->is_paying() ) {
-            echo '<div class="wrap"><h1>' . esc_html__( 'Licence active ✓', 'clielo' ) . '</h1><p>' . esc_html__( 'Votre licence premium est active. Toutes les fonctionnalités sont débloquées.', 'clielo' ) . '</p></div>';
-            return;
-        }
-
-        $reconnect_url = $fs->get_reconnect_url();
-        $upgrade_url   = $fs->is_registered() ? $fs->get_upgrade_url() : null;
-        ?>
-        <div class="wrap">
-            <h1><?php esc_html_e( 'Activer votre licence Clielo', 'clielo' ); ?></h1>
-            <div style="max-width:560px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:28px 32px;margin-top:16px">
-                <h2 style="margin-top:0"><?php esc_html_e( 'Vous avez déjà une licence ?', 'clielo' ); ?></h2>
-                <p><?php esc_html_e( 'Cliquez ci-dessous pour connecter votre compte Freemius et activer les fonctionnalités premium (Stripe, Factures, Todos, Emails…).', 'clielo' ); ?></p>
-                <a href="<?php echo esc_url( $reconnect_url ); ?>" class="button button-primary button-large">
-                    <?php esc_html_e( 'Connecter mon compte &amp; activer la licence', 'clielo' ); ?>
-                </a>
-                <?php if ( $upgrade_url ) : ?>
-                <hr style="margin:24px 0">
-                <h2 style="margin-top:0"><?php esc_html_e( 'Pas encore de licence ?', 'clielo' ); ?></h2>
-                <a href="<?php echo esc_url( $upgrade_url ); ?>" class="button button-secondary button-large" target="_blank" rel="noopener">
-                    <?php esc_html_e( 'Voir les plans premium', 'clielo' ); ?>
-                </a>
-                <?php endif; ?>
-            </div>
-        </div>
-        <?php
     }
 
     public static function register_settings(): void {
