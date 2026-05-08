@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,10 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.0.5 =
+* Elementor widget: add style controls for chat button (color, size, radius) and chat popup (background, radius, width, height)
+* Elementor widget: chat button and popup now use CSS variables — controls update live in Elementor editor via :root selectors
 
 = 1.0.4 =
 * Elementor widget: live preview now works correctly for all style controls (CSS variables via style tag, overridable by Elementor selectors)

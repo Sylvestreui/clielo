@@ -397,11 +397,11 @@ class Clielo_Front {
         $btn_style = implode( ';', [
             'position:fixed !important',
             'z-index:2147483647 !important',
-            'width:60px !important',
-            'height:60px !important',
+            'width:var(--clielo-chat-btn-size) !important',
+            'height:var(--clielo-chat-btn-size) !important',
             'border:none !important',
-            'border-radius:50% !important',
-            'background:' . $color . ' !important',
+            'border-radius:var(--clielo-chat-btn-radius) !important',
+            'background:var(--clielo-chat-btn-bg) !important',
             'color:#fff !important',
             'cursor:pointer',
             'display:flex !important',
@@ -421,12 +421,12 @@ class Clielo_Front {
         $popup_style = implode( ';', [
             'position:fixed !important',
             'z-index:2147483646 !important',
-            'width:380px',
+            'width:var(--clielo-chat-popup-width)',
             'max-width:calc(100vw - 24px)',
-            'max-height:520px',
-            'border-radius:16px',
+            'max-height:var(--clielo-chat-popup-height)',
+            'border-radius:var(--clielo-chat-popup-radius)',
             'overflow:hidden',
-            'background:#fff !important',
+            'background:var(--clielo-chat-popup-bg) !important',
             'box-shadow:0 8px 32px rgba(0,0,0,0.18)',
             'flex-direction:column',
             'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',
@@ -521,6 +521,8 @@ class Clielo_Front {
             ],
         ] );
         ?>
+        <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- default chat CSS vars; overridable by Elementor selectors on :root. ?>
+        <style>body{--clielo-chat-btn-bg:<?php echo esc_attr( $color ); ?>;--clielo-chat-btn-size:60px;--clielo-chat-btn-radius:50%;--clielo-chat-header-bg:<?php echo esc_attr( $color ); ?>;--clielo-chat-popup-bg:#fff;--clielo-chat-popup-radius:16px;--clielo-chat-popup-width:380px;--clielo-chat-popup-height:520px}</style>
 
         <!-- Clielo : Bouton flottant -->
         <button id="clielo-toggle" style="<?php echo esc_attr( $btn_style ); ?>" aria-label="Chat">
@@ -531,7 +533,7 @@ class Clielo_Front {
         <!-- Clielo : Popup -->
         <div id="clielo-container" style="<?php echo esc_attr( $popup_style ); ?>">
             <!-- Header avec bouton retour -->
-            <div id="clielo-header" style="background:<?php echo esc_attr( $color ); ?> !important;color:#fff !important;padding:14px 20px !important;flex-shrink:0 !important;display:flex !important;align-items:center !important;gap:10px !important;margin:0 !important">
+            <div id="clielo-header" style="background:var(--clielo-chat-header-bg) !important;color:#fff !important;padding:14px 20px !important;flex-shrink:0 !important;display:flex !important;align-items:center !important;gap:10px !important;margin:0 !important">
                 <button id="clielo-back" type="button" style="display:none !important;background:none !important;border:none !important;color:#fff !important;cursor:pointer !important;padding:0 !important;margin:0 !important;flex-shrink:0 !important;line-height:1 !important">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
                 </button>
@@ -552,7 +554,7 @@ class Clielo_Front {
                 <form id="clielo-form" class="clielo-form" onsubmit="return false;">
                     <div class="clielo-input-wrapper">
                         <textarea id="clielo-input" class="clielo-input" placeholder="<?php esc_attr_e( 'Votre message...', 'clielo' ); ?>" rows="1" maxlength="1000"></textarea>
-                        <button type="button" id="clielo-send" class="clielo-send" style="background:<?php echo esc_attr( $color ); ?>">
+                        <button type="button" id="clielo-send" class="clielo-send" style="background:var(--clielo-chat-btn-bg)">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2Z"></path></svg>
                         </button>
                     </div>

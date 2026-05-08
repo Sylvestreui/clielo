@@ -671,6 +671,85 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
         ] );
 
         $this->end_controls_section();
+
+        /* ── Style — Bouton chat flottant ── */
+        $this->start_controls_section( 'section_style_chat_btn', [
+            'label' => __( 'Bouton chat flottant', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'chat_btn_color', [
+            'label'       => __( 'Couleur du bouton', 'clielo' ),
+            'type'        => \Elementor\Controls_Manager::COLOR,
+            'description' => __( 'Affecte aussi le header du popup et le bouton d\'envoi.', 'clielo' ),
+            'default'     => '',
+            'selectors'   => [ ':root' => '--clielo-chat-btn-bg: {{VALUE}}; --clielo-chat-header-bg: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'chat_btn_size', [
+            'label'      => __( 'Taille du bouton', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 40, 'max' => 80 ] ],
+            'default'    => [ 'size' => 60, 'unit' => 'px' ],
+            'selectors'  => [ ':root' => '--clielo-chat-btn-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->add_control( 'chat_btn_radius', [
+            'label'      => __( 'Rayon coins bouton', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px', '%' ],
+            'range'      => [
+                'px' => [ 'min' => 0, 'max' => 40 ],
+                '%'  => [ 'min' => 0, 'max' => 50 ],
+            ],
+            'default'    => [ 'size' => 50, 'unit' => '%' ],
+            'selectors'  => [ ':root' => '--clielo-chat-btn-radius: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style — Popup chat ── */
+        $this->start_controls_section( 'section_style_chat_popup', [
+            'label' => __( 'Popup chat', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'chat_popup_bg', [
+            'label'     => __( 'Fond du popup', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ ':root' => '--clielo-chat-popup-bg: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'chat_popup_radius', [
+            'label'      => __( 'Rayon coins popup', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 32 ] ],
+            'default'    => [ 'size' => 16, 'unit' => 'px' ],
+            'selectors'  => [ ':root' => '--clielo-chat-popup-radius: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->add_control( 'chat_popup_width', [
+            'label'      => __( 'Largeur du popup', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 280, 'max' => 600 ] ],
+            'default'    => [ 'size' => 380, 'unit' => 'px' ],
+            'selectors'  => [ ':root' => '--clielo-chat-popup-width: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->add_control( 'chat_popup_height', [
+            'label'      => __( 'Hauteur max du popup', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 300, 'max' => 800 ] ],
+            'default'    => [ 'size' => 520, 'unit' => 'px' ],
+            'selectors'  => [ ':root' => '--clielo-chat-popup-height: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->end_controls_section();
     }
 
     protected function render(): void {
