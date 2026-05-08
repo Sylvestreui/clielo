@@ -471,6 +471,9 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
             'type'        => \Elementor\Controls_Manager::COLOR,
             'description' => __( 'Laisser vide pour utiliser la couleur du plugin.', 'clielo' ),
             'default'     => '',
+            'selectors'   => [
+                '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-c: {{VALUE}}; --clielo-c-muted: {{VALUE}}; --clielo-c-light: {{VALUE}};',
+            ],
         ] );
 
         $this->add_control( 'card_border_radius', [
