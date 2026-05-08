@@ -426,12 +426,11 @@ class Clielo_Widget_Advanced_Price extends Clielo_Widget_Base {
  *  WIDGET OPTIONS DE SERVICE (packs + options + bouton commander)
  * ================================================================ */
 
-class Clielo_Widget_Service_Options extends \Elementor\Widget_Base {
+class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
 
     public function get_name(): string  { return 'clielo_service_options'; }
     public function get_title(): string { return __( 'Clielo — Options de service', 'clielo' ); }
     public function get_icon(): string  { return 'eicon-form-horizontal'; }
-    public function get_categories(): array { return [ 'clielo' ]; }
     public function get_keywords(): array { return [ 'clielo', 'service', 'pack', 'options', 'prix' ]; }
 
     protected function register_controls(): void {
@@ -439,14 +438,6 @@ class Clielo_Widget_Service_Options extends \Elementor\Widget_Base {
         /* ── Contenu ── */
         $this->start_controls_section( 'section_content', [
             'label' => __( 'Contenu', 'clielo' ),
-        ] );
-
-        $this->add_control( 'post_id', [
-            'label'       => __( 'ID du service', 'clielo' ),
-            'type'        => \Elementor\Controls_Manager::NUMBER,
-            'description' => __( 'Laisser vide pour utiliser le service de la page courante.', 'clielo' ),
-            'min'         => 0,
-            'default'     => '',
         ] );
 
         $this->add_control( 'show_order_button', [
@@ -519,17 +510,15 @@ class Clielo_Widget_Service_Options extends \Elementor\Widget_Base {
 
     protected function render(): void {
         $s                 = $this->get_settings_for_display();
-        $post_id           = ! empty( $s['post_id'] ) ? absint( $s['post_id'] ) : 0;
+        $post_id           = $this->get_post_id();
         $color             = ! empty( $s['color_override'] ) ? sanitize_hex_color( $s['color_override'] ) : '';
         $show_order_button = 'yes' === ( $s['show_order_button'] ?? 'yes' );
         $show_chat_bubble  = 'yes' === ( $s['show_chat_bubble'] ?? 'yes' );
 
         $args = [
+            'post_id'           => $post_id,
             'show_order_button' => $show_order_button,
         ];
-        if ( $post_id ) {
-            $args['post_id'] = $post_id;
-        }
         if ( $color ) {
             $args['color'] = $color;
         }
