@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,10 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.0.3 =
+* Elementor widget: color override now updates live in editor via CSS variables
+* Elementor widget: service options auto-detect current post, no manual ID needed
 
 = 1.0.2 =
 * Fix UTF-8 BOM in PHP files causing Freemius license activation to fail
