@@ -460,9 +460,9 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
 
         $this->end_controls_section();
 
-        /* ── Style ── */
+        /* ── Style — Général ── */
         $this->start_controls_section( 'section_style', [
-            'label' => __( 'Style', 'clielo' ),
+            'label' => __( 'Général', 'clielo' ),
             'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
         ] );
 
@@ -476,36 +476,198 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
             ],
         ] );
 
+        $this->add_control( 'card_background', [
+            'label'     => __( 'Fond de la carte', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-card-bg: {{VALUE}};' ],
+        ] );
+
         $this->add_control( 'card_border_radius', [
-            'label'      => __( 'Rayon de la carte', 'clielo' ),
+            'label'      => __( 'Rayon des coins (carte)', 'clielo' ),
             'type'       => \Elementor\Controls_Manager::SLIDER,
             'size_units' => [ 'px' ],
             'range'      => [ 'px' => [ 'min' => 0, 'max' => 32 ] ],
             'default'    => [ 'size' => 12, 'unit' => 'px' ],
-            'selectors'  => [ '{{WRAPPER}} #clielo-sc-card' => 'border-radius: {{SIZE}}{{UNIT}} !important;' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-card-radius: {{SIZE}}{{UNIT}};' ],
         ] );
 
-        $this->add_control( 'button_border_radius', [
-            'label'      => __( 'Rayon du bouton commander', 'clielo' ),
+        $this->end_controls_section();
+
+        /* ── Style — Noms des packs ── */
+        $this->start_controls_section( 'section_style_pack_name', [
+            'label' => __( 'Noms des packs', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'pack_name_color', [
+            'label'     => __( 'Couleur', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-name-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'pack_name_size', [
+            'label'      => __( 'Taille', 'clielo' ),
             'type'       => \Elementor\Controls_Manager::SLIDER,
             'size_units' => [ 'px' ],
-            'range'      => [ 'px' => [ 'min' => 0, 'max' => 32 ] ],
-            'default'    => [ 'size' => 8, 'unit' => 'px' ],
-            'selectors'  => [ '{{WRAPPER}} #clielo-sc-order' => 'border-radius: {{SIZE}}{{UNIT}} !important;' ],
+            'range'      => [ 'px' => [ 'min' => 10, 'max' => 28 ] ],
+            'default'    => [ 'size' => 14, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-name-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->add_control( 'pack_name_weight', [
+            'label'     => __( 'Graisse', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::SELECT,
+            'default'   => '700',
+            'options'   => [
+                '400' => __( 'Normal (400)', 'clielo' ),
+                '500' => __( 'Médium (500)', 'clielo' ),
+                '600' => __( 'Semi-gras (600)', 'clielo' ),
+                '700' => __( 'Gras (700)', 'clielo' ),
+                '800' => __( 'Extra-gras (800)', 'clielo' ),
+            ],
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-name-weight: {{VALUE}};' ],
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style — Prix des packs ── */
+        $this->start_controls_section( 'section_style_pack_price', [
+            'label' => __( 'Prix des packs', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'pack_price_color', [
+            'label'     => __( 'Couleur', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-price-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'pack_price_size', [
+            'label'      => __( 'Taille', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 10, 'max' => 28 ] ],
+            'default'    => [ 'size' => 14, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-price-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->add_control( 'pack_price_weight', [
+            'label'     => __( 'Graisse', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::SELECT,
+            'default'   => '800',
+            'options'   => [
+                '400' => __( 'Normal (400)', 'clielo' ),
+                '500' => __( 'Médium (500)', 'clielo' ),
+                '600' => __( 'Semi-gras (600)', 'clielo' ),
+                '700' => __( 'Gras (700)', 'clielo' ),
+                '800' => __( 'Extra-gras (800)', 'clielo' ),
+            ],
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-price-weight: {{VALUE}};' ],
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style — Caractéristiques ── */
+        $this->start_controls_section( 'section_style_features', [
+            'label' => __( 'Caractéristiques', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'feature_color', [
+            'label'     => __( 'Couleur', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-feat-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'feature_size', [
+            'label'      => __( 'Taille', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 9, 'max' => 18 ] ],
+            'default'    => [ 'size' => 12, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-feat-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style — Options ── */
+        $this->start_controls_section( 'section_style_options', [
+            'label' => __( 'Options supplémentaires', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'option_name_color', [
+            'label'     => __( 'Couleur nom', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-opt-name-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'option_name_size', [
+            'label'      => __( 'Taille nom', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 9, 'max' => 20 ] ],
+            'default'    => [ 'size' => 13, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-opt-name-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style — Bouton Commander ── */
+        $this->start_controls_section( 'section_style_button', [
+            'label' => __( 'Bouton Commander', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
         ] );
 
         $this->add_control( 'button_color', [
-            'label'     => __( 'Couleur du bouton commander', 'clielo' ),
+            'label'     => __( 'Fond du bouton', 'clielo' ),
             'type'      => \Elementor\Controls_Manager::COLOR,
             'default'   => '',
-            'selectors' => [ '{{WRAPPER}} #clielo-sc-order' => 'background: {{VALUE}} !important;' ],
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-btn-bg: {{VALUE}};' ],
         ] );
 
         $this->add_control( 'button_text_color', [
             'label'     => __( 'Couleur texte bouton', 'clielo' ),
             'type'      => \Elementor\Controls_Manager::COLOR,
-            'default'   => '#ffffff',
-            'selectors' => [ '{{WRAPPER}} #clielo-sc-order' => 'color: {{VALUE}} !important;' ],
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-btn-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'button_size', [
+            'label'      => __( 'Taille texte bouton', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 10, 'max' => 22 ] ],
+            'default'    => [ 'size' => 14, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-btn-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->add_control( 'button_weight', [
+            'label'     => __( 'Graisse texte bouton', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::SELECT,
+            'default'   => '600',
+            'options'   => [
+                '400' => __( 'Normal (400)', 'clielo' ),
+                '500' => __( 'Médium (500)', 'clielo' ),
+                '600' => __( 'Semi-gras (600)', 'clielo' ),
+                '700' => __( 'Gras (700)', 'clielo' ),
+                '800' => __( 'Extra-gras (800)', 'clielo' ),
+            ],
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-btn-weight: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'button_border_radius', [
+            'label'      => __( 'Rayon des coins (bouton)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 32 ] ],
+            'default'    => [ 'size' => 8, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-btn-radius: {{SIZE}}{{UNIT}};' ],
         ] );
 
         $this->end_controls_section();

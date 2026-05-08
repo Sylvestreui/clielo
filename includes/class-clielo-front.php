@@ -113,26 +113,20 @@ class Clielo_Front {
         ];
         $payment_mode_label = $payment_mode_labels[ $payment_mode ] ?? __( 'Paiement unique', 'clielo' );
 
-        ob_start();
-        ?>
-        <div class="clielo-sc-wrapper" style="--clielo-c:<?php echo esc_attr( $color ); ?>;--clielo-c-muted:<?php echo esc_attr( $c_muted ); ?>;--clielo-c-light:<?php echo esc_attr( $c_light ); ?>">
-        <?php
-        // Calcul de la luminance pour déterminer la couleur de texte lisible sur le fond du tooltip
-        $hex = ltrim( $c, '#' );
-        $r   = hexdec( substr( $hex, 0, 2 ) ) / 255;
-        $g   = hexdec( substr( $hex, 2, 2 ) ) / 255;
-        $b   = hexdec( substr( $hex, 4, 2 ) ) / 255;
-        $lum = 0.299 * $r + 0.587 * $g + 0.114 * $b;
-        $tip_text = $lum > 0.5 ? '#222' : '#fff';
-
-        // Variante adoucie de la couleur pour les éléments secondaires (features, bordures actives)
-        $r_int = hexdec( substr( $hex, 0, 2 ) );
-        $g_int = hexdec( substr( $hex, 2, 2 ) );
-        $b_int = hexdec( substr( $hex, 4, 2 ) );
+        $hex    = ltrim( $c, '#' );
+        $r_int  = absint( hexdec( substr( $hex, 0, 2 ) ) );
+        $g_int  = absint( hexdec( substr( $hex, 2, 2 ) ) );
+        $b_int  = absint( hexdec( substr( $hex, 4, 2 ) ) );
         $c_light = sprintf( 'rgba(%d,%d,%d,0.12)', $r_int, $g_int, $b_int );
         $c_muted = sprintf( 'rgba(%d,%d,%d,0.7)', $r_int, $g_int, $b_int );
+        $uid    = 'clielo-sc-' . wp_rand( 10000, 99999 );
+
+        ob_start();
         ?>
-        <div id="clielo-sc-card" style="font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important;border:1px solid #e0e0e0 !important;border-radius:12px !important;overflow-x:hidden !important;overflow-y:auto !important;max-height:calc(100vh - 80px) !important;background:#fff !important;box-shadow:0 2px 8px rgba(0,0,0,0.06) !important;max-width:100% !important;padding:0 !important;margin:0 0 20px 0 !important">
+        <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- per-instance CSS vars need inline style; wp_add_inline_style not usable after wp_head. ?>
+        <style>.<?php echo esc_html( $uid ); ?>{--clielo-c:<?php echo esc_attr( $color ); ?>;--clielo-c-muted:<?php echo esc_attr( $c_muted ); ?>;--clielo-c-light:<?php echo esc_attr( $c_light ); ?>;--clielo-card-radius:12px;--clielo-btn-radius:8px;--clielo-card-bg:#fff;--clielo-btn-bg:var(--clielo-c);--clielo-btn-color:#fff;--clielo-btn-size:14px;--clielo-btn-weight:600;--clielo-pack-name-size:14px;--clielo-pack-name-weight:700;--clielo-pack-name-color:#222;--clielo-pack-price-size:14px;--clielo-pack-price-weight:800;--clielo-pack-price-color:var(--clielo-c-muted);--clielo-pack-feat-size:12px;--clielo-pack-feat-color:#555;--clielo-opt-name-size:13px;--clielo-opt-name-weight:500;--clielo-opt-name-color:#333}</style>
+        <div class="clielo-sc-wrapper <?php echo esc_attr( $uid ); ?>">
+        <div id="clielo-sc-card" style="font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important;border:1px solid #e0e0e0 !important;border-radius:var(--clielo-card-radius) !important;overflow-x:hidden !important;overflow-y:auto !important;max-height:calc(100vh - 80px) !important;background:var(--clielo-card-bg) !important;box-shadow:0 2px 8px rgba(0,0,0,0.06) !important;max-width:100% !important;padding:0 !important;margin:0 0 20px 0 !important">
             <div style="display:flex !important;align-items:center !important;gap:8px !important;padding:12px 16px !important;background:var(--clielo-c) !important;color:#fff !important;font-size:14px !important;font-weight:600 !important;margin:0 !important;border-radius:0 !important;position:sticky !important;top:0 !important;z-index:2 !important">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1"></rect></svg>
                 <span style="color:#fff !important;font-size:14px !important;font-weight:600 !important"><?php esc_html_e( 'Options de service', 'clielo' ); ?></span>
@@ -158,7 +152,7 @@ class Clielo_Front {
                      style="border:2px solid <?php echo esc_attr( $brd ); ?> !important;border-radius:10px !important;padding:12px !important;cursor:pointer !important;background:<?php echo esc_attr( $bg ); ?> !important;position:relative !important;box-sizing:border-box !important;margin:0 !important;transition:border-color .15s,background .15s !important">
                     <div class="clielo-pack-dot" style="position:absolute !important;top:10px !important;right:10px !important;width:18px !important;height:18px !important;border-radius:50% !important;border:2px solid <?php echo esc_attr( $dot_brd ); ?> !important;background:<?php echo esc_attr( $dot_bg ); ?> !important;display:flex !important;align-items:center !important;justify-content:center !important"><?php if ( $is_sel ) : ?><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg><?php endif; ?></div>
                     <div style="display:flex !important;align-items:center !important;gap:6px !important;margin:0 0 4px 0 !important;padding-right:28px !important">
-                        <span style="font-size:14px !important;font-weight:700 !important;color:#222 !important"><?php echo esc_html( $pack['name'] ); ?></span>
+                        <span style="font-size:var(--clielo-pack-name-size) !important;font-weight:var(--clielo-pack-name-weight) !important;color:var(--clielo-pack-name-color) !important"><?php echo esc_html( $pack['name'] ); ?></span>
                         <?php if ( ! empty( $pack['description'] ) ) : ?>
                             <span class="clielo-info-tip">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -167,7 +161,7 @@ class Clielo_Front {
                         <?php endif; ?>
                     </div>
                     <div style="display:flex !important;align-items:baseline !important;gap:8px !important;margin:0 0 4px 0 !important">
-                        <span style="font-size:14px !important;font-weight:800 !important;color:var(--clielo-c-muted) !important"><?php echo esc_html( number_format( $pack['price'], 2, ',', ' ' ) ); ?> &euro;</span>
+                        <span style="font-size:var(--clielo-pack-price-size) !important;font-weight:var(--clielo-pack-price-weight) !important;color:var(--clielo-pack-price-color) !important"><?php echo esc_html( number_format( $pack['price'], 2, ',', ' ' ) ); ?> &euro;</span>
                         <?php if ( $pack_delay > 0 ) : ?>
                             <span style="font-size:11px !important;color:#888 !important">&#9201; <?php echo esc_html( $pack_delay ); ?> <?php esc_html_e( 'jour(s)', 'clielo' ); ?></span>
                         <?php endif; ?>
@@ -175,9 +169,9 @@ class Clielo_Front {
                     <?php if ( is_array( $features ) && ! empty( $features ) ) : ?>
                         <div style="margin:6px 0 0 0 !important;padding:0 !important">
                             <?php foreach ( $features as $feat ) : ?>
-                                <div style="display:flex !important;align-items:center !important;gap:6px !important;font-size:12px !important;color:#555 !important;line-height:1.6 !important;margin:0 !important;padding:0 !important">
+                                <div style="display:flex !important;align-items:center !important;gap:6px !important;font-size:var(--clielo-pack-feat-size) !important;color:var(--clielo-pack-feat-color) !important;line-height:1.6 !important;margin:0 !important;padding:0 !important">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="stroke:var(--clielo-c-muted)" stroke-width="2.5" style="flex-shrink:0 !important"><path d="M20 6L9 17l-5-5"></path></svg>
-                                    <span style="font-size:12px !important;color:#555 !important"><?php echo esc_html( $feat ); ?></span>
+                                    <span style="font-size:var(--clielo-pack-feat-size) !important;color:var(--clielo-pack-feat-color) !important"><?php echo esc_html( $feat ); ?></span>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -197,7 +191,7 @@ class Clielo_Front {
                 <input type="checkbox" class="clielo-sc-check" data-index="<?php echo absint( $i ); ?>" data-price="<?php echo esc_attr( $opt['price'] ); ?>" data-delay="<?php echo esc_attr( $opt_delay ); ?>" style="width:18px !important;height:18px !important;min-width:18px !important;margin:2px 0 0 0 !important;flex-shrink:0 !important;cursor:pointer !important" />
                 <div style="flex:1 !important;min-width:0 !important">
                     <div style="display:flex !important;justify-content:space-between !important;align-items:baseline !important;gap:8px !important;margin:0 !important;padding:0 !important">
-                        <span style="font-size:13px !important;font-weight:500 !important;color:#333 !important"><?php echo esc_html( $opt['name'] ); ?></span>
+                        <span style="font-size:var(--clielo-opt-name-size) !important;font-weight:var(--clielo-opt-name-weight) !important;color:var(--clielo-opt-name-color) !important"><?php echo esc_html( $opt['name'] ); ?></span>
                         <span style="font-size:13px !important;font-weight:600 !important;color:#555 !important;white-space:nowrap !important">+<?php echo esc_html( number_format( $opt['price'], 2, ',', ' ' ) ); ?> &euro;<?php if ( $opt_delay > 0 ) : ?> <span style="font-size:11px !important;color:#999 !important">+<?php echo esc_html( $opt_delay ); ?>j</span><?php endif; ?></span>
                     </div>
                     <?php if ( ! empty( $opt['description'] ) ) : ?>
@@ -282,7 +276,7 @@ class Clielo_Front {
                 $first_tva   = $tax_rate > 0 ? round( $first_price * $tax_rate / 100, 2 ) : 0;
                 $first_total = round( $first_price + $first_tva, 2 );
             ?>
-            <div style="padding:14px 16px !important;border-top:2px solid #e8e8e8 !important;background:#fafafa !important;margin:0 !important;position:sticky !important;bottom:0 !important;z-index:10 !important;border-radius:0 0 12px 12px !important">
+            <div style="padding:14px 16px !important;border-top:2px solid #e8e8e8 !important;background:#fafafa !important;margin:0 !important;position:sticky !important;bottom:0 !important;z-index:10 !important;border-radius:0 0 var(--clielo-card-radius) var(--clielo-card-radius) !important">
                 <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:12px !important;color:#888 !important;margin:0 0 2px 0 !important;padding:0 !important">
                     <span><?php esc_html_e( 'Sous-total', 'clielo' ); ?></span>
                     <span id="clielo-sc-subtotal-val"><?php echo esc_html( number_format( $first_price, 2, ',', ' ' ) ); ?> &euro;</span>
@@ -309,7 +303,7 @@ class Clielo_Front {
                     <span style="font-size:13px !important;color:#888 !important">&#9201; <?php esc_html_e( 'Délai estimé', 'clielo' ); ?></span>
                     <span id="clielo-sc-delay-val" style="font-size:13px !important;font-weight:600 !important;color:#555 !important"><?php echo esc_html( $first_delay ); ?> <?php esc_html_e( 'jour(s)', 'clielo' ); ?></span>
                 </div>
-                <button type="button" id="clielo-sc-order" style="display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;width:100% !important;padding:12px !important;border:none !important;border-radius:8px !important;background:var(--clielo-c) !important;color:#fff !important;font-size:14px !important;font-weight:600 !important;cursor:pointer !important;font-family:inherit !important;margin:0 !important;line-height:1.4 !important">
+                <button type="button" id="clielo-sc-order" style="display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;width:100% !important;padding:12px !important;border:none !important;border-radius:var(--clielo-btn-radius) !important;background:var(--clielo-btn-bg) !important;color:var(--clielo-btn-color) !important;font-size:var(--clielo-btn-size) !important;font-weight:var(--clielo-btn-weight) !important;cursor:pointer !important;font-family:inherit !important;margin:0 !important;line-height:1.4 !important">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     <?php echo ( clielo_is_premium() && Clielo_Stripe::is_enabled() ) ? esc_html__( 'Payer et commander', 'clielo' ) : esc_html__( 'Commander via le chat', 'clielo' ); ?>
                 </button>
@@ -325,7 +319,7 @@ class Clielo_Front {
                     <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;letter-spacing:0.3px"><?php esc_html_e( 'À partir de', 'clielo' ); ?></div>
                     <div id="clielo-mobile-price" style="font-size:16px;font-weight:600;color:var(--clielo-c)"><?php echo esc_html( number_format( $first_price, 2, ',', ' ' ) ); ?> &euro;</div>
                 </div>
-                <button type="button" id="clielo-mobile-cta" style="flex:1;max-width:240px;padding:12px 16px;border:none;border-radius:8px;background:var(--clielo-c);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.4">
+                <button type="button" id="clielo-mobile-cta" style="flex:1;max-width:240px;padding:12px 16px;border:none;border-radius:var(--clielo-btn-radius);background:var(--clielo-btn-bg);color:var(--clielo-btn-color);font-size:var(--clielo-btn-size);font-weight:var(--clielo-btn-weight);cursor:pointer;font-family:inherit;line-height:1.4">
                     <?php esc_html_e( 'Voir les offres', 'clielo' ); ?>
                 </button>
             </div>
