@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -54,7 +54,7 @@ class Clielo_Options {
             printf(
                 '<div style="padding:20px;text-align:center;color:#666"><p>%s</p><a href="%s" class="button button-primary">%s</a></div>',
                 esc_html__( 'La version gratuite est limitée à 1 service. Passez à Pro pour des services illimités.', 'clielo' ),
-                esc_url( admin_url( 'admin.php?page=serviceflow-pricing' ) ),
+                esc_url( admin_url( 'admin.php?page=clielo-pricing' ) ),
                 esc_html__( 'Passer à Pro', 'clielo' )
             );
             return;
@@ -74,53 +74,53 @@ class Clielo_Options {
         }
         ?>
         <!-- Packs -->
-        <div class="serviceflow-meta-section">
+        <div class="clielo-meta-section">
             <h4><?php esc_html_e( 'Packs', 'clielo' ); ?></h4>
-            <p class="serviceflow-section-desc"><?php esc_html_e( 'Le client en choisit un seul. Ajoutez au moins un pack.', 'clielo' ); ?></p>
-            <div id="serviceflow-packs-list">
+            <p class="clielo-section-desc"><?php esc_html_e( 'Le client en choisit un seul. Ajoutez au moins un pack.', 'clielo' ); ?></p>
+            <div id="clielo-packs-list">
                 <?php foreach ( $packs as $i => $pack ) : ?>
-                    <div class="serviceflow-pack-item" data-index="<?php echo absint( $i ); ?>">
-                        <button type="button" class="serviceflow-pack-remove"><?php esc_html_e( 'Supprimer', 'clielo' ); ?></button>
-                        <div class="serviceflow-meta-row">
-                            <div class="serviceflow-field">
+                    <div class="clielo-pack-item" data-index="<?php echo absint( $i ); ?>">
+                        <button type="button" class="clielo-pack-remove"><?php esc_html_e( 'Supprimer', 'clielo' ); ?></button>
+                        <div class="clielo-meta-row">
+                            <div class="clielo-field">
                                 <label><?php esc_html_e( 'Nom', 'clielo' ); ?></label>
                                 <input type="text" name="clielo_packs[<?php echo absint( $i ); ?>][name]" value="<?php echo esc_attr( $pack['name'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Ex: Pack Basique', 'clielo' ); ?>" />
                             </div>
-                            <div class="serviceflow-field-price">
+                            <div class="clielo-field-price">
                                 <label><?php esc_html_e( 'Prix (€)', 'clielo' ); ?></label>
                                 <input type="number" name="clielo_packs[<?php echo absint( $i ); ?>][price]" value="<?php echo esc_attr( $pack['price'] ?? '' ); ?>" min="0" step="0.01" />
                             </div>
-                            <div class="serviceflow-field-price">
+                            <div class="clielo-field-price">
                                 <label><?php esc_html_e( 'Délai (jours)', 'clielo' ); ?></label>
                                 <input type="number" name="clielo_packs[<?php echo absint( $i ); ?>][delay]" value="<?php echo esc_attr( $pack['delay'] ?? '' ); ?>" min="0" step="1" />
                             </div>
                         </div>
-                        <div class="serviceflow-meta-row">
-                            <div class="serviceflow-field">
+                        <div class="clielo-meta-row">
+                            <div class="clielo-field">
                                 <label><?php esc_html_e( 'Description (infobulle)', 'clielo' ); ?></label>
                                 <input type="text" name="clielo_packs[<?php echo absint( $i ); ?>][description]" value="<?php echo esc_attr( $pack['description'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Texte affiché au survol de l\'icône info', 'clielo' ); ?>" />
                             </div>
                         </div>
-                        <div class="serviceflow-features-section">
+                        <div class="clielo-features-section">
                             <label><?php esc_html_e( 'Caractéristiques du pack', 'clielo' ); ?></label>
-                            <div class="serviceflow-features-list">
+                            <div class="clielo-features-list">
                                 <?php
                                 $features = $pack['features'] ?? [];
                                 if ( is_array( $features ) ) :
                                     foreach ( $features as $fi => $feat ) : ?>
-                                        <div class="serviceflow-feature-item">
+                                        <div class="clielo-feature-item">
                                             <input type="text" name="clielo_packs[<?php echo absint( $i ); ?>][features][]" value="<?php echo esc_attr( $feat ); ?>" placeholder="<?php esc_attr_e( 'Ex: 5 pages incluses', 'clielo' ); ?>" />
-                                            <button type="button" class="serviceflow-feature-rm">&times;</button>
+                                            <button type="button" class="clielo-feature-rm">&times;</button>
                                         </div>
                                     <?php endforeach;
                                 endif; ?>
                             </div>
-                            <button type="button" class="serviceflow-add-feature" data-pack-index="<?php echo absint( $i ); ?>">+ <?php esc_html_e( 'Ajouter une caractéristique', 'clielo' ); ?></button>
+                            <button type="button" class="clielo-add-feature" data-pack-index="<?php echo absint( $i ); ?>">+ <?php esc_html_e( 'Ajouter une caractéristique', 'clielo' ); ?></button>
                         </div>
                     </div>
                 <?php endforeach; ?>
             </div>
-            <button type="button" id="serviceflow-add-pack" class="button"><?php esc_html_e( '+ Ajouter un pack', 'clielo' ); ?></button>
+            <button type="button" id="clielo-add-pack" class="button"><?php esc_html_e( '+ Ajouter un pack', 'clielo' ); ?></button>
         </div>
 
         <?php if ( clielo_is_premium() ) :
@@ -136,9 +136,9 @@ class Clielo_Options {
                 'daily'   => __( 'Express (jours)', 'clielo' ),
             ];
         ?>
-        <div class="serviceflow-meta-section">
+        <div class="clielo-meta-section">
             <h4><?php esc_html_e( 'Options avancées', 'clielo' ); ?></h4>
-            <p class="serviceflow-section-desc"><?php esc_html_e( 'Ajoutez des options avec tarification flexible. Chaque option est affichée sur le widget de commande.', 'clielo' ); ?></p>
+            <p class="clielo-section-desc"><?php esc_html_e( 'Ajoutez des options avec tarification flexible. Chaque option est affichée sur le widget de commande.', 'clielo' ); ?></p>
 
             <div id="sf-adv-opts-list">
                 <?php foreach ( $adv_opts as $i => $opt ) :
@@ -217,10 +217,10 @@ class Clielo_Options {
             $payment_mode       = get_post_meta( $post->ID, '_clielo_payment_mode', true ) ?: ( Clielo_Stripe::get_settings()['default_payment_mode'] ?? 'single' );
             $installments_count = (int) get_post_meta( $post->ID, '_clielo_installments_count', true ) ?: 3;
         ?>
-        <div class="serviceflow-meta-section">
+        <div class="clielo-meta-section">
             <h4><?php esc_html_e( 'Mode de paiement', 'clielo' ); ?></h4>
-            <div class="serviceflow-meta-row">
-                <div class="serviceflow-field">
+            <div class="clielo-meta-row">
+                <div class="clielo-field">
                     <label><?php esc_html_e( 'Type de paiement', 'clielo' ); ?></label>
                     <select name="clielo_payment_mode" id="sf-payment-mode-select">
                         <option value="single"       <?php selected( $payment_mode, 'single' ); ?>><?php esc_html_e( 'Paiement unique', 'clielo' ); ?></option>
@@ -230,7 +230,7 @@ class Clielo_Options {
                     </select>
                     <p id="sf-monthly-hint" style="font-size:11px;color:#888;margin:4px 0 0;<?php echo $payment_mode !== 'monthly' ? 'display:none' : ''; ?>"><?php esc_html_e( 'Le prix du pack = tarif mensuel. Le 1er mois est réglé au départ, les suivants sont envoyés manuellement.', 'clielo' ); ?></p>
                 </div>
-                <div class="serviceflow-field-price" id="sf-installments-field" style="<?php echo in_array( $payment_mode, [ 'installments', 'monthly' ], true ) ? '' : 'display:none'; ?>">
+                <div class="clielo-field-price" id="sf-installments-field" style="<?php echo in_array( $payment_mode, [ 'installments', 'monthly' ], true ) ? '' : 'display:none'; ?>">
                     <label id="sf-installments-label"><?php echo $payment_mode === 'monthly' ? esc_html__( 'Nombre de mois', 'clielo' ) : esc_html__( 'Nombre de mensualités', 'clielo' ); ?></label>
                     <input type="number" name="clielo_installments_count" value="<?php echo esc_attr( $installments_count ); ?>" min="1" max="60" step="1" />
                 </div>
@@ -239,29 +239,29 @@ class Clielo_Options {
         <?php endif; ?>
 
         <!-- Options supplémentaires -->
-        <div class="serviceflow-meta-section">
+        <div class="clielo-meta-section">
             <h4><?php esc_html_e( 'Options supplémentaires', 'clielo' ); ?></h4>
-            <p class="serviceflow-section-desc"><?php esc_html_e( 'Cumulables avec le pack choisi.', 'clielo' ); ?></p>
-            <div id="serviceflow-options-list">
+            <p class="clielo-section-desc"><?php esc_html_e( 'Cumulables avec le pack choisi.', 'clielo' ); ?></p>
+            <div id="clielo-options-list">
                 <?php foreach ( $options as $i => $opt ) : ?>
-                    <div class="serviceflow-option-item" data-index="<?php echo absint( $i ); ?>">
-                        <button type="button" class="serviceflow-option-remove"><?php esc_html_e( 'Supprimer', 'clielo' ); ?></button>
-                        <div class="serviceflow-meta-row">
-                            <div class="serviceflow-field">
+                    <div class="clielo-option-item" data-index="<?php echo absint( $i ); ?>">
+                        <button type="button" class="clielo-option-remove"><?php esc_html_e( 'Supprimer', 'clielo' ); ?></button>
+                        <div class="clielo-meta-row">
+                            <div class="clielo-field">
                                 <label><?php esc_html_e( 'Nom', 'clielo' ); ?></label>
                                 <input type="text" name="clielo_opts[<?php echo absint( $i ); ?>][name]" value="<?php echo esc_attr( $opt['name'] ?? '' ); ?>" />
                             </div>
-                            <div class="serviceflow-field-price">
+                            <div class="clielo-field-price">
                                 <label><?php esc_html_e( 'Prix (€)', 'clielo' ); ?></label>
                                 <input type="number" name="clielo_opts[<?php echo absint( $i ); ?>][price]" value="<?php echo esc_attr( $opt['price'] ?? '' ); ?>" min="0" step="0.01" />
                             </div>
-                            <div class="serviceflow-field-price">
+                            <div class="clielo-field-price">
                                 <label><?php esc_html_e( 'Délai (jours)', 'clielo' ); ?></label>
                                 <input type="number" name="clielo_opts[<?php echo absint( $i ); ?>][delay]" value="<?php echo esc_attr( $opt['delay'] ?? '' ); ?>" min="0" step="1" />
                             </div>
                         </div>
-                        <div class="serviceflow-meta-row">
-                            <div class="serviceflow-field">
+                        <div class="clielo-meta-row">
+                            <div class="clielo-field">
                                 <label><?php esc_html_e( 'Description', 'clielo' ); ?></label>
                                 <input type="text" name="clielo_opts[<?php echo absint( $i ); ?>][description]" value="<?php echo esc_attr( $opt['description'] ?? '' ); ?>" />
                             </div>
@@ -269,7 +269,7 @@ class Clielo_Options {
                     </div>
                 <?php endforeach; ?>
             </div>
-            <button type="button" id="serviceflow-add-option" class="button"><?php esc_html_e( '+ Ajouter une option', 'clielo' ); ?></button>
+            <button type="button" id="clielo-add-option" class="button"><?php esc_html_e( '+ Ajouter une option', 'clielo' ); ?></button>
         </div>
         <?php
     }
@@ -287,26 +287,26 @@ class Clielo_Options {
         wp_enqueue_script( 'jquery-ui-sortable' );
 
         wp_add_inline_style( 'wp-admin',
-            '.serviceflow-meta-section { margin-bottom: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; }' .
-            '.serviceflow-meta-section h4 { margin: 0 0 4px; font-size: 14px; }' .
-            '.serviceflow-meta-section .serviceflow-section-desc { font-size: 12px; color: #888; margin: 0 0 12px; }' .
-            '.serviceflow-meta-row { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }' .
-            '.serviceflow-meta-row label { display: block; font-weight: 600; font-size: 12px; margin-bottom: 4px; color: #555; }' .
-            '.serviceflow-meta-row input[type="text"],.serviceflow-meta-row input[type="number"],.serviceflow-meta-row textarea { width: 100%; }' .
-            '.serviceflow-meta-row .serviceflow-field { flex: 1; }' .
-            '.serviceflow-meta-row .serviceflow-field-price { flex: 0 0 120px; }' .
-            '.serviceflow-pack-item,.serviceflow-option-item { padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; position: relative; }' .
-            '.serviceflow-pack-remove,.serviceflow-option-remove { position: absolute; top: 8px; right: 8px; background: #dc3545; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 12px; }' .
-            '.serviceflow-pack-remove:hover,.serviceflow-option-remove:hover { background: #c82333; }' .
-            '#serviceflow-add-pack,#serviceflow-add-option { margin-top: 8px; }' .
-            '.serviceflow-features-section { margin-top: 8px; padding: 8px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px; }' .
-            '.serviceflow-features-section > label { display: block; font-weight: 600; font-size: 12px; color: #555; margin-bottom: 6px; }' .
-            '.serviceflow-feature-item { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }' .
-            '.serviceflow-feature-item input[type="text"] { flex: 1; }' .
-            '.serviceflow-feature-rm { background: #dc3545; color: #fff; border: none; border-radius: 3px; padding: 2px 8px; cursor: pointer; font-size: 11px; line-height: 1.6; }' .
-            '.serviceflow-feature-rm:hover { background: #c82333; }' .
-            '.serviceflow-add-feature { font-size: 12px; cursor: pointer; color: #0073aa; background: none; border: none; padding: 4px 0; }' .
-            '.serviceflow-add-feature:hover { text-decoration: underline; }' .
+            '.clielo-meta-section { margin-bottom: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; }' .
+            '.clielo-meta-section h4 { margin: 0 0 4px; font-size: 14px; }' .
+            '.clielo-meta-section .clielo-section-desc { font-size: 12px; color: #888; margin: 0 0 12px; }' .
+            '.clielo-meta-row { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }' .
+            '.clielo-meta-row label { display: block; font-weight: 600; font-size: 12px; margin-bottom: 4px; color: #555; }' .
+            '.clielo-meta-row input[type="text"],.clielo-meta-row input[type="number"],.clielo-meta-row textarea { width: 100%; }' .
+            '.clielo-meta-row .clielo-field { flex: 1; }' .
+            '.clielo-meta-row .clielo-field-price { flex: 0 0 120px; }' .
+            '.clielo-pack-item,.clielo-option-item { padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; position: relative; }' .
+            '.clielo-pack-remove,.clielo-option-remove { position: absolute; top: 8px; right: 8px; background: #dc3545; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 12px; }' .
+            '.clielo-pack-remove:hover,.clielo-option-remove:hover { background: #c82333; }' .
+            '#clielo-add-pack,#clielo-add-option { margin-top: 8px; }' .
+            '.clielo-features-section { margin-top: 8px; padding: 8px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px; }' .
+            '.clielo-features-section > label { display: block; font-weight: 600; font-size: 12px; color: #555; margin-bottom: 6px; }' .
+            '.clielo-feature-item { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }' .
+            '.clielo-feature-item input[type="text"] { flex: 1; }' .
+            '.clielo-feature-rm { background: #dc3545; color: #fff; border: none; border-radius: 3px; padding: 2px 8px; cursor: pointer; font-size: 11px; line-height: 1.6; }' .
+            '.clielo-feature-rm:hover { background: #c82333; }' .
+            '.clielo-add-feature { font-size: 12px; cursor: pointer; color: #0073aa; background: none; border: none; padding: 4px 0; }' .
+            '.clielo-add-feature:hover { text-decoration: underline; }' .
             '.sf-adv-opt-row{display:flex;align-items:center;background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:8px;margin-bottom:6px}' .
             '.sf-adv-opt-handle{cursor:grab}.sf-adv-opt-handle:active{cursor:grabbing}' .
             '.sf-adv-opt-placeholder{background:#e8f0fe;border:2px dashed #4a90d9;border-radius:4px;margin-bottom:6px}' .
@@ -368,68 +368,68 @@ class Clielo_Options {
         wp_add_inline_script( 'jquery-core', "
             jQuery(function($){
                 /* ── Packs repeater ── */
-                var packIdx = $('#serviceflow-packs-list .serviceflow-pack-item').length;
+                var packIdx = $('#clielo-packs-list .clielo-pack-item').length;
 
-                $('#serviceflow-add-pack').on('click', function(){
-                    var html = '<div class=\"serviceflow-pack-item\" data-index=\"'+packIdx+'\">' +
-                        '<button type=\"button\" class=\"serviceflow-pack-remove\">" . esc_js( __( 'Supprimer', 'clielo' ) ) . "</button>' +
-                        '<div class=\"serviceflow-meta-row\">' +
-                            '<div class=\"serviceflow-field\"><label>" . esc_js( __( 'Nom', 'clielo' ) ) . "</label><input type=\"text\" name=\"clielo_packs['+packIdx+'][name]\" placeholder=\"" . esc_js( __( 'Ex: Pack Basique', 'clielo' ) ) . "\" /></div>' +
-                            '<div class=\"serviceflow-field-price\"><label>" . esc_js( __( 'Prix (€)', 'clielo' ) ) . "</label><input type=\"number\" name=\"clielo_packs['+packIdx+'][price]\" min=\"0\" step=\"0.01\" /></div>' +
-                            '<div class=\"serviceflow-field-price\"><label>" . esc_js( __( 'Délai (jours)', 'clielo' ) ) . "</label><input type=\"number\" name=\"clielo_packs['+packIdx+'][delay]\" min=\"0\" step=\"1\" /></div>' +
+                $('#clielo-add-pack').on('click', function(){
+                    var html = '<div class=\"clielo-pack-item\" data-index=\"'+packIdx+'\">' +
+                        '<button type=\"button\" class=\"clielo-pack-remove\">" . esc_js( __( 'Supprimer', 'clielo' ) ) . "</button>' +
+                        '<div class=\"clielo-meta-row\">' +
+                            '<div class=\"clielo-field\"><label>" . esc_js( __( 'Nom', 'clielo' ) ) . "</label><input type=\"text\" name=\"clielo_packs['+packIdx+'][name]\" placeholder=\"" . esc_js( __( 'Ex: Pack Basique', 'clielo' ) ) . "\" /></div>' +
+                            '<div class=\"clielo-field-price\"><label>" . esc_js( __( 'Prix (€)', 'clielo' ) ) . "</label><input type=\"number\" name=\"clielo_packs['+packIdx+'][price]\" min=\"0\" step=\"0.01\" /></div>' +
+                            '<div class=\"clielo-field-price\"><label>" . esc_js( __( 'Délai (jours)', 'clielo' ) ) . "</label><input type=\"number\" name=\"clielo_packs['+packIdx+'][delay]\" min=\"0\" step=\"1\" /></div>' +
                         '</div>' +
-                        '<div class=\"serviceflow-meta-row\">' +
-                            '<div class=\"serviceflow-field\"><label>" . esc_js( __( 'Description (infobulle)', 'clielo' ) ) . "</label><input type=\"text\" name=\"clielo_packs['+packIdx+'][description]\" placeholder=\"" . esc_js( __( "Texte affiché au survol de l'icône info", 'clielo' ) ) . "\" /></div>' +
+                        '<div class=\"clielo-meta-row\">' +
+                            '<div class=\"clielo-field\"><label>" . esc_js( __( 'Description (infobulle)', 'clielo' ) ) . "</label><input type=\"text\" name=\"clielo_packs['+packIdx+'][description]\" placeholder=\"" . esc_js( __( "Texte affiché au survol de l'icône info", 'clielo' ) ) . "\" /></div>' +
                         '</div>' +
-                        '<div class=\"serviceflow-features-section\">' +
+                        '<div class=\"clielo-features-section\">' +
                             '<label>" . esc_js( __( 'Caractéristiques du pack', 'clielo' ) ) . "</label>' +
-                            '<div class=\"serviceflow-features-list\"></div>' +
-                            '<button type=\"button\" class=\"serviceflow-add-feature\" data-pack-index=\"'+packIdx+'\">+ " . esc_js( __( 'Ajouter une caractéristique', 'clielo' ) ) . "</button>' +
+                            '<div class=\"clielo-features-list\"></div>' +
+                            '<button type=\"button\" class=\"clielo-add-feature\" data-pack-index=\"'+packIdx+'\">+ " . esc_js( __( 'Ajouter une caractéristique', 'clielo' ) ) . "</button>' +
                         '</div>' +
                     '</div>';
-                    $('#serviceflow-packs-list').append(html);
+                    $('#clielo-packs-list').append(html);
                     packIdx++;
                 });
 
-                $(document).on('click', '.serviceflow-pack-remove', function(){
-                    $(this).closest('.serviceflow-pack-item').remove();
+                $(document).on('click', '.clielo-pack-remove', function(){
+                    $(this).closest('.clielo-pack-item').remove();
                 });
 
                 /* ── Features repeater ── */
-                $(document).on('click', '.serviceflow-add-feature', function(){
-                    var idx = $(this).closest('.serviceflow-pack-item').data('index');
-                    var html = '<div class=\"serviceflow-feature-item\">' +
+                $(document).on('click', '.clielo-add-feature', function(){
+                    var idx = $(this).closest('.clielo-pack-item').data('index');
+                    var html = '<div class=\"clielo-feature-item\">' +
                         '<input type=\"text\" name=\"clielo_packs['+idx+'][features][]\" placeholder=\"" . esc_js( __( 'Ex: 5 pages incluses', 'clielo' ) ) . "\" />' +
-                        '<button type=\"button\" class=\"serviceflow-feature-rm\">&times;</button>' +
+                        '<button type=\"button\" class=\"clielo-feature-rm\">&times;</button>' +
                     '</div>';
-                    $(this).siblings('.serviceflow-features-list').append(html);
+                    $(this).siblings('.clielo-features-list').append(html);
                 });
 
-                $(document).on('click', '.serviceflow-feature-rm', function(){
-                    $(this).closest('.serviceflow-feature-item').remove();
+                $(document).on('click', '.clielo-feature-rm', function(){
+                    $(this).closest('.clielo-feature-item').remove();
                 });
 
                 /* ── Options repeater ── */
-                var optIdx = $('#serviceflow-options-list .serviceflow-option-item').length;
+                var optIdx = $('#clielo-options-list .clielo-option-item').length;
 
-                $('#serviceflow-add-option').on('click', function(){
-                    var html = '<div class=\"serviceflow-option-item\" data-index=\"'+optIdx+'\">' +
-                        '<button type=\"button\" class=\"serviceflow-option-remove\">" . esc_js( __( 'Supprimer', 'clielo' ) ) . "</button>' +
-                        '<div class=\"serviceflow-meta-row\">' +
-                            '<div class=\"serviceflow-field\"><label>" . esc_js( __( 'Nom', 'clielo' ) ) . "</label><input type=\"text\" name=\"clielo_opts['+optIdx+'][name]\" /></div>' +
-                            '<div class=\"serviceflow-field-price\"><label>" . esc_js( __( 'Prix (€)', 'clielo' ) ) . "</label><input type=\"number\" name=\"clielo_opts['+optIdx+'][price]\" min=\"0\" step=\"0.01\" /></div>' +
-                            '<div class=\"serviceflow-field-price\"><label>" . esc_js( __( 'Délai (jours)', 'clielo' ) ) . "</label><input type=\"number\" name=\"clielo_opts['+optIdx+'][delay]\" min=\"0\" step=\"1\" /></div>' +
+                $('#clielo-add-option').on('click', function(){
+                    var html = '<div class=\"clielo-option-item\" data-index=\"'+optIdx+'\">' +
+                        '<button type=\"button\" class=\"clielo-option-remove\">" . esc_js( __( 'Supprimer', 'clielo' ) ) . "</button>' +
+                        '<div class=\"clielo-meta-row\">' +
+                            '<div class=\"clielo-field\"><label>" . esc_js( __( 'Nom', 'clielo' ) ) . "</label><input type=\"text\" name=\"clielo_opts['+optIdx+'][name]\" /></div>' +
+                            '<div class=\"clielo-field-price\"><label>" . esc_js( __( 'Prix (€)', 'clielo' ) ) . "</label><input type=\"number\" name=\"clielo_opts['+optIdx+'][price]\" min=\"0\" step=\"0.01\" /></div>' +
+                            '<div class=\"clielo-field-price\"><label>" . esc_js( __( 'Délai (jours)', 'clielo' ) ) . "</label><input type=\"number\" name=\"clielo_opts['+optIdx+'][delay]\" min=\"0\" step=\"1\" /></div>' +
                         '</div>' +
-                        '<div class=\"serviceflow-meta-row\">' +
-                            '<div class=\"serviceflow-field\"><label>" . esc_js( __( 'Description', 'clielo' ) ) . "</label><input type=\"text\" name=\"clielo_opts['+optIdx+'][description]\" /></div>' +
+                        '<div class=\"clielo-meta-row\">' +
+                            '<div class=\"clielo-field\"><label>" . esc_js( __( 'Description', 'clielo' ) ) . "</label><input type=\"text\" name=\"clielo_opts['+optIdx+'][description]\" /></div>' +
                         '</div>' +
                     '</div>';
-                    $('#serviceflow-options-list').append(html);
+                    $('#clielo-options-list').append(html);
                     optIdx++;
                 });
 
-                $(document).on('click', '.serviceflow-option-remove', function(){
-                    $(this).closest('.serviceflow-option-item').remove();
+                $(document).on('click', '.clielo-option-remove', function(){
+                    $(this).closest('.clielo-option-item').remove();
                 });
             });
         " );

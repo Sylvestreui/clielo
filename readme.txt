@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,12 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.0.1 =
+* Add Elementor widget for service options (packs, options, order button toggle)
+* Premium features now unlock instantly via license key activation (no separate zip required)
+* Add license activation page in admin menu
+* Rename all internal identifiers from serviceflow to clielo
 
 = 1.0.0 =
 * Initial public release

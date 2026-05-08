@@ -258,10 +258,6 @@
             'val' => WP_FS__DIR,
         ),
         array(
-            'key' => 'DISABLE_WP_CRON',
-            'val' => defined( 'DISABLE_WP_CRON' ) ? ( DISABLE_WP_CRON ? 'true' : 'false' ) : 'Not defined',
-        ),
-        array(
             'key' => 'wp_using_ext_object_cache()',
             'val' => wp_using_ext_object_cache() ? 'true' : 'false',
         ),
@@ -286,11 +282,7 @@
                 echo ' class="alternate"';
             } ?>>
                 <td><?php echo $p['key'] ?></td>
-                <td><?php echo $p['val'] ?><?php
-                    if ( 'DISABLE_WP_CRON' === $p['key'] && 'true' === $p['val'] ) {
-                        echo '<p><small><strong>Freemius SDK’s sync cron jobs will not run unless an alternative server-side cron is set up.</strong></small></p>';
-                    }
-                ?></td>
+                <td><?php echo $p['val'] ?></td>
             </tr>
             <?php $alternate = ! $alternate ?>
         <?php endforeach ?>

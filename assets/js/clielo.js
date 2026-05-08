@@ -1,19 +1,19 @@
-(function () {
+﻿(function () {
     'use strict';
 
-    var config = window.serviceflow || {};
+    var config = window.clielo || {};
     var POLL_INTERVAL = 5000;
     var lastMessageId = 0;
     var pollTimer = null;
     var hasLoaded = false;
     var unreadCount = 0;
 
-    var $container = document.getElementById('serviceflow-container');
-    var $messages  = document.getElementById('serviceflow-messages');
-    var $form      = document.getElementById('serviceflow-form');
-    var $input     = document.getElementById('serviceflow-input');
-    var $send      = document.getElementById('serviceflow-send');
-    var $badge     = document.getElementById('serviceflow-badge');
+    var $container = document.getElementById('clielo-container');
+    var $messages  = document.getElementById('clielo-messages');
+    var $form      = document.getElementById('clielo-form');
+    var $input     = document.getElementById('clielo-input');
+    var $send      = document.getElementById('clielo-send');
+    var $badge     = document.getElementById('clielo-badge');
 
     if (!$container || !$messages) return;
 
@@ -53,7 +53,7 @@
     // ─── Load ───────────────────────────────────────────────
     function loadMessages() {
         fetch(config.ajax_url + '?' + new URLSearchParams({
-            action: 'serviceflow_load',
+            action: 'clielo_load',
             post_id: config.post_id,
             nonce: config.nonce
         }))
@@ -61,14 +61,14 @@
         .then(function (res) {
             $messages.innerHTML = '';
             if (!res.success || !res.data || res.data.length === 0) {
-                $messages.innerHTML = '<div class="serviceflow-empty">' + escapeHtml(config.i18n.empty) + '</div>';
+                $messages.innerHTML = '<div class="clielo-empty">' + escapeHtml(config.i18n.empty) + '</div>';
                 return;
             }
             res.data.forEach(function (msg) { appendMessage(msg); });
             scrollToBottom();
         })
         .catch(function () {
-            $messages.innerHTML = '<div class="serviceflow-empty">' + escapeHtml(config.i18n.error) + '</div>';
+            $messages.innerHTML = '<div class="clielo-empty">' + escapeHtml(config.i18n.error) + '</div>';
         });
     }
 
@@ -80,7 +80,7 @@
         $send.disabled = true;
 
         var fd = new FormData();
-        fd.append('action', 'serviceflow_send');
+        fd.append('action', 'clielo_send');
         fd.append('post_id', config.post_id);
         fd.append('nonce', config.nonce);
         fd.append('message', message);
@@ -111,7 +111,7 @@
 
     function pollNewMessages() {
         fetch(config.ajax_url + '?' + new URLSearchParams({
-            action: 'serviceflow_poll',
+            action: 'clielo_poll',
             post_id: config.post_id,
             last_id: lastMessageId,
             nonce: config.nonce
@@ -151,15 +151,15 @@
         var side = isMine ? 'mine' : 'other';
 
         var el = document.createElement('div');
-        el.className = 'serviceflow-message serviceflow-message--' + side;
+        el.className = 'clielo-message clielo-message--' + side;
         el.setAttribute('data-msg-id', msg.id);
 
         el.innerHTML =
-            '<div class="serviceflow-avatar"><img src="' + escapeHtml(msg.avatar) + '" alt="' + escapeHtml(msg.display_name) + '"></div>' +
-            '<div class="serviceflow-bubble-wrap">' +
-                (!isMine ? '<div class="serviceflow-username">' + escapeHtml(msg.display_name) + '</div>' : '') +
-                '<div class="serviceflow-bubble">' + escapeHtml(msg.message) + '</div>' +
-                '<div class="serviceflow-time">' + formatTime(msg.created_at) + '</div>' +
+            '<div class="clielo-avatar"><img src="' + escapeHtml(msg.avatar) + '" alt="' + escapeHtml(msg.display_name) + '"></div>' +
+            '<div class="clielo-bubble-wrap">' +
+                (!isMine ? '<div class="clielo-username">' + escapeHtml(msg.display_name) + '</div>' : '') +
+                '<div class="clielo-bubble">' + escapeHtml(msg.message) + '</div>' +
+                '<div class="clielo-time">' + formatTime(msg.created_at) + '</div>' +
             '</div>';
 
         $messages.appendChild(el);
@@ -181,7 +181,7 @@
 
     // ─── Helpers ────────────────────────────────────────────
     function scrollToBottom() { $messages.scrollTop = $messages.scrollHeight; }
-    function removeEmpty() { var el = $messages.querySelector('.serviceflow-empty'); if (el) el.remove(); }
+    function removeEmpty() { var el = $messages.querySelector('.clielo-empty'); if (el) el.remove(); }
 
     function formatTime(s) {
         if (!s) return '';

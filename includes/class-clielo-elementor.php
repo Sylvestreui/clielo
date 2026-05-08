@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -222,7 +222,7 @@ class Clielo_Tag_Pack_Features extends Clielo_Tag_Base {
         }
 
         if ( $format === 'list' ) {
-            echo '<ul class="serviceflow-features-list">';
+            echo '<ul class="clielo-features-list">';
             foreach ( $features as $f ) {
                 echo '<li>' . esc_html( $f ) . '</li>';
             }

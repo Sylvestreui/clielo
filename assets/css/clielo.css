@@ -1,9 +1,9 @@
-/* ==========================================================================
-   ServiceFlow — Styles (couleurs gérées en inline par PHP)
+﻿/* ==========================================================================
+   Clielo — Styles (couleurs gérées en inline par PHP)
    ========================================================================== */
 
 /* ── Zone messages ───────────────────────────────────────── */
-.serviceflow-messages {
+.clielo-messages {
     flex: 1;
     height: 340px;
     overflow-y: auto;
@@ -14,8 +14,8 @@
     background: #f9fafb;
 }
 
-.serviceflow-loading,
-.serviceflow-empty {
+.clielo-loading,
+.clielo-empty {
     text-align: center;
     color: #999;
     padding: 30px 20px;
@@ -23,38 +23,38 @@
 }
 
 /* ── Message ─────────────────────────────────────────────── */
-.serviceflow-message {
+.clielo-message {
     display: flex;
     gap: 10px;
     max-width: 85%;
-    animation: serviceflow-msg-in 0.2s ease;
+    animation: clielo-msg-in 0.2s ease;
 }
 
-.serviceflow-message--mine {
+.clielo-message--mine {
     align-self: flex-end;
     flex-direction: row-reverse;
 }
 
-.serviceflow-message--other {
+.clielo-message--other {
     align-self: flex-start;
 }
 
-.serviceflow-message--system {
+.clielo-message--system {
     align-self: center;
     max-width: 90%;
 }
 
-@keyframes serviceflow-msg-in {
+@keyframes clielo-msg-in {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Avatar */
-.serviceflow-avatar {
+.clielo-avatar {
     flex-shrink: 0;
 }
 
-.serviceflow-avatar img {
+.clielo-avatar img {
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -62,7 +62,7 @@
 }
 
 /* Bulle */
-.serviceflow-bubble {
+.clielo-bubble {
     padding: 10px 14px;
     border-radius: 16px;
     font-size: 14px;
@@ -70,14 +70,14 @@
     word-break: break-word;
 }
 
-.serviceflow-message--other .serviceflow-bubble {
+.clielo-message--other .clielo-bubble {
     background: #e9ecef;
     color: #333;
     border-bottom-left-radius: 4px;
 }
 
 /* Nom utilisateur */
-.serviceflow-username {
+.clielo-username {
     font-size: 12px;
     font-weight: 600;
     margin-bottom: 2px;
@@ -85,31 +85,31 @@
 }
 
 /* Heure */
-.serviceflow-time {
+.clielo-time {
     font-size: 11px;
     color: #999;
     margin-top: 4px;
 }
 
-.serviceflow-message--mine .serviceflow-time {
+.clielo-message--mine .clielo-time {
     text-align: right;
 }
 
 /* ── Formulaire ──────────────────────────────────────────── */
-.serviceflow-form {
+.clielo-form {
     padding: 12px 16px;
     border-top: 1px solid #e0e0e0;
     background: #fff;
     flex-shrink: 0;
 }
 
-.serviceflow-input-wrapper {
+.clielo-input-wrapper {
     display: flex;
     gap: 8px;
     align-items: flex-end;
 }
 
-.serviceflow-input {
+.clielo-input {
     flex: 1;
     border: 1px solid #d0d5dd !important;
     border-radius: 20px !important;
@@ -127,11 +127,11 @@
     scrollbar-width: none !important;
 }
 
-.serviceflow-input::-webkit-scrollbar {
+.clielo-input::-webkit-scrollbar {
     display: none;
 }
 
-.serviceflow-send {
+.clielo-send {
     flex-shrink: 0;
     width: 40px !important;
     height: 40px !important;
@@ -146,17 +146,17 @@
     transition: transform 0.1s;
 }
 
-.serviceflow-send:active {
+.clielo-send:active {
     transform: scale(0.95);
 }
 
-.serviceflow-send:disabled {
+.clielo-send:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
 /* ── Login notice ────────────────────────────────────────── */
-.serviceflow-login-notice {
+.clielo-login-notice {
     padding: 16px;
     text-align: center;
     border-top: 1px solid #e0e0e0;
@@ -164,19 +164,19 @@
     flex-shrink: 0;
 }
 
-.serviceflow-login-notice p {
+.clielo-login-notice p {
     margin: 0;
     font-size: 14px;
     color: #666;
 }
 
-.serviceflow-login-notice a {
+.clielo-login-notice a {
     text-decoration: none;
     font-weight: 600;
 }
 
-/* ── Shortcode [serviceflow_options] — Carte d'options ────────── */
-.serviceflow-sc-card {
+/* ── Shortcode [clielo_options] — Carte d'options ────────── */
+.clielo-sc-card {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
@@ -185,7 +185,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.serviceflow-sc-header {
+.clielo-sc-header {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -196,13 +196,13 @@
 }
 
 /* Offre de base */
-.serviceflow-sc-base {
+.clielo-sc-base {
     padding: 16px;
     background: #f9fafb;
     border-bottom: 1px solid #e8e8e8;
 }
 
-.serviceflow-sc-base-label {
+.clielo-sc-base-label {
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
@@ -211,33 +211,33 @@
     margin-bottom: 4px;
 }
 
-.serviceflow-sc-base-name {
+.clielo-sc-base-name {
     font-size: 16px;
     font-weight: 700;
     color: #222;
     margin-bottom: 2px;
 }
 
-.serviceflow-sc-base-price {
+.clielo-sc-base-price {
     font-size: 20px;
     font-weight: 800;
     margin-bottom: 6px;
 }
 
-.serviceflow-sc-base-desc {
+.clielo-sc-base-desc {
     font-size: 12px;
     color: #777;
     line-height: 1.4;
 }
 
 /* Séparateur */
-.serviceflow-sc-separator {
+.clielo-sc-separator {
     height: 0;
     border-top: 1px solid #e8e8e8;
 }
 
 /* Titre options */
-.serviceflow-sc-opts-title {
+.clielo-sc-opts-title {
     padding: 12px 16px 4px;
     font-size: 12px;
     font-weight: 600;
@@ -247,7 +247,7 @@
 }
 
 /* Option individuelle */
-.serviceflow-sc-opt {
+.clielo-sc-opt {
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -257,15 +257,15 @@
     border-bottom: 1px solid #f5f5f5;
 }
 
-.serviceflow-sc-opt:last-of-type {
+.clielo-sc-opt:last-of-type {
     border-bottom: none;
 }
 
-.serviceflow-sc-opt:hover {
+.clielo-sc-opt:hover {
     background: #f9fafb;
 }
 
-.serviceflow-sc-opt input[type="checkbox"] {
+.clielo-sc-opt input[type="checkbox"] {
     width: 18px;
     height: 18px;
     margin-top: 2px;
@@ -273,32 +273,32 @@
     cursor: pointer;
 }
 
-.serviceflow-sc-opt-info {
+.clielo-sc-opt-info {
     flex: 1;
     min-width: 0;
 }
 
-.serviceflow-sc-opt-row {
+.clielo-sc-opt-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 8px;
 }
 
-.serviceflow-sc-opt-name {
+.clielo-sc-opt-name {
     font-size: 13px;
     font-weight: 500;
     color: #333;
 }
 
-.serviceflow-sc-opt-price {
+.clielo-sc-opt-price {
     font-size: 13px;
     font-weight: 600;
     color: #555;
     white-space: nowrap;
 }
 
-.serviceflow-sc-opt-desc {
+.clielo-sc-opt-desc {
     font-size: 11px;
     color: #999;
     line-height: 1.3;
@@ -306,13 +306,13 @@
 }
 
 /* Footer : total + bouton */
-.serviceflow-sc-footer {
+.clielo-sc-footer {
     padding: 14px 16px;
     border-top: 2px solid #e8e8e8;
     background: #fafafa;
 }
 
-.serviceflow-sc-total {
+.clielo-sc-total {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -322,7 +322,7 @@
     margin-bottom: 12px;
 }
 
-.serviceflow-sc-order {
+.clielo-sc-order {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -338,30 +338,30 @@
     transition: opacity 0.2s, transform 0.1s;
 }
 
-.serviceflow-sc-order:hover {
+.clielo-sc-order:hover {
     opacity: 0.9;
 }
 
-.serviceflow-sc-order:active {
+.clielo-sc-order:active {
     transform: scale(0.98);
 }
 
 /* ── Scrollbar messages ──────────────────────────────────── */
-.serviceflow-messages::-webkit-scrollbar { width: 6px; }
-.serviceflow-messages::-webkit-scrollbar-track { background: transparent; }
-.serviceflow-messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+.clielo-messages::-webkit-scrollbar { width: 6px; }
+.clielo-messages::-webkit-scrollbar-track { background: transparent; }
+.clielo-messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 600px) {
-    .serviceflow-messages {
+    .clielo-messages {
         height: 260px;
     }
 
-    .serviceflow-message {
+    .clielo-message {
         max-width: 92%;
     }
 
-    #serviceflow-container {
+    #clielo-container {
         left: 12px !important;
         right: 12px !important;
         width: auto !important;

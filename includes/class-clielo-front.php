@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -18,16 +18,16 @@ class Clielo_Front {
         }
 
         wp_enqueue_style(
-            'serviceflow-inter',
+            'clielo-inter',
             'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
             [],
             CLIELO_VERSION
         );
 
         wp_enqueue_style(
-            'serviceflow-style',
-            CLIELO_PLUGIN_URL . 'assets/css/serviceflow.css',
-            [ 'serviceflow-inter' ],
+            'clielo-style',
+            CLIELO_PLUGIN_URL . 'assets/css/clielo.css',
+            [ 'clielo-inter' ],
             CLIELO_VERSION
         );
 
@@ -44,40 +44,60 @@ class Clielo_Front {
         $b_int = hexdec( substr( $hex, 4, 2 ) );
         $c_muted = sprintf( 'rgba(%d,%d,%d,0.7)', $r_int, $g_int, $b_int );
 
-        wp_add_inline_style( 'serviceflow-style',
-            '.serviceflow-info-tip{position:relative !important;cursor:help !important;display:inline-flex !important;align-items:center !important;color:#aaa !important}' .
-            '.serviceflow-info-tip .serviceflow-tip-text{visibility:hidden !important;opacity:0 !important;position:absolute !important;left:50% !important;bottom:calc(100% + 8px) !important;transform:translateX(-50%) !important;background:#333 !important;color:#fff !important;font-size:12px !important;font-weight:400 !important;line-height:1.4 !important;padding:8px 12px !important;border-radius:6px !important;max-width:350px !important;width:max-content !important;z-index:100 !important;pointer-events:none !important;transition:opacity .15s !important;box-shadow:0 2px 8px rgba(0,0,0,0.15) !important;text-align:left !important}' .
-            '.serviceflow-info-tip .serviceflow-tip-text::after{content:"" !important;position:absolute !important;top:100% !important;left:50% !important;transform:translateX(-50%) !important;border:5px solid transparent !important;border-top-color:#333 !important}' .
-            '.serviceflow-info-tip:hover .serviceflow-tip-text{visibility:visible !important;opacity:1 !important}' .
-            '.serviceflow-sc-check{-webkit-appearance:none !important;-moz-appearance:none !important;appearance:none !important;width:18px !important;height:18px !important;min-width:18px !important;border:2px solid #ccc !important;border-radius:4px !important;background:#fff !important;cursor:pointer !important;position:relative !important;transition:all .15s !important;margin:2px 0 0 0 !important;flex-shrink:0 !important}' .
-            '.serviceflow-sc-check:checked{background:' . $c . ' !important;border-color:' . $c . ' !important}' .
-            '.serviceflow-sc-check:checked::after{content:"" !important;position:absolute !important;left:5px !important;top:1px !important;width:5px !important;height:10px !important;border:solid #fff !important;border-width:0 2px 2px 0 !important;transform:rotate(45deg) !important}' .
-            '#serviceflow-sc-card{scrollbar-width:none !important}' .
-            '#serviceflow-sc-card::-webkit-scrollbar{width:1px !important}' .
-            '#serviceflow-sc-card::-webkit-scrollbar-track{background:transparent !important}' .
-            '#serviceflow-sc-card::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15) !important;border-radius:1px !important}' .
-            '#serviceflow-sc-card:hover::-webkit-scrollbar{width:2px !important}' .
-            '#serviceflow-sc-card:hover::-webkit-scrollbar-thumb{background:' . $c_muted . ' !important}' .
-            '@media (min-width: 768px) { #serviceflow-container { min-height: 520px !important; max-height: 680px !important; } }'
+        wp_add_inline_style( 'clielo-style',
+            '.clielo-info-tip{position:relative !important;cursor:help !important;display:inline-flex !important;align-items:center !important;color:#aaa !important}' .
+            '.clielo-info-tip .clielo-tip-text{visibility:hidden !important;opacity:0 !important;position:absolute !important;left:50% !important;bottom:calc(100% + 8px) !important;transform:translateX(-50%) !important;background:#333 !important;color:#fff !important;font-size:12px !important;font-weight:400 !important;line-height:1.4 !important;padding:8px 12px !important;border-radius:6px !important;max-width:350px !important;width:max-content !important;z-index:100 !important;pointer-events:none !important;transition:opacity .15s !important;box-shadow:0 2px 8px rgba(0,0,0,0.15) !important;text-align:left !important}' .
+            '.clielo-info-tip .clielo-tip-text::after{content:"" !important;position:absolute !important;top:100% !important;left:50% !important;transform:translateX(-50%) !important;border:5px solid transparent !important;border-top-color:#333 !important}' .
+            '.clielo-info-tip:hover .clielo-tip-text{visibility:visible !important;opacity:1 !important}' .
+            '.clielo-sc-check{-webkit-appearance:none !important;-moz-appearance:none !important;appearance:none !important;width:18px !important;height:18px !important;min-width:18px !important;border:2px solid #ccc !important;border-radius:4px !important;background:#fff !important;cursor:pointer !important;position:relative !important;transition:all .15s !important;margin:2px 0 0 0 !important;flex-shrink:0 !important}' .
+            '.clielo-sc-check:checked{background:' . $c . ' !important;border-color:' . $c . ' !important}' .
+            '.clielo-sc-check:checked::after{content:"" !important;position:absolute !important;left:5px !important;top:1px !important;width:5px !important;height:10px !important;border:solid #fff !important;border-width:0 2px 2px 0 !important;transform:rotate(45deg) !important}' .
+            '#clielo-sc-card{scrollbar-width:none !important}' .
+            '#clielo-sc-card::-webkit-scrollbar{width:1px !important}' .
+            '#clielo-sc-card::-webkit-scrollbar-track{background:transparent !important}' .
+            '#clielo-sc-card::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15) !important;border-radius:1px !important}' .
+            '#clielo-sc-card:hover::-webkit-scrollbar{width:2px !important}' .
+            '#clielo-sc-card:hover::-webkit-scrollbar-thumb{background:' . $c_muted . ' !important}' .
+            '@media (min-width: 768px) { #clielo-container { min-height: 520px !important; max-height: 680px !important; } }'
         );
     }
 
     /**
-     * Shortcode [clielo_options] — affiche packs + options de service.
+     * Renders the service options card (packs, options, order button).
+     *
+     * @param array $args {
+     *     @type int    $post_id           Post ID. Defaults to queried object.
+     *     @type string $color             Hex color. Defaults to plugin setting.
+     *     @type bool   $show_order_button Whether to show total + order button. Default true.
+     * }
      */
-    public static function shortcode_options(): string {
-        if ( ! self::is_chat_page() ) {
-            return '';
-        }
-
-        $post_id = get_queried_object_id();
-        $packs   = Clielo_Options::get_packs( $post_id );
-        $options = Clielo_Options::get_options( $post_id );
-        $color   = esc_attr( Clielo_Admin::get_color() );
+    public static function render_options_card( array $args = [] ): string {
+        $post_id           = ! empty( $args['post_id'] ) ? absint( $args['post_id'] ) : get_queried_object_id();
+        $show_order_button = isset( $args['show_order_button'] ) ? (bool) $args['show_order_button'] : true;
+        $packs             = Clielo_Options::get_packs( $post_id );
+        $options           = Clielo_Options::get_options( $post_id );
+        $color             = esc_attr( ! empty( $args['color'] ) ? $args['color'] : Clielo_Admin::get_color() );
 
         if ( empty( $packs ) ) {
             return '';
         }
+
+        if ( ! wp_style_is( 'clielo-style', 'enqueued' ) ) {
+            wp_enqueue_style( 'clielo-inter', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap', [], null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+            wp_enqueue_style( 'clielo-style', CLIELO_PLUGIN_URL . 'assets/css/clielo.css', [ 'clielo-inter' ], CLIELO_VERSION );
+            $hex_e = ltrim( $color, '#' );
+            $r_e   = absint( hexdec( substr( $hex_e, 0, 2 ) ) );
+            $g_e   = absint( hexdec( substr( $hex_e, 2, 2 ) ) );
+            $b_e   = absint( hexdec( substr( $hex_e, 4, 2 ) ) );
+            wp_add_inline_style( 'clielo-style',
+                '.clielo-sc-check:checked{background:' . esc_attr( $color ) . ' !important;border-color:' . esc_attr( $color ) . ' !important}' .
+                '#clielo-sc-card:hover::-webkit-scrollbar-thumb{background:rgba(' . $r_e . ',' . $g_e . ',' . $b_e . ',0.7) !important}'
+            );
+        }
+        if ( ! wp_script_is( 'clielo-chat-js', 'registered' ) ) {
+            wp_register_script( 'clielo-chat-js', false, [ 'jquery' ], CLIELO_VERSION, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+        }
+        wp_enqueue_script( 'clielo-chat-js' );
 
         $c              = $color;
         $first_price    = floatval( $packs[0]['price'] ?? 0 );
@@ -111,7 +131,7 @@ class Clielo_Front {
         $c_light = sprintf( 'rgba(%d,%d,%d,0.12)', $r_int, $g_int, $b_int );
         $c_muted = sprintf( 'rgba(%d,%d,%d,0.7)', $r_int, $g_int, $b_int );
         ?>
-        <div id="serviceflow-sc-card" style="font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important;border:1px solid #e0e0e0 !important;border-radius:12px !important;overflow-x:hidden !important;overflow-y:auto !important;max-height:calc(100vh - 80px) !important;background:#fff !important;box-shadow:0 2px 8px rgba(0,0,0,0.06) !important;max-width:100% !important;padding:0 !important;margin:0 0 20px 0 !important">
+        <div id="clielo-sc-card" style="font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important;border:1px solid #e0e0e0 !important;border-radius:12px !important;overflow-x:hidden !important;overflow-y:auto !important;max-height:calc(100vh - 80px) !important;background:#fff !important;box-shadow:0 2px 8px rgba(0,0,0,0.06) !important;max-width:100% !important;padding:0 !important;margin:0 0 20px 0 !important">
             <div style="display:flex !important;align-items:center !important;gap:8px !important;padding:12px 16px !important;background:<?php echo esc_attr( $c ); ?> !important;color:#fff !important;font-size:14px !important;font-weight:600 !important;margin:0 !important;border-radius:0 !important;position:sticky !important;top:0 !important;z-index:2 !important">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1"></rect></svg>
                 <span style="color:#fff !important;font-size:14px !important;font-weight:600 !important"><?php esc_html_e( 'Options de service', 'clielo' ); ?></span>
@@ -123,7 +143,7 @@ class Clielo_Front {
                 <span style="display:inline-flex !important;align-items:center !important;gap:4px !important;font-size:11px !important;font-weight:500 !important;color:#fff !important;background:<?php echo esc_attr( $c ); ?> !important;padding:2px 8px !important;border-radius:20px !important;opacity:0.85 !important">&#128179; <?php echo esc_html( $payment_mode_label ); ?></span>
             </div>
 
-            <div id="serviceflow-sc-packs" data-color="<?php echo esc_attr( $c ); ?>" style="display:flex !important;flex-direction:column !important;gap:10px !important;padding:8px 16px 16px !important;margin:0 !important">
+            <div id="clielo-sc-packs" data-color="<?php echo esc_attr( $c ); ?>" style="display:flex !important;flex-direction:column !important;gap:10px !important;padding:8px 16px 16px !important;margin:0 !important">
                 <?php foreach ( $packs as $i => $pack ) :
                     $pack_delay = absint( $pack['delay'] ?? 0 );
                     $is_sel     = ( $i === 0 );
@@ -133,15 +153,15 @@ class Clielo_Front {
                     $dot_brd    = $is_sel ? $c : '#ccc';
                     $features   = $pack['features'] ?? [];
                 ?>
-                <div class="serviceflow-sc-pack" data-index="<?php echo absint( $i ); ?>" data-price="<?php echo esc_attr( $pack['price'] ); ?>" data-delay="<?php echo esc_attr( $pack_delay ); ?>" <?php echo $is_sel ? 'data-selected="true"' : ''; ?>
+                <div class="clielo-sc-pack" data-index="<?php echo absint( $i ); ?>" data-price="<?php echo esc_attr( $pack['price'] ); ?>" data-delay="<?php echo esc_attr( $pack_delay ); ?>" <?php echo $is_sel ? 'data-selected="true"' : ''; ?>
                      style="border:2px solid <?php echo esc_attr( $brd ); ?> !important;border-radius:10px !important;padding:12px !important;cursor:pointer !important;background:<?php echo esc_attr( $bg ); ?> !important;position:relative !important;box-sizing:border-box !important;margin:0 !important;transition:border-color .15s,background .15s !important">
-                    <div class="serviceflow-pack-dot" style="position:absolute !important;top:10px !important;right:10px !important;width:18px !important;height:18px !important;border-radius:50% !important;border:2px solid <?php echo esc_attr( $dot_brd ); ?> !important;background:<?php echo esc_attr( $dot_bg ); ?> !important;display:flex !important;align-items:center !important;justify-content:center !important"><?php if ( $is_sel ) : ?><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg><?php endif; ?></div>
+                    <div class="clielo-pack-dot" style="position:absolute !important;top:10px !important;right:10px !important;width:18px !important;height:18px !important;border-radius:50% !important;border:2px solid <?php echo esc_attr( $dot_brd ); ?> !important;background:<?php echo esc_attr( $dot_bg ); ?> !important;display:flex !important;align-items:center !important;justify-content:center !important"><?php if ( $is_sel ) : ?><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg><?php endif; ?></div>
                     <div style="display:flex !important;align-items:center !important;gap:6px !important;margin:0 0 4px 0 !important;padding-right:28px !important">
                         <span style="font-size:14px !important;font-weight:700 !important;color:#222 !important"><?php echo esc_html( $pack['name'] ); ?></span>
                         <?php if ( ! empty( $pack['description'] ) ) : ?>
-                            <span class="serviceflow-info-tip">
+                            <span class="clielo-info-tip">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                <span class="serviceflow-tip-text"><?php echo esc_html( $pack['description'] ); ?></span>
+                                <span class="clielo-tip-text"><?php echo esc_html( $pack['description'] ); ?></span>
                             </span>
                         <?php endif; ?>
                     </div>
@@ -172,8 +192,8 @@ class Clielo_Front {
             <?php foreach ( $options as $i => $opt ) :
                 $opt_delay = absint( $opt['delay'] ?? 0 );
             ?>
-            <div class="serviceflow-sc-opt-wrap" style="display:flex !important;align-items:flex-start !important;gap:10px !important;padding:10px 16px !important;cursor:pointer !important;border-bottom:1px solid #f5f5f5 !important;margin:0 !important">
-                <input type="checkbox" class="serviceflow-sc-check" data-index="<?php echo absint( $i ); ?>" data-price="<?php echo esc_attr( $opt['price'] ); ?>" data-delay="<?php echo esc_attr( $opt_delay ); ?>" style="width:18px !important;height:18px !important;min-width:18px !important;margin:2px 0 0 0 !important;flex-shrink:0 !important;cursor:pointer !important" />
+            <div class="clielo-sc-opt-wrap" style="display:flex !important;align-items:flex-start !important;gap:10px !important;padding:10px 16px !important;cursor:pointer !important;border-bottom:1px solid #f5f5f5 !important;margin:0 !important">
+                <input type="checkbox" class="clielo-sc-check" data-index="<?php echo absint( $i ); ?>" data-price="<?php echo esc_attr( $opt['price'] ); ?>" data-delay="<?php echo esc_attr( $opt_delay ); ?>" style="width:18px !important;height:18px !important;min-width:18px !important;margin:2px 0 0 0 !important;flex-shrink:0 !important;cursor:pointer !important" />
                 <div style="flex:1 !important;min-width:0 !important">
                     <div style="display:flex !important;justify-content:space-between !important;align-items:baseline !important;gap:8px !important;margin:0 !important;padding:0 !important">
                         <span style="font-size:13px !important;font-weight:500 !important;color:#333 !important"><?php echo esc_html( $opt['name'] ); ?></span>
@@ -221,7 +241,7 @@ class Clielo_Front {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $c ); ?>" stroke-width="2" style="flex-shrink:0 !important"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                     <?php else : ?>
                     <input type="checkbox" id="<?php echo esc_attr( $opt_id ); ?>-check"
-                           class="serviceflow-sc-check sf-adv-opt-check"
+                           class="clielo-sc-check sf-adv-opt-check"
                            data-opt-index="<?php echo absint( $opt_i ); ?>"
                            data-opt-mode="<?php echo esc_attr( $opt_mode ); ?>"
                            data-opt-price="<?php echo esc_attr( $opt_price ); ?>"
@@ -256,7 +276,7 @@ class Clielo_Front {
             <?php endif; ?>
 
             <!-- Total + Délai + Commander (masqué pour admin) -->
-            <?php if ( ! current_user_can( 'manage_options' ) ) : ?>
+            <?php if ( ! current_user_can( 'manage_options' ) && $show_order_button ) : ?>
             <?php
                 $first_tva   = $tax_rate > 0 ? round( $first_price * $tax_rate / 100, 2 ) : 0;
                 $first_total = round( $first_price + $first_tva, 2 );
@@ -264,31 +284,31 @@ class Clielo_Front {
             <div style="padding:14px 16px !important;border-top:2px solid #e8e8e8 !important;background:#fafafa !important;margin:0 !important;position:sticky !important;bottom:0 !important;z-index:10 !important;border-radius:0 0 12px 12px !important">
                 <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:12px !important;color:#888 !important;margin:0 0 2px 0 !important;padding:0 !important">
                     <span><?php esc_html_e( 'Sous-total', 'clielo' ); ?></span>
-                    <span id="serviceflow-sc-subtotal-val"><?php echo esc_html( number_format( $first_price, 2, ',', ' ' ) ); ?> &euro;</span>
+                    <span id="clielo-sc-subtotal-val"><?php echo esc_html( number_format( $first_price, 2, ',', ' ' ) ); ?> &euro;</span>
                 </div>
                 <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:12px !important;color:#888 !important;margin:0 0 6px 0 !important;padding:0 !important">
                     <?php if ( $tax_rate > 0 ) : ?>
                         <span><?php esc_html_e( 'TVA', 'clielo' ); ?> (<?php echo esc_html( $tax_rate ); ?>%)</span>
-                        <span id="serviceflow-sc-tva-val"><?php echo esc_html( number_format( $first_tva, 2, ',', ' ' ) ); ?> &euro;</span>
+                        <span id="clielo-sc-tva-val"><?php echo esc_html( number_format( $first_tva, 2, ',', ' ' ) ); ?> &euro;</span>
                     <?php else : ?>
-                        <span id="serviceflow-sc-tva-val" style="font-style:italic !important"><?php esc_html_e( 'TVA : 0% (non applicable)', 'clielo' ); ?></span>
+                        <span id="clielo-sc-tva-val" style="font-style:italic !important"><?php esc_html_e( 'TVA : 0% (non applicable)', 'clielo' ); ?></span>
                         <span></span>
                     <?php endif; ?>
                 </div>
                 <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:16px !important;font-weight:700 !important;color:#222 !important;margin:0 0 4px 0 !important;padding:0 !important;border-top:1px solid #e8e8e8 !important;padding-top:6px !important">
                     <span style="font-size:16px !important;font-weight:700 !important;color:#222 !important"><?php esc_html_e( 'Total', 'clielo' ); ?></span>
-                    <span id="serviceflow-sc-total-val" style="font-size:16px !important;font-weight:700 !important;color:<?php echo esc_attr( $c_muted ); ?> !important"><?php echo esc_html( number_format( $first_total, 2, ',', ' ' ) ); ?> &euro;</span>
+                    <span id="clielo-sc-total-val" style="font-size:16px !important;font-weight:700 !important;color:<?php echo esc_attr( $c_muted ); ?> !important"><?php echo esc_html( number_format( $first_total, 2, ',', ' ' ) ); ?> &euro;</span>
                 </div>
                 <?php if ( $payment_mode !== 'single' ) : ?>
-                <div id="serviceflow-sc-breakdown" style="background:<?php echo esc_attr( $c_light ); ?> !important;border-radius:6px !important;padding:8px 10px !important;margin:6px 0 8px 0 !important;font-size:12px !important;color:#555 !important"></div>
+                <div id="clielo-sc-breakdown" style="background:<?php echo esc_attr( $c_light ); ?> !important;border-radius:6px !important;padding:8px 10px !important;margin:6px 0 8px 0 !important;font-size:12px !important;color:#555 !important"></div>
                 <?php else : ?>
-                <div id="serviceflow-sc-breakdown" style="display:none !important"></div>
+                <div id="clielo-sc-breakdown" style="display:none !important"></div>
                 <?php endif; ?>
-                <div id="serviceflow-sc-delay-row" style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:13px !important;color:#888 !important;margin:0 0 12px 0 !important;padding:0 !important">
+                <div id="clielo-sc-delay-row" style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:13px !important;color:#888 !important;margin:0 0 12px 0 !important;padding:0 !important">
                     <span style="font-size:13px !important;color:#888 !important">&#9201; <?php esc_html_e( 'Délai estimé', 'clielo' ); ?></span>
-                    <span id="serviceflow-sc-delay-val" style="font-size:13px !important;font-weight:600 !important;color:#555 !important"><?php echo esc_html( $first_delay ); ?> <?php esc_html_e( 'jour(s)', 'clielo' ); ?></span>
+                    <span id="clielo-sc-delay-val" style="font-size:13px !important;font-weight:600 !important;color:#555 !important"><?php echo esc_html( $first_delay ); ?> <?php esc_html_e( 'jour(s)', 'clielo' ); ?></span>
                 </div>
-                <button type="button" id="serviceflow-sc-order" style="display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;width:100% !important;padding:12px !important;border:none !important;border-radius:8px !important;background:<?php echo esc_attr( $c ); ?> !important;color:#fff !important;font-size:14px !important;font-weight:600 !important;cursor:pointer !important;font-family:inherit !important;margin:0 !important;line-height:1.4 !important">
+                <button type="button" id="clielo-sc-order" style="display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;width:100% !important;padding:12px !important;border:none !important;border-radius:8px !important;background:<?php echo esc_attr( $c ); ?> !important;color:#fff !important;font-size:14px !important;font-weight:600 !important;cursor:pointer !important;font-family:inherit !important;margin:0 !important;line-height:1.4 !important">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     <?php echo ( clielo_is_premium() && Clielo_Stripe::is_enabled() ) ? esc_html__( 'Payer et commander', 'clielo' ) : esc_html__( 'Commander via le chat', 'clielo' ); ?>
                 </button>
@@ -296,15 +316,15 @@ class Clielo_Front {
             <?php endif; ?>
         </div>
 
-        <?php if ( ! current_user_can( 'manage_options' ) ) : ?>
+        <?php if ( ! current_user_can( 'manage_options' ) && $show_order_button ) : ?>
         <!-- Barre sticky mobile : visible uniquement quand la carte options n'est pas à l'écran -->
-        <div id="serviceflow-mobile-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:2147483645;background:#fff;box-shadow:0 -2px 12px rgba(0,0,0,0.12);padding:12px 16px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+        <div id="clielo-mobile-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:2147483645;background:#fff;box-shadow:0 -2px 12px rgba(0,0,0,0.12);padding:12px 16px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
                 <div style="flex-shrink:0">
                     <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;letter-spacing:0.3px"><?php esc_html_e( 'À partir de', 'clielo' ); ?></div>
-                    <div id="serviceflow-mobile-price" style="font-size:16px;font-weight:600;color:<?php echo esc_attr( $c ); ?>"><?php echo esc_html( number_format( $first_price, 2, ',', ' ' ) ); ?> &euro;</div>
+                    <div id="clielo-mobile-price" style="font-size:16px;font-weight:600;color:<?php echo esc_attr( $c ); ?>"><?php echo esc_html( number_format( $first_price, 2, ',', ' ' ) ); ?> &euro;</div>
                 </div>
-                <button type="button" id="serviceflow-mobile-cta" style="flex:1;max-width:240px;padding:12px 16px;border:none;border-radius:8px;background:<?php echo esc_attr( $c ); ?>;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.4">
+                <button type="button" id="clielo-mobile-cta" style="flex:1;max-width:240px;padding:12px 16px;border:none;border-radius:8px;background:<?php echo esc_attr( $c ); ?>;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.4">
                     <?php esc_html_e( 'Voir les offres', 'clielo' ); ?>
                 </button>
             </div>
@@ -313,22 +333,22 @@ class Clielo_Front {
 
         <?php
         wp_add_inline_script( 'clielo-chat-js', '(function(){
-            var wraps = document.querySelectorAll(".serviceflow-sc-opt-wrap");
+            var wraps = document.querySelectorAll(".clielo-sc-opt-wrap");
             wraps.forEach(function(w){ w.addEventListener("click", function(e){ if(e.target.type!=="checkbox"){ var cb=w.querySelector("input[type=\'checkbox\']"); if(cb&&!cb.disabled){cb.checked=!cb.checked;cb.dispatchEvent(new Event("change"));} } }); });
-            var packs=document.querySelectorAll(".serviceflow-sc-pack");
-            var packBox=document.getElementById("serviceflow-sc-packs");
+            var packs=document.querySelectorAll(".clielo-sc-pack");
+            var packBox=document.getElementById("clielo-sc-packs");
             var pColor=packBox?packBox.dataset.color:"#3b82f6";
             var hexToRgb=function(h){h=h.replace("#","");return{r:parseInt(h.substring(0,2),16),g:parseInt(h.substring(2,4),16),b:parseInt(h.substring(4,6),16)};};
             var rgb=hexToRgb(pColor);
             var pColorMuted="rgba("+rgb.r+","+rgb.g+","+rgb.b+",0.7)";
             var pColorLight="rgba("+rgb.r+","+rgb.g+","+rgb.b+",0.12)";
             var checkSvg=\'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg>\';
-            packs.forEach(function(p){ p.addEventListener("click",function(){ if(packBox&&packBox.hasAttribute("data-frozen"))return; packs.forEach(function(pp){ pp.removeAttribute("data-selected"); pp.style.setProperty("border-color","#e0e0e0","important"); pp.style.setProperty("background","#fff","important"); var d=pp.querySelector(".serviceflow-pack-dot"); if(d){d.style.setProperty("border-color","#ccc","important");d.style.setProperty("background","transparent","important");d.innerHTML="";} }); p.setAttribute("data-selected","true"); p.style.setProperty("border-color",pColorMuted,"important"); p.style.setProperty("background",pColorLight,"important"); var d=p.querySelector(".serviceflow-pack-dot"); if(d){d.style.setProperty("border-color",pColor,"important");d.style.setProperty("background",pColor,"important");d.innerHTML=checkSvg;} document.dispatchEvent(new Event("clielo_pack_changed")); }); });
-            var mobileBar=document.getElementById("serviceflow-mobile-bar");
-            var scCard=document.getElementById("serviceflow-sc-card");
-            var mobileCta=document.getElementById("serviceflow-mobile-cta");
-            var mobilePrice=document.getElementById("serviceflow-mobile-price");
-            var chatBtn=document.getElementById("serviceflow-toggle");
+            packs.forEach(function(p){ p.addEventListener("click",function(){ if(packBox&&packBox.hasAttribute("data-frozen"))return; packs.forEach(function(pp){ pp.removeAttribute("data-selected"); pp.style.setProperty("border-color","#e0e0e0","important"); pp.style.setProperty("background","#fff","important"); var d=pp.querySelector(".clielo-pack-dot"); if(d){d.style.setProperty("border-color","#ccc","important");d.style.setProperty("background","transparent","important");d.innerHTML="";} }); p.setAttribute("data-selected","true"); p.style.setProperty("border-color",pColorMuted,"important"); p.style.setProperty("background",pColorLight,"important"); var d=p.querySelector(".clielo-pack-dot"); if(d){d.style.setProperty("border-color",pColor,"important");d.style.setProperty("background",pColor,"important");d.innerHTML=checkSvg;} document.dispatchEvent(new Event("clielo_pack_changed")); }); });
+            var mobileBar=document.getElementById("clielo-mobile-bar");
+            var scCard=document.getElementById("clielo-sc-card");
+            var mobileCta=document.getElementById("clielo-mobile-cta");
+            var mobilePrice=document.getElementById("clielo-mobile-price");
+            var chatBtn=document.getElementById("clielo-toggle");
             if(mobileBar&&scCard){
                 var isMobile=function(){return window.innerWidth<=768;};
                 var adjustChatBtn=function(barVisible){if(!chatBtn)return;chatBtn.style.setProperty("bottom",barVisible&&isMobile()?"80px":"24px","important");};
@@ -336,13 +356,23 @@ class Clielo_Front {
                 observer.observe(scCard);
                 window.addEventListener("resize",function(){if(!isMobile()){mobileBar.style.display="none";adjustChatBtn(false);}});
                 if(mobileCta){mobileCta.addEventListener("click",function(){scCard.scrollIntoView({behavior:"smooth",block:"center"});});}
-                if(mobilePrice){var syncPrice=function(){var totalEl=document.getElementById("serviceflow-sc-total-val");if(totalEl)mobilePrice.textContent=totalEl.textContent;};document.addEventListener("clielo_pack_changed",syncPrice);var checks=document.querySelectorAll(".serviceflow-sc-check");checks.forEach(function(cb){cb.addEventListener("change",function(){setTimeout(syncPrice,50);});});}
+                if(mobilePrice){var syncPrice=function(){var totalEl=document.getElementById("clielo-sc-total-val");if(totalEl)mobilePrice.textContent=totalEl.textContent;};document.addEventListener("clielo_pack_changed",syncPrice);var checks=document.querySelectorAll(".clielo-sc-check");checks.forEach(function(cb){cb.addEventListener("change",function(){setTimeout(syncPrice,50);});});}
             }
             document.querySelectorAll(".sf-adv-qty-minus,.sf-adv-qty-plus").forEach(function(btn){btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();var inp=document.getElementById(btn.dataset.target+"-qty");if(!inp)return;var v=parseInt(inp.value)||0;inp.value=btn.classList.contains("sf-adv-qty-minus")?Math.max(0,v-1):v+1;document.dispatchEvent(new Event("clielo_pack_changed"));});});
             document.querySelectorAll(".sf-adv-opt-qty").forEach(function(inp){inp.addEventListener("change",function(){if(parseInt(inp.value)<0)inp.value=0;document.dispatchEvent(new Event("clielo_pack_changed"));});});
             document.querySelectorAll(".sf-adv-opt-check").forEach(function(cb){cb.addEventListener("change",function(){document.dispatchEvent(new Event("clielo_pack_changed"));});});
         })();' );
         return ob_get_clean();
+    }
+
+    /**
+     * Shortcode [clielo_options] — affiche packs + options de service.
+     */
+    public static function shortcode_options(): string {
+        if ( ! self::is_chat_page() ) {
+            return '';
+        }
+        return self::render_options_card();
     }
 
     /**
@@ -497,42 +527,42 @@ class Clielo_Front {
         ?>
 
         <!-- Clielo : Bouton flottant -->
-        <button id="serviceflow-toggle" style="<?php echo esc_attr( $btn_style ); ?>" aria-label="Chat">
+        <button id="clielo-toggle" style="<?php echo esc_attr( $btn_style ); ?>" aria-label="Chat">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-            <span id="serviceflow-badge" style="position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;background:#e53e3e;color:#fff;border-radius:50%;font-size:11px;font-weight:700;align-items:center;justify-content:center;line-height:1;display:none"></span>
+            <span id="clielo-badge" style="position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;background:#e53e3e;color:#fff;border-radius:50%;font-size:11px;font-weight:700;align-items:center;justify-content:center;line-height:1;display:none"></span>
         </button>
 
         <!-- Clielo : Popup -->
-        <div id="serviceflow-container" style="<?php echo esc_attr( $popup_style ); ?>">
+        <div id="clielo-container" style="<?php echo esc_attr( $popup_style ); ?>">
             <!-- Header avec bouton retour -->
-            <div id="serviceflow-header" style="background:<?php echo esc_attr( $color ); ?> !important;color:#fff !important;padding:14px 20px !important;flex-shrink:0 !important;display:flex !important;align-items:center !important;gap:10px !important;margin:0 !important">
-                <button id="serviceflow-back" type="button" style="display:none !important;background:none !important;border:none !important;color:#fff !important;cursor:pointer !important;padding:0 !important;margin:0 !important;flex-shrink:0 !important;line-height:1 !important">
+            <div id="clielo-header" style="background:<?php echo esc_attr( $color ); ?> !important;color:#fff !important;padding:14px 20px !important;flex-shrink:0 !important;display:flex !important;align-items:center !important;gap:10px !important;margin:0 !important">
+                <button id="clielo-back" type="button" style="display:none !important;background:none !important;border:none !important;color:#fff !important;cursor:pointer !important;padding:0 !important;margin:0 !important;flex-shrink:0 !important;line-height:1 !important">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
                 </button>
-                <h3 id="serviceflow-header-title" style="margin:0 !important;font-size:16px !important;font-weight:600 !important;color:#fff !important;flex:1 !important"><?php esc_html_e( 'Chat', 'clielo' ); ?></h3>
+                <h3 id="clielo-header-title" style="margin:0 !important;font-size:16px !important;font-weight:600 !important;color:#fff !important;flex:1 !important"><?php esc_html_e( 'Chat', 'clielo' ); ?></h3>
             </div>
 
             <!-- Liste de conversations (admin uniquement) -->
-            <div id="serviceflow-client-list" style="display:none !important;flex:1 !important;overflow-y:auto !important;background:#f9fafb !important;padding:0 !important"></div>
+            <div id="clielo-client-list" style="display:none !important;flex:1 !important;overflow-y:auto !important;background:#f9fafb !important;padding:0 !important"></div>
 
-            <div id="serviceflow-order-bar" style="display:none;padding:10px 16px;background:#f0f4ff;border-bottom:1px solid #d0d9e8;font-size:13px;flex-shrink:0"></div>
-            <div id="serviceflow-todo-bar" style="display:none;padding:10px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:12px;flex-shrink:0;max-height:200px;overflow-y:auto"></div>
+            <div id="clielo-order-bar" style="display:none;padding:10px 16px;background:#f0f4ff;border-bottom:1px solid #d0d9e8;font-size:13px;flex-shrink:0"></div>
+            <div id="clielo-todo-bar" style="display:none;padding:10px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:12px;flex-shrink:0;max-height:200px;overflow-y:auto"></div>
 
-            <div id="serviceflow-messages" class="serviceflow-messages">
-                <div class="serviceflow-loading"><?php esc_html_e( 'Chargement...', 'clielo' ); ?></div>
+            <div id="clielo-messages" class="clielo-messages">
+                <div class="clielo-loading"><?php esc_html_e( 'Chargement...', 'clielo' ); ?></div>
             </div>
 
             <?php if ( $is_logged ) : ?>
-                <form id="serviceflow-form" class="serviceflow-form" onsubmit="return false;">
-                    <div class="serviceflow-input-wrapper">
-                        <textarea id="serviceflow-input" class="serviceflow-input" placeholder="<?php esc_attr_e( 'Votre message...', 'clielo' ); ?>" rows="1" maxlength="1000"></textarea>
-                        <button type="button" id="serviceflow-send" class="serviceflow-send" style="background:<?php echo esc_attr( $color ); ?>">
+                <form id="clielo-form" class="clielo-form" onsubmit="return false;">
+                    <div class="clielo-input-wrapper">
+                        <textarea id="clielo-input" class="clielo-input" placeholder="<?php esc_attr_e( 'Votre message...', 'clielo' ); ?>" rows="1" maxlength="1000"></textarea>
+                        <button type="button" id="clielo-send" class="clielo-send" style="background:<?php echo esc_attr( $color ); ?>">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2Z"></path></svg>
                         </button>
                     </div>
                 </form>
             <?php else : ?>
-                <div class="serviceflow-login-notice">
+                <div class="clielo-login-notice">
                     <p><?php
                         printf(
                             /* translators: %s: HTML link tag for login page */
@@ -551,18 +581,18 @@ class Clielo_Front {
             var lastId = parseInt(localStorage.getItem(lsKey) || '0', 10);
             var hasLoaded = false, unread = 0;
 
-            var btn         = document.getElementById('serviceflow-toggle');
-            var box         = document.getElementById('serviceflow-container');
-            var msgs        = document.getElementById('serviceflow-messages');
-            var input       = document.getElementById('serviceflow-input');
-            var send        = document.getElementById('serviceflow-send');
-            var badge       = document.getElementById('serviceflow-badge');
-            var orderBar    = document.getElementById('serviceflow-order-bar');
-            var todoBar     = document.getElementById('serviceflow-todo-bar');
-            var clientList  = document.getElementById('serviceflow-client-list');
-            var backBtn     = document.getElementById('serviceflow-back');
-            var headerTitle = document.getElementById('serviceflow-header-title');
-            var chatForm    = document.getElementById('serviceflow-form');
+            var btn         = document.getElementById('clielo-toggle');
+            var box         = document.getElementById('clielo-container');
+            var msgs        = document.getElementById('clielo-messages');
+            var input       = document.getElementById('clielo-input');
+            var send        = document.getElementById('clielo-send');
+            var badge       = document.getElementById('clielo-badge');
+            var orderBar    = document.getElementById('clielo-order-bar');
+            var todoBar     = document.getElementById('clielo-todo-bar');
+            var clientList  = document.getElementById('clielo-client-list');
+            var backBtn     = document.getElementById('clielo-back');
+            var headerTitle = document.getElementById('clielo-header-title');
+            var chatForm    = document.getElementById('clielo-form');
 
             if(!btn || !box || !msgs) return;
 
@@ -656,7 +686,7 @@ class Clielo_Front {
                             statusDot = '<span style="display:inline-block !important;width:8px !important;height:8px !important;border-radius:50% !important;background:'+dc+' !important;flex-shrink:0 !important"></span>';
                         }
                         var orderLabel = cl.has_order ? '<span style="font-size:11px !important;color:#888 !important">#CMD-'+cl.order_id+'</span>' : '';
-                        html += '<div class="serviceflow-client-row" data-client-id="'+cl.client_id+'" data-client-name="'+esc(cl.display_name)+'" style="display:flex !important;align-items:center !important;gap:10px !important;padding:12px 16px !important;border-bottom:1px solid #eee !important;cursor:pointer !important;background:#fff !important;transition:background 0.15s !important">'
+                        html += '<div class="clielo-client-row" data-client-id="'+cl.client_id+'" data-client-name="'+esc(cl.display_name)+'" style="display:flex !important;align-items:center !important;gap:10px !important;padding:12px 16px !important;border-bottom:1px solid #eee !important;cursor:pointer !important;background:#fff !important;transition:background 0.15s !important">'
                             + '<img src="'+esc(cl.avatar)+'" style="width:36px !important;height:36px !important;border-radius:50% !important;object-fit:cover !important;flex-shrink:0 !important" />'
                             + '<div style="flex:1 !important;min-width:0 !important">'
                             + '<div style="font-size:14px !important;font-weight:600 !important;color:#222 !important">'+esc(cl.display_name)+'</div>'
@@ -668,7 +698,7 @@ class Clielo_Front {
                     });
                     clientList.innerHTML = html;
 
-                    clientList.querySelectorAll('.serviceflow-client-row').forEach(function(row){
+                    clientList.querySelectorAll('.clielo-client-row').forEach(function(row){
                         row.addEventListener('click', function(){
                             selectClient(parseInt(row.dataset.clientId), row.dataset.clientName);
                         });
@@ -686,7 +716,7 @@ class Clielo_Front {
 
                 hasLoaded = false;
                 lastId = 0;
-                msgs.innerHTML = '<div class="serviceflow-loading">Chargement...</div>';
+                msgs.innerHTML = '<div class="clielo-loading">Chargement...</div>';
                 loadMsgs();
                 renderOrderBar();
                 if(input) input.focus();
@@ -700,15 +730,15 @@ class Clielo_Front {
             }
 
             /* ── Shortcode elements ──────────────────── */
-            var scOrder   = document.getElementById('serviceflow-sc-order');
-            var scChecks  = document.querySelectorAll('.serviceflow-sc-check');
-            var scPacks   = document.querySelectorAll('.serviceflow-sc-pack');
-            var scTotal     = document.getElementById('serviceflow-sc-total-val');
-            var scSubtotal  = document.getElementById('serviceflow-sc-subtotal-val');
-            var scTva       = document.getElementById('serviceflow-sc-tva-val');
-            var scDelay     = document.getElementById('serviceflow-sc-delay-val');
-            var scBreakdown = document.getElementById('serviceflow-sc-breakdown');
-            var packBox   = document.getElementById('serviceflow-sc-packs');
+            var scOrder   = document.getElementById('clielo-sc-order');
+            var scChecks  = document.querySelectorAll('.clielo-sc-check');
+            var scPacks   = document.querySelectorAll('.clielo-sc-pack');
+            var scTotal     = document.getElementById('clielo-sc-total-val');
+            var scSubtotal  = document.getElementById('clielo-sc-subtotal-val');
+            var scTva       = document.getElementById('clielo-sc-tva-val');
+            var scDelay     = document.getElementById('clielo-sc-delay-val');
+            var scBreakdown = document.getElementById('clielo-sc-breakdown');
+            var packBox   = document.getElementById('clielo-sc-packs');
             var scOrigBg  = C.color;
 
             var selectedPackIdx = 0;
@@ -724,7 +754,7 @@ class Clielo_Front {
 
             /* Pack sélection — écouter l'événement du shortcode */
             document.addEventListener('clielo_pack_changed', function(){
-                var sel = document.querySelector('.serviceflow-sc-pack[data-selected]');
+                var sel = document.querySelector('.clielo-sc-pack[data-selected]');
                 if(sel) selectedPackIdx = parseInt(sel.dataset.index);
                 calcScTotal();
             });
@@ -742,7 +772,7 @@ class Clielo_Front {
                 orderSent = true;
                 isEditing = false;
                 scChecks.forEach(function(cb){ cb.disabled = true; cb.style.opacity = '0.5'; cb.style.cursor = 'default'; });
-                document.querySelectorAll('.serviceflow-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'default'; w.style.opacity = '0.7'; });
+                document.querySelectorAll('.clielo-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'default'; w.style.opacity = '0.7'; });
                 scPacks.forEach(function(p){ p.style.setProperty('opacity','0.7','important'); p.style.setProperty('cursor','default','important'); });
                 if(packBox) packBox.setAttribute('data-frozen','true');
                 setOrderBtnText(C.i18n.order_modify_btn, svgEdit);
@@ -757,7 +787,7 @@ class Clielo_Front {
             function unlockCard(){
                 isEditing = true;
                 scChecks.forEach(function(cb){ cb.disabled = false; cb.style.opacity = '1'; cb.style.cursor = 'pointer'; });
-                document.querySelectorAll('.serviceflow-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'pointer'; w.style.opacity = '1'; });
+                document.querySelectorAll('.clielo-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'pointer'; w.style.opacity = '1'; });
                 scPacks.forEach(function(p){ p.style.setProperty('opacity','1','important'); p.style.setProperty('cursor','pointer','important'); });
                 if(packBox) packBox.removeAttribute('data-frozen');
                 setOrderBtnText(C.i18n.order_btn, svgChat);
@@ -774,7 +804,7 @@ class Clielo_Front {
                 orderSent = true;
                 isEditing = false;
                 scChecks.forEach(function(cb){ cb.disabled = true; cb.style.opacity = '0.5'; cb.style.cursor = 'default'; });
-                document.querySelectorAll('.serviceflow-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'default'; w.style.opacity = '0.7'; });
+                document.querySelectorAll('.clielo-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'default'; w.style.opacity = '0.7'; });
                 scPacks.forEach(function(p){ p.style.setProperty('opacity','0.7','important'); p.style.setProperty('cursor','default','important'); });
                 if(packBox) packBox.setAttribute('data-frozen','true');
                 setOrderBtnText(C.i18n.order_locked, svgChat);
@@ -791,7 +821,7 @@ class Clielo_Front {
                 isEditing = false;
                 orderFrozen = false;
                 scChecks.forEach(function(cb){ cb.disabled = false; cb.style.opacity = '1'; cb.style.cursor = 'pointer'; cb.checked = false; });
-                document.querySelectorAll('.serviceflow-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'pointer'; w.style.opacity = '1'; });
+                document.querySelectorAll('.clielo-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'pointer'; w.style.opacity = '1'; });
                 scPacks.forEach(function(p){ p.style.setProperty('opacity','1','important'); p.style.setProperty('cursor','pointer','important'); });
                 if(packBox) packBox.removeAttribute('data-frozen');
                 setOrderBtnText(C.i18n.order_btn, svgChat);
@@ -1106,14 +1136,14 @@ class Clielo_Front {
                     hasLoaded = true;
                     var msgsData = res.data && res.data.messages ? res.data.messages : (res.data || []);
                     if(!res.success||!msgsData.length){
-                        msgs.innerHTML='<div class="serviceflow-empty">'+esc(C.i18n.empty)+'</div>';
+                        msgs.innerHTML='<div class="clielo-empty">'+esc(C.i18n.empty)+'</div>';
                         return;
                     }
                     msgsData.forEach(function(m){addMsg(m);});
                     updatePayButtons(res.data.paid_schedule_ids||[], res.data.expired_schedule_ids||[]);
                     scrollEnd();
                 })
-                .catch(function(){ msgs.innerHTML='<div class="serviceflow-empty">'+esc(C.i18n.error)+'</div>'; });
+                .catch(function(){ msgs.innerHTML='<div class="clielo-empty">'+esc(C.i18n.error)+'</div>'; });
             }
 
             /* ── Mise à jour boutons paiement dans le chat ── */
@@ -1194,7 +1224,7 @@ class Clielo_Front {
 
                 if(isSys){
                     var el = document.createElement('div');
-                    el.className = 'serviceflow-message serviceflow-message--system';
+                    el.className = 'clielo-message clielo-message--system';
                     el.setAttribute('data-msg-id', m.id);
                     // Convertir les URLs en boutons cliquables (token-based: remplacer avant esc())
                     var rawMsg = m.message;
@@ -1220,15 +1250,15 @@ class Clielo_Front {
 
                 var mine = m.is_mine||(parseInt(m.user_id)===parseInt(C.user_id));
                 var el = document.createElement('div');
-                el.className = 'serviceflow-message serviceflow-message--'+(mine?'mine':'other');
+                el.className = 'clielo-message clielo-message--'+(mine?'mine':'other');
                 el.setAttribute('data-msg-id', m.id);
                 var bubbleStyle = mine ? 'background:'+C.color+';color:#fff;border-bottom-right-radius:4px' : '';
                 el.innerHTML =
-                    '<div class="serviceflow-avatar"><img src="'+esc(m.avatar)+'" alt="'+esc(m.display_name)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover"></div>'+
-                    '<div class="serviceflow-bubble-wrap">'+
-                        (!mine?'<div class="serviceflow-username">'+esc(m.display_name)+'</div>':'')+
-                        '<div class="serviceflow-bubble" style="'+bubbleStyle+'">'+esc(m.message).replace(/\n/g,'<br>')+'</div>'+
-                        '<div class="serviceflow-time">'+fmtTime(m.created_at)+'</div>'+
+                    '<div class="clielo-avatar"><img src="'+esc(m.avatar)+'" alt="'+esc(m.display_name)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover"></div>'+
+                    '<div class="clielo-bubble-wrap">'+
+                        (!mine?'<div class="clielo-username">'+esc(m.display_name)+'</div>':'')+
+                        '<div class="clielo-bubble" style="'+bubbleStyle+'">'+esc(m.message).replace(/\n/g,'<br>')+'</div>'+
+                        '<div class="clielo-time">'+fmtTime(m.created_at)+'</div>'+
                     '</div>';
                 msgs.appendChild(el);
                 lastId = Math.max(lastId, parseInt(m.id));
@@ -1533,7 +1563,7 @@ class Clielo_Front {
 
             /* ── Helpers ─────────────────────────────── */
             function scrollEnd(){ msgs.scrollTop = msgs.scrollHeight; }
-            function rmEmpty(){ var e=msgs.querySelector('.serviceflow-empty'); if(e)e.remove(); }
+            function rmEmpty(){ var e=msgs.querySelector('.clielo-empty'); if(e)e.remove(); }
             function fmtTime(s){
                 if(!s)return'';
                 var d=new Date(s.replace(' ','T'));

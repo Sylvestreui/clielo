@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -305,7 +305,7 @@ class Clielo_Invoices {
             __( 'Invoices', 'clielo' ),
             __( 'Invoices', 'clielo' ),
             'manage_options',
-            'serviceflow-invoices',
+            'clielo-invoices',
             [ __CLASS__, 'render_invoices_list' ]
         );
         add_submenu_page(
@@ -313,7 +313,7 @@ class Clielo_Invoices {
             __( 'New invoice', 'clielo' ),
             __( 'New invoice', 'clielo' ),
             'manage_options',
-            'serviceflow-invoice-new',
+            'clielo-invoice-new',
             [ __CLASS__, 'render_invoice_new' ]
         );
         add_submenu_page(
@@ -321,7 +321,7 @@ class Clielo_Invoices {
             __( 'External clients', 'clielo' ),
             __( 'External clients', 'clielo' ),
             'manage_options',
-            'serviceflow-clients',
+            'clielo-clients',
             [ __CLASS__, 'render_clients_page' ]
         );
         add_submenu_page(
@@ -329,7 +329,7 @@ class Clielo_Invoices {
             __( 'Invoice settings', 'clielo' ),
             __( 'Invoice settings', 'clielo' ),
             'manage_options',
-            'serviceflow-invoice-settings',
+            'clielo-invoice-settings',
             [ __CLASS__, 'render_settings_page' ]
         );
         // Hidden page to view an invoice
@@ -338,7 +338,7 @@ class Clielo_Invoices {
             __( 'View invoice', 'clielo' ),
             '',
             'manage_options',
-            'serviceflow-invoice-view',
+            'clielo-invoice-view',
             [ __CLASS__, 'render_invoice_view' ]
         );
         // Hidden page to edit a draft invoice
@@ -347,59 +347,59 @@ class Clielo_Invoices {
             __( 'Edit invoice', 'clielo' ),
             '',
             'manage_options',
-            'serviceflow-invoice-edit',
+            'clielo-invoice-edit',
             [ __CLASS__, 'render_invoice_edit' ]
         );
     }
 
     private static function get_invoice_view_css( string $color ): string {
         return
-            '.serviceflow-invoice-page{max-width:800px;margin:20px auto;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:40px;padding-bottom:60px;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;color:#333}' .
-            '.serviceflow-inv-header{display:flex;justify-content:space-between;align-items:flex-start}' .
-            '.serviceflow-inv-logo img{max-height:60px}' .
-            '.serviceflow-inv-company{font-size:12px;color:#555;line-height:1.6;margin-top:10px}' .
-            '.serviceflow-inv-company strong{font-size:16px;color:#222;display:block;margin-bottom:4px}' .
-            '.serviceflow-inv-header-right{text-align:right}' .
-            '.serviceflow-inv-header-right h3{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;margin:0 0 8px}' .
-            '.serviceflow-inv-header-right p{margin:0;font-size:13px;line-height:1.5}' .
-            '.serviceflow-inv-parties{display:flex;justify-content:space-between;gap:20px;margin-top:6px;margin-bottom:15px;align-items:flex-end}' .
-            '.serviceflow-inv-emetteur{flex:1}' .
-            '.serviceflow-inv-emetteur h3,.serviceflow-inv-client h3{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;margin:0 0 8px}' .
-            '.serviceflow-inv-emetteur p,.serviceflow-inv-client p{margin:0;font-size:13px;line-height:1.5}' .
-            '.serviceflow-inv-client{flex:1;text-align:right}' .
-            '.serviceflow-inv-items-table{width:100%;border-collapse:collapse;margin-top:80px;margin-bottom:20px}' .
-            '.serviceflow-inv-items-table th{background:#f9f9f9;text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;border-bottom:2px solid #e0e0e0}' .
-            '.serviceflow-inv-items-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid #f0f0f0}' .
-            '.serviceflow-inv-items-table .text-right{text-align:right}' .
-            '.serviceflow-inv-totals{margin-left:auto;width:280px}' .
-            '.serviceflow-inv-totals-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}' .
-            '.serviceflow-inv-totals-row.total-row{border-top:2px solid #222;font-size:16px;font-weight:700;padding-top:10px;margin-top:4px}' .
-            '.serviceflow-inv-notes{margin-top:40px;padding:16px;background:#f9f9f9;border-radius:6px;font-size:12px;color:#555;line-height:1.5;width:40%}' .
-            '.serviceflow-inv-footer-text{text-align:center;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:12px;margin-top:auto}' .
-            '.serviceflow-inv-actions{margin-top:20px;display:flex;gap:8px;flex-wrap:wrap}' .
-            '.serviceflow-inv-actions button{padding:8px 20px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}' .
+            '.clielo-invoice-page{max-width:800px;margin:20px auto;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:40px;padding-bottom:60px;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;color:#333}' .
+            '.clielo-inv-header{display:flex;justify-content:space-between;align-items:flex-start}' .
+            '.clielo-inv-logo img{max-height:60px}' .
+            '.clielo-inv-company{font-size:12px;color:#555;line-height:1.6;margin-top:10px}' .
+            '.clielo-inv-company strong{font-size:16px;color:#222;display:block;margin-bottom:4px}' .
+            '.clielo-inv-header-right{text-align:right}' .
+            '.clielo-inv-header-right h3{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;margin:0 0 8px}' .
+            '.clielo-inv-header-right p{margin:0;font-size:13px;line-height:1.5}' .
+            '.clielo-inv-parties{display:flex;justify-content:space-between;gap:20px;margin-top:6px;margin-bottom:15px;align-items:flex-end}' .
+            '.clielo-inv-emetteur{flex:1}' .
+            '.clielo-inv-emetteur h3,.clielo-inv-client h3{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;margin:0 0 8px}' .
+            '.clielo-inv-emetteur p,.clielo-inv-client p{margin:0;font-size:13px;line-height:1.5}' .
+            '.clielo-inv-client{flex:1;text-align:right}' .
+            '.clielo-inv-items-table{width:100%;border-collapse:collapse;margin-top:80px;margin-bottom:20px}' .
+            '.clielo-inv-items-table th{background:#f9f9f9;text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;border-bottom:2px solid #e0e0e0}' .
+            '.clielo-inv-items-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid #f0f0f0}' .
+            '.clielo-inv-items-table .text-right{text-align:right}' .
+            '.clielo-inv-totals{margin-left:auto;width:280px}' .
+            '.clielo-inv-totals-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}' .
+            '.clielo-inv-totals-row.total-row{border-top:2px solid #222;font-size:16px;font-weight:700;padding-top:10px;margin-top:4px}' .
+            '.clielo-inv-notes{margin-top:40px;padding:16px;background:#f9f9f9;border-radius:6px;font-size:12px;color:#555;line-height:1.5;width:40%}' .
+            '.clielo-inv-footer-text{text-align:center;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:12px;margin-top:auto}' .
+            '.clielo-inv-actions{margin-top:20px;display:flex;gap:8px;flex-wrap:wrap}' .
+            '.clielo-inv-actions button{padding:8px 20px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}' .
             '@media print{' .
                 '@page{size:A4;margin:10mm 10mm 14mm 10mm}' .
                 '#adminmenumain,#wpadminbar,.no-print,#wpfooter,.update-nag,.notice{display:none!important}' .
                 '#wpcontent{margin-left:0!important;padding:0!important}' .
-                '.serviceflow-invoice-page{box-shadow:none!important;border:none!important;border-radius:0!important;padding:20px!important;padding-bottom:10px!important;margin:0!important;max-width:100%!important;display:flex!important;flex-direction:column!important;min-height:calc(297mm - 24mm - 40px)!important}' .
-                '.serviceflow-inv-header{display:flex!important;justify-content:space-between!important;align-items:flex-start!important}' .
-                '.serviceflow-inv-parties{display:flex!important;justify-content:space-between!important;gap:20px!important;margin-top:6px!important;margin-bottom:15px!important;align-items:flex-end!important}' .
-                '.serviceflow-inv-emetteur{flex:1!important}' .
-                '.serviceflow-inv-client{flex:1!important;text-align:right!important}' .
-                '.serviceflow-inv-notes{margin-top:40px!important;width:40%!important;background:#f9f9f9!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' .
-                '.serviceflow-inv-items-table{margin-top:80px!important}' .
-                '.serviceflow-inv-items-table th{background:#f9f9f9!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' .
-                '.serviceflow-inv-footer-text{margin-top:auto!important;text-align:center!important;padding-top:8px!important;border-top:1px solid #ccc!important;font-size:9px!important;color:#999!important;display:block!important}' .
+                '.clielo-invoice-page{box-shadow:none!important;border:none!important;border-radius:0!important;padding:20px!important;padding-bottom:10px!important;margin:0!important;max-width:100%!important;display:flex!important;flex-direction:column!important;min-height:calc(297mm - 24mm - 40px)!important}' .
+                '.clielo-inv-header{display:flex!important;justify-content:space-between!important;align-items:flex-start!important}' .
+                '.clielo-inv-parties{display:flex!important;justify-content:space-between!important;gap:20px!important;margin-top:6px!important;margin-bottom:15px!important;align-items:flex-end!important}' .
+                '.clielo-inv-emetteur{flex:1!important}' .
+                '.clielo-inv-client{flex:1!important;text-align:right!important}' .
+                '.clielo-inv-notes{margin-top:40px!important;width:40%!important;background:#f9f9f9!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' .
+                '.clielo-inv-items-table{margin-top:80px!important}' .
+                '.clielo-inv-items-table th{background:#f9f9f9!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' .
+                '.clielo-inv-footer-text{margin-top:auto!important;text-align:center!important;padding-top:8px!important;border-top:1px solid #ccc!important;font-size:9px!important;color:#999!important;display:block!important}' .
             '}';
     }
 
     public static function enqueue_admin_scripts( string $hook ): void {
-        if ( strpos( $hook, 'serviceflow-invoice' ) === false && strpos( $hook, 'serviceflow-clients' ) === false ) {
+        if ( strpos( $hook, 'clielo-invoice' ) === false && strpos( $hook, 'clielo-clients' ) === false ) {
             return;
         }
 
-        if ( strpos( $hook, 'serviceflow-invoice-settings' ) !== false ) {
+        if ( strpos( $hook, 'clielo-invoice-settings' ) !== false ) {
             wp_enqueue_media();
         }
 
@@ -413,71 +413,71 @@ class Clielo_Invoices {
         wp_add_inline_style(
             'wp-admin',
             // Settings page
-            '.serviceflow-inv-section{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}' .
-            '.serviceflow-inv-section h2{font-size:15px;font-weight:700;color:#222;margin:0 0 16px;padding:0 0 12px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}' .
-            '.serviceflow-inv-field{margin-bottom:14px}' .
-            '.serviceflow-inv-field label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px}' .
-            '.serviceflow-inv-field input[type="text"],.serviceflow-inv-field input[type="number"],.serviceflow-inv-field input[type="email"],.serviceflow-inv-field textarea{width:100%;max-width:500px}' .
-            '.serviceflow-inv-field textarea{height:80px}' .
-            '.serviceflow-inv-row{display:flex;gap:16px;flex-wrap:wrap}' .
-            '.serviceflow-inv-row .serviceflow-inv-field{flex:1;min-width:200px}' .
-            '.serviceflow-inv-logo-preview{margin-top:8px}' .
-            '.serviceflow-inv-logo-preview img{max-height:80px;border:1px solid #e0e0e0;border-radius:4px;padding:4px;background:#fafafa}' .
+            '.clielo-inv-section{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}' .
+            '.clielo-inv-section h2{font-size:15px;font-weight:700;color:#222;margin:0 0 16px;padding:0 0 12px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}' .
+            '.clielo-inv-field{margin-bottom:14px}' .
+            '.clielo-inv-field label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px}' .
+            '.clielo-inv-field input[type="text"],.clielo-inv-field input[type="number"],.clielo-inv-field input[type="email"],.clielo-inv-field textarea{width:100%;max-width:500px}' .
+            '.clielo-inv-field textarea{height:80px}' .
+            '.clielo-inv-row{display:flex;gap:16px;flex-wrap:wrap}' .
+            '.clielo-inv-row .clielo-inv-field{flex:1;min-width:200px}' .
+            '.clielo-inv-logo-preview{margin-top:8px}' .
+            '.clielo-inv-logo-preview img{max-height:80px;border:1px solid #e0e0e0;border-radius:4px;padding:4px;background:#fafafa}' .
             // Clients page
-            '.serviceflow-clients-wrap{display:flex;gap:24px;flex-wrap:wrap}' .
-            '.serviceflow-clients-list{flex:1;min-width:400px}' .
-            '.serviceflow-clients-form{flex:0 0 380px}' .
-            '.serviceflow-clients-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}' .
-            '.serviceflow-clients-table th{background:#f9f9f9;text-align:left;padding:10px 12px;font-size:12px;font-weight:600;color:#555;border-bottom:1px solid #e0e0e0}' .
-            '.serviceflow-clients-table td{padding:10px 12px;font-size:13px;color:#333;border-bottom:1px solid #f5f5f5}' .
-            '.serviceflow-clients-table tr:last-child td{border-bottom:none}' .
-            '.serviceflow-cl-form-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}' .
-            '.serviceflow-cl-form-card h3{margin:0 0 16px;font-size:15px;font-weight:700;color:#222}' .
-            '.serviceflow-cl-field{margin-bottom:12px}' .
-            '.serviceflow-cl-field label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:3px}' .
-            '.serviceflow-cl-field input,.serviceflow-cl-field textarea{width:100%}' .
-            '.serviceflow-cl-field textarea{height:60px}' .
-            '.serviceflow-cl-row{display:flex;gap:10px}' .
-            '.serviceflow-cl-row .serviceflow-cl-field{flex:1}' .
-            '.serviceflow-cl-actions a{cursor:pointer;font-size:12px;margin-right:8px}' .
-            '.serviceflow-cl-actions .edit{color:#0073aa}' .
-            '.serviceflow-cl-actions .delete{color:#dc3545}' .
+            '.clielo-clients-wrap{display:flex;gap:24px;flex-wrap:wrap}' .
+            '.clielo-clients-list{flex:1;min-width:400px}' .
+            '.clielo-clients-form{flex:0 0 380px}' .
+            '.clielo-clients-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}' .
+            '.clielo-clients-table th{background:#f9f9f9;text-align:left;padding:10px 12px;font-size:12px;font-weight:600;color:#555;border-bottom:1px solid #e0e0e0}' .
+            '.clielo-clients-table td{padding:10px 12px;font-size:13px;color:#333;border-bottom:1px solid #f5f5f5}' .
+            '.clielo-clients-table tr:last-child td{border-bottom:none}' .
+            '.clielo-cl-form-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}' .
+            '.clielo-cl-form-card h3{margin:0 0 16px;font-size:15px;font-weight:700;color:#222}' .
+            '.clielo-cl-field{margin-bottom:12px}' .
+            '.clielo-cl-field label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:3px}' .
+            '.clielo-cl-field input,.clielo-cl-field textarea{width:100%}' .
+            '.clielo-cl-field textarea{height:60px}' .
+            '.clielo-cl-row{display:flex;gap:10px}' .
+            '.clielo-cl-row .clielo-cl-field{flex:1}' .
+            '.clielo-cl-actions a{cursor:pointer;font-size:12px;margin-right:8px}' .
+            '.clielo-cl-actions .edit{color:#0073aa}' .
+            '.clielo-cl-actions .delete{color:#dc3545}' .
             // List page (dynamic color)
-            '.serviceflow-inv-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}' .
-            '.serviceflow-inv-filter{padding:6px 14px;border:1px solid #ddd;border-radius:20px;font-size:13px;font-weight:500;color:#555;text-decoration:none;background:#fff;cursor:pointer;transition:all .15s}' .
-            '.serviceflow-inv-filter.active,.serviceflow-inv-filter:hover{border-color:' . $color . ';color:' . $color . '}' .
-            '.serviceflow-inv-filter .count{font-size:11px;color:#999;margin-left:4px}' .
-            '.serviceflow-inv-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}' .
-            '.serviceflow-inv-table th{background:#f9f9f9;text-align:left;padding:10px 12px;font-size:12px;font-weight:600;color:#555;border-bottom:1px solid #e0e0e0}' .
-            '.serviceflow-inv-table td{padding:10px 12px;font-size:13px;color:#333;border-bottom:1px solid #f5f5f5}' .
-            '.serviceflow-inv-table tr:last-child td{border-bottom:none}' .
-            '.serviceflow-inv-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;color:#fff}' .
-            '.serviceflow-inv-status-wrap{position:relative;display:inline-block}' .
-            '.serviceflow-inv-badge.clickable{cursor:pointer;transition:opacity .15s}' .
-            '.serviceflow-inv-badge.clickable:hover{opacity:.8}' .
-            '.serviceflow-inv-status-dd{display:none;position:absolute;top:100%;left:0;margin-top:4px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:100;min-width:140px;overflow:hidden}' .
-            '.serviceflow-inv-status-dd.open{display:block}' .
-            '.serviceflow-inv-status-dd a{display:flex;align-items:center;gap:6px;padding:7px 12px;font-size:12px;color:#333;text-decoration:none;white-space:nowrap;transition:background .1s}' .
-            '.serviceflow-inv-status-dd a:hover{background:#f5f5f5}' .
-            '.serviceflow-inv-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}' .
-            '.serviceflow-inv-act{font-size:12px;margin-right:6px;cursor:pointer;text-decoration:none}' .
+            '.clielo-inv-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}' .
+            '.clielo-inv-filter{padding:6px 14px;border:1px solid #ddd;border-radius:20px;font-size:13px;font-weight:500;color:#555;text-decoration:none;background:#fff;cursor:pointer;transition:all .15s}' .
+            '.clielo-inv-filter.active,.clielo-inv-filter:hover{border-color:' . $color . ';color:' . $color . '}' .
+            '.clielo-inv-filter .count{font-size:11px;color:#999;margin-left:4px}' .
+            '.clielo-inv-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}' .
+            '.clielo-inv-table th{background:#f9f9f9;text-align:left;padding:10px 12px;font-size:12px;font-weight:600;color:#555;border-bottom:1px solid #e0e0e0}' .
+            '.clielo-inv-table td{padding:10px 12px;font-size:13px;color:#333;border-bottom:1px solid #f5f5f5}' .
+            '.clielo-inv-table tr:last-child td{border-bottom:none}' .
+            '.clielo-inv-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;color:#fff}' .
+            '.clielo-inv-status-wrap{position:relative;display:inline-block}' .
+            '.clielo-inv-badge.clickable{cursor:pointer;transition:opacity .15s}' .
+            '.clielo-inv-badge.clickable:hover{opacity:.8}' .
+            '.clielo-inv-status-dd{display:none;position:absolute;top:100%;left:0;margin-top:4px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:100;min-width:140px;overflow:hidden}' .
+            '.clielo-inv-status-dd.open{display:block}' .
+            '.clielo-inv-status-dd a{display:flex;align-items:center;gap:6px;padding:7px 12px;font-size:12px;color:#333;text-decoration:none;white-space:nowrap;transition:background .1s}' .
+            '.clielo-inv-status-dd a:hover{background:#f5f5f5}' .
+            '.clielo-inv-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}' .
+            '.clielo-inv-act{font-size:12px;margin-right:6px;cursor:pointer;text-decoration:none}' .
             // New/Edit invoice
-            '.serviceflow-newinv-section{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}' .
-            '.serviceflow-newinv-section h2{font-size:15px;font-weight:700;color:#222;margin:0 0 16px;padding:0 0 12px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}' .
-            '.serviceflow-newinv-field{margin-bottom:14px}' .
-            '.serviceflow-newinv-field label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px}' .
-            '.serviceflow-newinv-field select,.serviceflow-newinv-field input,.serviceflow-newinv-field textarea{width:100%;max-width:500px}' .
-            '.serviceflow-newinv-field textarea{height:80px}' .
-            '.serviceflow-newinv-radio{display:flex;gap:16px;margin-bottom:12px}' .
-            '.serviceflow-newinv-radio label{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;cursor:pointer;color:#333}' .
-            '.serviceflow-items-table{width:100%;border-collapse:collapse;margin-bottom:8px}' .
-            '.serviceflow-items-table th{text-align:left;padding:8px;font-size:12px;font-weight:600;color:#555;background:#f9f9f9;border-bottom:1px solid #e0e0e0}' .
-            '.serviceflow-items-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5}' .
-            '.serviceflow-items-table input{width:100%}' .
-            '.serviceflow-items-rm{background:#dc3545;color:#fff;border:none;border-radius:3px;padding:4px 10px;cursor:pointer;font-size:11px}' .
-            '.serviceflow-items-rm:hover{background:#c82333}' .
-            '.serviceflow-newinv-totals{text-align:right;font-size:14px;color:#333;line-height:2}' .
-            '.serviceflow-newinv-totals strong{font-size:16px}' .
+            '.clielo-newinv-section{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}' .
+            '.clielo-newinv-section h2{font-size:15px;font-weight:700;color:#222;margin:0 0 16px;padding:0 0 12px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}' .
+            '.clielo-newinv-field{margin-bottom:14px}' .
+            '.clielo-newinv-field label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px}' .
+            '.clielo-newinv-field select,.clielo-newinv-field input,.clielo-newinv-field textarea{width:100%;max-width:500px}' .
+            '.clielo-newinv-field textarea{height:80px}' .
+            '.clielo-newinv-radio{display:flex;gap:16px;margin-bottom:12px}' .
+            '.clielo-newinv-radio label{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;cursor:pointer;color:#333}' .
+            '.clielo-items-table{width:100%;border-collapse:collapse;margin-bottom:8px}' .
+            '.clielo-items-table th{text-align:left;padding:8px;font-size:12px;font-weight:600;color:#555;background:#f9f9f9;border-bottom:1px solid #e0e0e0}' .
+            '.clielo-items-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5}' .
+            '.clielo-items-table input{width:100%}' .
+            '.clielo-items-rm{background:#dc3545;color:#fff;border:none;border-radius:3px;padding:4px 10px;cursor:pointer;font-size:11px}' .
+            '.clielo-items-rm:hover{background:#c82333}' .
+            '.clielo-newinv-totals{text-align:right;font-size:14px;color:#333;line-height:2}' .
+            '.clielo-newinv-totals strong{font-size:16px}' .
             // View invoice page
             self::get_invoice_view_css( $color )
         );
@@ -1286,58 +1286,58 @@ class Clielo_Invoices {
         $color = esc_attr( Clielo_Admin::get_color() );
         $nonce = wp_create_nonce( 'clielo_nonce' );
         ?>
-        <div class="wrap serviceflow-dashboard">
+        <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <span class="dashicons dashicons-media-text" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
                 <?php esc_html_e( 'Clielo — Réglages facturation', 'clielo' ); ?>
             </h1>
 
-            <div id="serviceflow-inv-settings-form">
+            <div id="clielo-inv-settings-form">
                 <!-- Entreprise -->
-                <div class="serviceflow-inv-section">
+                <div class="clielo-inv-section">
                     <h2><span class="dashicons dashicons-building"></span> <?php esc_html_e( 'Informations de l\'entreprise', 'clielo' ); ?></h2>
-                    <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-field">
                         <label><?php esc_html_e( 'Nom de l\'entreprise', 'clielo' ); ?></label>
-                        <input type="text" id="serviceflow-inv-company-name" value="<?php echo esc_attr( $s['company_name'] ); ?>" />
+                        <input type="text" id="clielo-inv-company-name" value="<?php echo esc_attr( $s['company_name'] ); ?>" />
                     </div>
-                    <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-field">
                         <label><?php esc_html_e( 'Adresse', 'clielo' ); ?></label>
-                        <textarea id="serviceflow-inv-company-address"><?php echo esc_textarea( $s['company_address'] ); ?></textarea>
+                        <textarea id="clielo-inv-company-address"><?php echo esc_textarea( $s['company_address'] ); ?></textarea>
                     </div>
-                    <div class="serviceflow-inv-row">
-                        <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-row">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Code postal', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-inv-company-postal" value="<?php echo esc_attr( $s['company_postal'] ); ?>" />
+                            <input type="text" id="clielo-inv-company-postal" value="<?php echo esc_attr( $s['company_postal'] ); ?>" />
                         </div>
-                        <div class="serviceflow-inv-field">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Ville', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-inv-company-city" value="<?php echo esc_attr( $s['company_city'] ); ?>" />
+                            <input type="text" id="clielo-inv-company-city" value="<?php echo esc_attr( $s['company_city'] ); ?>" />
                         </div>
-                        <div class="serviceflow-inv-field">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Pays', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-inv-company-country" value="<?php echo esc_attr( $s['company_country'] ); ?>" />
+                            <input type="text" id="clielo-inv-company-country" value="<?php echo esc_attr( $s['company_country'] ); ?>" />
                         </div>
                     </div>
-                    <div class="serviceflow-inv-row">
-                        <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-row">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Téléphone', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-inv-company-phone" value="<?php echo esc_attr( $s['company_phone'] ); ?>" />
+                            <input type="text" id="clielo-inv-company-phone" value="<?php echo esc_attr( $s['company_phone'] ); ?>" />
                         </div>
-                        <div class="serviceflow-inv-field">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Email', 'clielo' ); ?></label>
-                            <input type="email" id="serviceflow-inv-company-email" value="<?php echo esc_attr( $s['company_email'] ); ?>" />
+                            <input type="email" id="clielo-inv-company-email" value="<?php echo esc_attr( $s['company_email'] ); ?>" />
                         </div>
                     </div>
                 </div>
 
                 <!-- Logo -->
-                <div class="serviceflow-inv-section">
+                <div class="clielo-inv-section">
                     <h2><span class="dashicons dashicons-format-image"></span> <?php esc_html_e( 'Logo', 'clielo' ); ?></h2>
-                    <div class="serviceflow-inv-field">
-                        <input type="hidden" id="serviceflow-inv-company-logo" value="<?php echo esc_url( $s['company_logo'] ); ?>" />
-                        <button type="button" id="serviceflow-inv-upload-logo" class="button"><?php esc_html_e( 'Choisir un logo', 'clielo' ); ?></button>
-                        <button type="button" id="serviceflow-inv-remove-logo" class="button" style="<?php echo empty( $s['company_logo'] ) ? 'display:none' : ''; ?>"><?php esc_html_e( 'Supprimer', 'clielo' ); ?></button>
-                        <div class="serviceflow-inv-logo-preview">
+                    <div class="clielo-inv-field">
+                        <input type="hidden" id="clielo-inv-company-logo" value="<?php echo esc_url( $s['company_logo'] ); ?>" />
+                        <button type="button" id="clielo-inv-upload-logo" class="button"><?php esc_html_e( 'Choisir un logo', 'clielo' ); ?></button>
+                        <button type="button" id="clielo-inv-remove-logo" class="button" style="<?php echo empty( $s['company_logo'] ) ? 'display:none' : ''; ?>"><?php esc_html_e( 'Supprimer', 'clielo' ); ?></button>
+                        <div class="clielo-inv-logo-preview">
                             <?php if ( ! empty( $s['company_logo'] ) ) : ?>
                                 <img src="<?php echo esc_url( $s['company_logo'] ); ?>" />
                             <?php endif; ?>
@@ -1346,64 +1346,64 @@ class Clielo_Invoices {
                 </div>
 
                 <!-- Identification -->
-                <div class="serviceflow-inv-section">
+                <div class="clielo-inv-section">
                     <h2><span class="dashicons dashicons-id-alt"></span> <?php esc_html_e( 'Identification', 'clielo' ); ?></h2>
-                    <div class="serviceflow-inv-row">
-                        <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-row">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Numéro de TVA', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-inv-vat" value="<?php echo esc_attr( $s['vat_number'] ); ?>" />
+                            <input type="text" id="clielo-inv-vat" value="<?php echo esc_attr( $s['vat_number'] ); ?>" />
                         </div>
-                        <div class="serviceflow-inv-field">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Libellé identifiant', 'clielo' ); ?></label>
                             <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-                                <select id="serviceflow-inv-siret-label-select" style="max-width:180px">
+                                <select id="clielo-inv-siret-label-select" style="max-width:180px">
                                     <option value="SIRET" <?php selected( $s['siret_label'], 'SIRET' ); ?>>SIRET</option>
                                     <option value="IFU" <?php selected( $s['siret_label'], 'IFU' ); ?>>IFU</option>
                                     <option value="SIRET/IFU" <?php selected( $s['siret_label'], 'SIRET/IFU' ); ?>>SIRET/IFU</option>
                                     <option value="custom" <?php echo ! in_array( $s['siret_label'], [ 'SIRET', 'IFU', 'SIRET/IFU' ], true ) ? 'selected' : ''; ?>><?php esc_html_e( 'Personnalisé', 'clielo' ); ?></option>
                                 </select>
-                                <input type="text" id="serviceflow-inv-siret-label-custom" value="<?php echo esc_attr( $s['siret_label'] ); ?>" placeholder="<?php esc_attr_e( 'Ex: RCS, SIREN...', 'clielo' ); ?>" style="max-width:200px;<?php echo in_array( $s['siret_label'], [ 'SIRET', 'IFU', 'SIRET/IFU' ], true ) ? 'display:none' : ''; ?>" />
+                                <input type="text" id="clielo-inv-siret-label-custom" value="<?php echo esc_attr( $s['siret_label'] ); ?>" placeholder="<?php esc_attr_e( 'Ex: RCS, SIREN...', 'clielo' ); ?>" style="max-width:200px;<?php echo in_array( $s['siret_label'], [ 'SIRET', 'IFU', 'SIRET/IFU' ], true ) ? 'display:none' : ''; ?>" />
                             </div>
-                            <input type="hidden" id="serviceflow-inv-siret-label" value="<?php echo esc_attr( $s['siret_label'] ); ?>" />
+                            <input type="hidden" id="clielo-inv-siret-label" value="<?php echo esc_attr( $s['siret_label'] ); ?>" />
                             <label><?php esc_html_e( 'Numéro', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-inv-siret" value="<?php echo esc_attr( $s['siret_ifu'] ); ?>" />
+                            <input type="text" id="clielo-inv-siret" value="<?php echo esc_attr( $s['siret_ifu'] ); ?>" />
                         </div>
                     </div>
                 </div>
 
                 <!-- Facturation -->
-                <div class="serviceflow-inv-section">
+                <div class="clielo-inv-section">
                     <h2><span class="dashicons dashicons-money-alt"></span> <?php esc_html_e( 'Facturation', 'clielo' ); ?></h2>
-                    <div class="serviceflow-inv-row">
-                        <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-row">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Préfixe des factures', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-inv-prefix" value="<?php echo esc_attr( $s['invoice_prefix'] ); ?>" placeholder="FACT-" />
+                            <input type="text" id="clielo-inv-prefix" value="<?php echo esc_attr( $s['invoice_prefix'] ); ?>" placeholder="FACT-" />
                         </div>
-                        <div class="serviceflow-inv-field">
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Taux de TVA (%)', 'clielo' ); ?></label>
-                            <input type="number" id="serviceflow-inv-taxrate" value="<?php echo esc_attr( $s['tax_rate'] ); ?>" min="0" max="100" step="0.01" />
+                            <input type="number" id="clielo-inv-taxrate" value="<?php echo esc_attr( $s['tax_rate'] ); ?>" min="0" max="100" step="0.01" />
                         </div>
                     </div>
-                    <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-field">
                         <label><?php esc_html_e( 'Mention TVA (affiché si taux = 0%)', 'clielo' ); ?></label>
-                        <input type="text" id="serviceflow-inv-taxnotice" value="<?php echo esc_attr( $s['tax_notice'] ); ?>" placeholder="<?php esc_attr_e( 'TVA non applicable, article 293 B du CGI', 'clielo' ); ?>" style="width:100%" />
+                        <input type="text" id="clielo-inv-taxnotice" value="<?php echo esc_attr( $s['tax_notice'] ); ?>" placeholder="<?php esc_attr_e( 'TVA non applicable, article 293 B du CGI', 'clielo' ); ?>" style="width:100%" />
                     </div>
                 </div>
 
                 <!-- Textes -->
-                <div class="serviceflow-inv-section">
+                <div class="clielo-inv-section">
                     <h2><span class="dashicons dashicons-editor-alignleft"></span> <?php esc_html_e( 'Textes', 'clielo' ); ?></h2>
-                    <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-field">
                         <label><?php esc_html_e( 'Conditions de paiement', 'clielo' ); ?></label>
-                        <textarea id="serviceflow-inv-terms"><?php echo esc_textarea( $s['payment_terms'] ); ?></textarea>
+                        <textarea id="clielo-inv-terms"><?php echo esc_textarea( $s['payment_terms'] ); ?></textarea>
                     </div>
-                    <div class="serviceflow-inv-field">
+                    <div class="clielo-inv-field">
                         <label><?php esc_html_e( 'Pied de page facture', 'clielo' ); ?></label>
-                        <textarea id="serviceflow-inv-footer"><?php echo esc_textarea( $s['footer_text'] ); ?></textarea>
+                        <textarea id="clielo-inv-footer"><?php echo esc_textarea( $s['footer_text'] ); ?></textarea>
                     </div>
                 </div>
 
-                <button type="button" id="serviceflow-inv-save-settings" class="button button-primary" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>;padding:8px 24px;font-size:14px">
+                <button type="button" id="clielo-inv-save-settings" class="button button-primary" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>;padding:8px 24px;font-size:14px">
                     <?php esc_html_e( 'Enregistrer', 'clielo' ); ?>
                 </button>
             </div>
@@ -1416,10 +1416,10 @@ class Clielo_Invoices {
                 var nonce   = '<?php echo esc_js( $nonce ); ?>';
 
                 // Logo uploader
-                var uploadBtn = document.getElementById('serviceflow-inv-upload-logo');
-                var removeBtn = document.getElementById('serviceflow-inv-remove-logo');
-                var logoInput = document.getElementById('serviceflow-inv-company-logo');
-                var preview   = document.querySelector('.serviceflow-inv-logo-preview');
+                var uploadBtn = document.getElementById('clielo-inv-upload-logo');
+                var removeBtn = document.getElementById('clielo-inv-remove-logo');
+                var logoInput = document.getElementById('clielo-inv-company-logo');
+                var preview   = document.querySelector('.clielo-inv-logo-preview');
 
                 if(uploadBtn){
                     uploadBtn.addEventListener('click', function(){
@@ -1442,9 +1442,9 @@ class Clielo_Invoices {
                 }
 
                 // Libellé SIRET/IFU select ↔ custom
-                var siretSelect = document.getElementById('serviceflow-inv-siret-label-select');
-                var siretCustom = document.getElementById('serviceflow-inv-siret-label-custom');
-                var siretHidden = document.getElementById('serviceflow-inv-siret-label');
+                var siretSelect = document.getElementById('clielo-inv-siret-label-select');
+                var siretCustom = document.getElementById('clielo-inv-siret-label-custom');
+                var siretHidden = document.getElementById('clielo-inv-siret-label');
                 function syncSiretLabel(){
                     if(siretSelect.value === 'custom'){
                         siretCustom.style.display = '';
@@ -1458,7 +1458,7 @@ class Clielo_Invoices {
                 siretCustom.addEventListener('input', function(){ siretHidden.value = this.value; });
 
                 // Save
-                document.getElementById('serviceflow-inv-save-settings').addEventListener('click', function(){
+                document.getElementById('clielo-inv-save-settings').addEventListener('click', function(){
                     var btn = this;
                     btn.disabled = true;
                     btn.textContent = '<?php echo esc_js( __( 'Enregistrement...', 'clielo' ) ); ?>';
@@ -1466,22 +1466,22 @@ class Clielo_Invoices {
                     var fd = new FormData();
                     fd.append('action', 'clielo_save_invoice_settings');
                     fd.append('nonce', nonce);
-                    fd.append('company_name', document.getElementById('serviceflow-inv-company-name').value);
-                    fd.append('company_address', document.getElementById('serviceflow-inv-company-address').value);
-                    fd.append('company_postal', document.getElementById('serviceflow-inv-company-postal').value);
-                    fd.append('company_city', document.getElementById('serviceflow-inv-company-city').value);
-                    fd.append('company_country', document.getElementById('serviceflow-inv-company-country').value);
-                    fd.append('company_phone', document.getElementById('serviceflow-inv-company-phone').value);
-                    fd.append('company_email', document.getElementById('serviceflow-inv-company-email').value);
-                    fd.append('company_logo', document.getElementById('serviceflow-inv-company-logo').value);
-                    fd.append('vat_number', document.getElementById('serviceflow-inv-vat').value);
-                    fd.append('siret_ifu', document.getElementById('serviceflow-inv-siret').value);
-                    fd.append('siret_label', document.getElementById('serviceflow-inv-siret-label').value);
-                    fd.append('invoice_prefix', document.getElementById('serviceflow-inv-prefix').value);
-                    fd.append('tax_rate', document.getElementById('serviceflow-inv-taxrate').value);
-                    fd.append('tax_notice', document.getElementById('serviceflow-inv-taxnotice').value);
-                    fd.append('payment_terms', document.getElementById('serviceflow-inv-terms').value);
-                    fd.append('footer_text', document.getElementById('serviceflow-inv-footer').value);
+                    fd.append('company_name', document.getElementById('clielo-inv-company-name').value);
+                    fd.append('company_address', document.getElementById('clielo-inv-company-address').value);
+                    fd.append('company_postal', document.getElementById('clielo-inv-company-postal').value);
+                    fd.append('company_city', document.getElementById('clielo-inv-company-city').value);
+                    fd.append('company_country', document.getElementById('clielo-inv-company-country').value);
+                    fd.append('company_phone', document.getElementById('clielo-inv-company-phone').value);
+                    fd.append('company_email', document.getElementById('clielo-inv-company-email').value);
+                    fd.append('company_logo', document.getElementById('clielo-inv-company-logo').value);
+                    fd.append('vat_number', document.getElementById('clielo-inv-vat').value);
+                    fd.append('siret_ifu', document.getElementById('clielo-inv-siret').value);
+                    fd.append('siret_label', document.getElementById('clielo-inv-siret-label').value);
+                    fd.append('invoice_prefix', document.getElementById('clielo-inv-prefix').value);
+                    fd.append('tax_rate', document.getElementById('clielo-inv-taxrate').value);
+                    fd.append('tax_notice', document.getElementById('clielo-inv-taxnotice').value);
+                    fd.append('payment_terms', document.getElementById('clielo-inv-terms').value);
+                    fd.append('footer_text', document.getElementById('clielo-inv-footer').value);
 
                     fetch(ajaxUrl, {method:'POST', body:fd, credentials:'same-origin'})
                     .then(function(r){ return r.json(); })
@@ -1517,15 +1517,15 @@ class Clielo_Invoices {
         $color   = esc_attr( Clielo_Admin::get_color() );
         $nonce   = wp_create_nonce( 'clielo_nonce' );
         ?>
-        <div class="wrap serviceflow-dashboard">
+        <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <span class="dashicons dashicons-groups" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
                 <?php esc_html_e( 'Clielo — Clients externes', 'clielo' ); ?>
             </h1>
 
-            <div class="serviceflow-clients-wrap">
-                <div class="serviceflow-clients-list">
-                    <table class="serviceflow-clients-table" id="serviceflow-cl-table">
+            <div class="clielo-clients-wrap">
+                <div class="clielo-clients-list">
+                    <table class="clielo-clients-table" id="clielo-cl-table">
                         <thead>
                             <tr>
                                 <th><?php esc_html_e( 'Nom', 'clielo' ); ?></th>
@@ -1556,7 +1556,7 @@ class Clielo_Invoices {
                                         <td><?php echo esc_html( $cl->email ); ?></td>
                                         <td><?php echo esc_html( $cl->company ); ?></td>
                                         <td><?php echo esc_html( $cl->city ); ?></td>
-                                        <td class="serviceflow-cl-actions">
+                                        <td class="clielo-cl-actions">
                                             <a class="edit" data-id="<?php echo (int) $cl->id; ?>"><?php esc_html_e( 'Modifier', 'clielo' ); ?></a>
                                             <a class="delete" data-id="<?php echo (int) $cl->id; ?>"><?php esc_html_e( 'Supprimer', 'clielo' ); ?></a>
                                         </td>
@@ -1567,64 +1567,64 @@ class Clielo_Invoices {
                     </table>
                 </div>
 
-                <div class="serviceflow-clients-form">
-                    <div class="serviceflow-cl-form-card">
-                        <h3 id="serviceflow-cl-form-title"><?php esc_html_e( 'Ajouter un client', 'clielo' ); ?></h3>
-                        <input type="hidden" id="serviceflow-cl-id" value="0" />
-                        <div class="serviceflow-cl-field">
+                <div class="clielo-clients-form">
+                    <div class="clielo-cl-form-card">
+                        <h3 id="clielo-cl-form-title"><?php esc_html_e( 'Ajouter un client', 'clielo' ); ?></h3>
+                        <input type="hidden" id="clielo-cl-id" value="0" />
+                        <div class="clielo-cl-field">
                             <label><?php esc_html_e( 'Nom *', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-cl-name" />
+                            <input type="text" id="clielo-cl-name" />
                         </div>
-                        <div class="serviceflow-cl-field">
+                        <div class="clielo-cl-field">
                             <label><?php esc_html_e( 'Email', 'clielo' ); ?></label>
-                            <input type="email" id="serviceflow-cl-email" />
+                            <input type="email" id="clielo-cl-email" />
                         </div>
-                        <div class="serviceflow-cl-field">
+                        <div class="clielo-cl-field">
                             <label><?php esc_html_e( 'Société', 'clielo' ); ?></label>
-                            <input type="text" id="serviceflow-cl-company" />
+                            <input type="text" id="clielo-cl-company" />
                         </div>
-                        <div class="serviceflow-cl-field">
+                        <div class="clielo-cl-field">
                             <label><?php esc_html_e( 'Adresse', 'clielo' ); ?></label>
-                            <textarea id="serviceflow-cl-address"></textarea>
+                            <textarea id="clielo-cl-address"></textarea>
                         </div>
-                        <div class="serviceflow-cl-row">
-                            <div class="serviceflow-cl-field">
+                        <div class="clielo-cl-row">
+                            <div class="clielo-cl-field">
                                 <label><?php esc_html_e( 'Code postal', 'clielo' ); ?></label>
-                                <input type="text" id="serviceflow-cl-postal" />
+                                <input type="text" id="clielo-cl-postal" />
                             </div>
-                            <div class="serviceflow-cl-field">
+                            <div class="clielo-cl-field">
                                 <label><?php esc_html_e( 'Ville', 'clielo' ); ?></label>
-                                <input type="text" id="serviceflow-cl-city" />
+                                <input type="text" id="clielo-cl-city" />
                             </div>
                         </div>
-                        <div class="serviceflow-cl-row">
-                            <div class="serviceflow-cl-field">
+                        <div class="clielo-cl-row">
+                            <div class="clielo-cl-field">
                                 <label><?php esc_html_e( 'Pays', 'clielo' ); ?></label>
-                                <input type="text" id="serviceflow-cl-country" value="France" />
+                                <input type="text" id="clielo-cl-country" value="France" />
                             </div>
-                            <div class="serviceflow-cl-field">
+                            <div class="clielo-cl-field">
                                 <label><?php esc_html_e( 'Téléphone', 'clielo' ); ?></label>
-                                <input type="text" id="serviceflow-cl-phone" />
+                                <input type="text" id="clielo-cl-phone" />
                             </div>
                         </div>
-                        <div class="serviceflow-cl-row">
-                            <div class="serviceflow-cl-field">
+                        <div class="clielo-cl-row">
+                            <div class="clielo-cl-field">
                                 <label><?php esc_html_e( 'N° TVA', 'clielo' ); ?></label>
-                                <input type="text" id="serviceflow-cl-vat" />
+                                <input type="text" id="clielo-cl-vat" />
                             </div>
-                            <div class="serviceflow-cl-field">
+                            <div class="clielo-cl-field">
                                 <label><?php esc_html_e( 'SIRET / IFU', 'clielo' ); ?></label>
-                                <input type="text" id="serviceflow-cl-siret" />
+                                <input type="text" id="clielo-cl-siret" />
                             </div>
                         </div>
-                        <div class="serviceflow-cl-field">
+                        <div class="clielo-cl-field">
                             <label><?php esc_html_e( 'Notes', 'clielo' ); ?></label>
-                            <textarea id="serviceflow-cl-notes"></textarea>
+                            <textarea id="clielo-cl-notes"></textarea>
                         </div>
-                        <button type="button" id="serviceflow-cl-save" class="button button-primary" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>;margin-right:8px">
+                        <button type="button" id="clielo-cl-save" class="button button-primary" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>;margin-right:8px">
                             <?php esc_html_e( 'Enregistrer', 'clielo' ); ?>
                         </button>
-                        <button type="button" id="serviceflow-cl-reset" class="button"><?php esc_html_e( 'Annuler', 'clielo' ); ?></button>
+                        <button type="button" id="clielo-cl-reset" class="button"><?php esc_html_e( 'Annuler', 'clielo' ); ?></button>
                     </div>
                 </div>
             </div>
@@ -1637,39 +1637,39 @@ class Clielo_Invoices {
                 var nonce   = '<?php echo esc_js( $nonce ); ?>';
 
                 function resetForm(){
-                    document.getElementById('serviceflow-cl-id').value = '0';
-                    document.getElementById('serviceflow-cl-form-title').textContent = '<?php echo esc_js( __( 'Ajouter un client', 'clielo' ) ); ?>';
+                    document.getElementById('clielo-cl-id').value = '0';
+                    document.getElementById('clielo-cl-form-title').textContent = '<?php echo esc_js( __( 'Ajouter un client', 'clielo' ) ); ?>';
                     ['name','email','company','address','postal','city','phone','vat','siret','notes'].forEach(function(f){
-                        document.getElementById('serviceflow-cl-'+f).value = '';
+                        document.getElementById('clielo-cl-'+f).value = '';
                     });
-                    document.getElementById('serviceflow-cl-country').value = 'France';
+                    document.getElementById('clielo-cl-country').value = 'France';
                 }
 
-                document.getElementById('serviceflow-cl-reset').addEventListener('click', resetForm);
+                document.getElementById('clielo-cl-reset').addEventListener('click', resetForm);
 
                 // Edit
-                document.querySelectorAll('.serviceflow-cl-actions .edit').forEach(function(a){
+                document.querySelectorAll('.clielo-cl-actions .edit').forEach(function(a){
                     a.addEventListener('click', function(){
                         var tr = this.closest('tr');
-                        document.getElementById('serviceflow-cl-id').value = tr.dataset.id;
-                        document.getElementById('serviceflow-cl-name').value = tr.dataset.name;
-                        document.getElementById('serviceflow-cl-email').value = tr.dataset.email;
-                        document.getElementById('serviceflow-cl-company').value = tr.dataset.company;
-                        document.getElementById('serviceflow-cl-address').value = tr.dataset.address;
-                        document.getElementById('serviceflow-cl-city').value = tr.dataset.city;
-                        document.getElementById('serviceflow-cl-postal').value = tr.dataset.postal;
-                        document.getElementById('serviceflow-cl-country').value = tr.dataset.country;
-                        document.getElementById('serviceflow-cl-phone').value = tr.dataset.phone;
-                        document.getElementById('serviceflow-cl-vat').value = tr.dataset.vat;
-                        document.getElementById('serviceflow-cl-siret').value = tr.dataset.siret;
-                        document.getElementById('serviceflow-cl-notes').value = tr.dataset.notes;
-                        document.getElementById('serviceflow-cl-form-title').textContent = '<?php echo esc_js( __( 'Modifier le client', 'clielo' ) ); ?>';
-                        document.querySelector('.serviceflow-clients-form').scrollIntoView({behavior:'smooth'});
+                        document.getElementById('clielo-cl-id').value = tr.dataset.id;
+                        document.getElementById('clielo-cl-name').value = tr.dataset.name;
+                        document.getElementById('clielo-cl-email').value = tr.dataset.email;
+                        document.getElementById('clielo-cl-company').value = tr.dataset.company;
+                        document.getElementById('clielo-cl-address').value = tr.dataset.address;
+                        document.getElementById('clielo-cl-city').value = tr.dataset.city;
+                        document.getElementById('clielo-cl-postal').value = tr.dataset.postal;
+                        document.getElementById('clielo-cl-country').value = tr.dataset.country;
+                        document.getElementById('clielo-cl-phone').value = tr.dataset.phone;
+                        document.getElementById('clielo-cl-vat').value = tr.dataset.vat;
+                        document.getElementById('clielo-cl-siret').value = tr.dataset.siret;
+                        document.getElementById('clielo-cl-notes').value = tr.dataset.notes;
+                        document.getElementById('clielo-cl-form-title').textContent = '<?php echo esc_js( __( 'Modifier le client', 'clielo' ) ); ?>';
+                        document.querySelector('.clielo-clients-form').scrollIntoView({behavior:'smooth'});
                     });
                 });
 
                 // Delete
-                document.querySelectorAll('.serviceflow-cl-actions .delete').forEach(function(a){
+                document.querySelectorAll('.clielo-cl-actions .delete').forEach(function(a){
                     a.addEventListener('click', function(){
                         if(!confirm('<?php echo esc_js( __( 'Supprimer ce client ?', 'clielo' ) ); ?>')) return;
                         var id = this.dataset.id;
@@ -1684,24 +1684,24 @@ class Clielo_Invoices {
                 });
 
                 // Save
-                document.getElementById('serviceflow-cl-save').addEventListener('click', function(){
+                document.getElementById('clielo-cl-save').addEventListener('click', function(){
                     var btn = this;
                     btn.disabled = true;
                     var fd = new FormData();
                     fd.append('action','clielo_save_ext_client');
                     fd.append('nonce',nonce);
-                    fd.append('client_id', document.getElementById('serviceflow-cl-id').value);
-                    fd.append('name', document.getElementById('serviceflow-cl-name').value);
-                    fd.append('email', document.getElementById('serviceflow-cl-email').value);
-                    fd.append('company', document.getElementById('serviceflow-cl-company').value);
-                    fd.append('address', document.getElementById('serviceflow-cl-address').value);
-                    fd.append('city', document.getElementById('serviceflow-cl-city').value);
-                    fd.append('postal_code', document.getElementById('serviceflow-cl-postal').value);
-                    fd.append('country', document.getElementById('serviceflow-cl-country').value);
-                    fd.append('phone', document.getElementById('serviceflow-cl-phone').value);
-                    fd.append('vat_number', document.getElementById('serviceflow-cl-vat').value);
-                    fd.append('siret', document.getElementById('serviceflow-cl-siret').value);
-                    fd.append('notes', document.getElementById('serviceflow-cl-notes').value);
+                    fd.append('client_id', document.getElementById('clielo-cl-id').value);
+                    fd.append('name', document.getElementById('clielo-cl-name').value);
+                    fd.append('email', document.getElementById('clielo-cl-email').value);
+                    fd.append('company', document.getElementById('clielo-cl-company').value);
+                    fd.append('address', document.getElementById('clielo-cl-address').value);
+                    fd.append('city', document.getElementById('clielo-cl-city').value);
+                    fd.append('postal_code', document.getElementById('clielo-cl-postal').value);
+                    fd.append('country', document.getElementById('clielo-cl-country').value);
+                    fd.append('phone', document.getElementById('clielo-cl-phone').value);
+                    fd.append('vat_number', document.getElementById('clielo-cl-vat').value);
+                    fd.append('siret', document.getElementById('clielo-cl-siret').value);
+                    fd.append('notes', document.getElementById('clielo-cl-notes').value);
                     fetch(ajaxUrl,{method:'POST',body:fd,credentials:'same-origin'})
                     .then(function(r){return r.json();})
                     .then(function(res){ btn.disabled=false; if(res.success) location.reload(); else alert(res.data.message||'Erreur'); });
@@ -1730,29 +1730,29 @@ class Clielo_Invoices {
         $colors   = self::get_status_colors();
         $color    = esc_attr( Clielo_Admin::get_color() );
         $nonce    = wp_create_nonce( 'clielo_nonce' );
-        $page_url = admin_url( 'admin.php?page=serviceflow-invoices' );
+        $page_url = admin_url( 'admin.php?page=clielo-invoices' );
         ?>
-        <div class="wrap serviceflow-dashboard">
+        <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <span class="dashicons dashicons-media-text" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
                 <?php esc_html_e( 'Clielo — Factures', 'clielo' ); ?>
-                <a href="<?php echo esc_url( admin_url( 'admin.php?page=serviceflow-invoice-new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Nouvelle facture', 'clielo' ); ?></a>
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=clielo-invoice-new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Nouvelle facture', 'clielo' ); ?></a>
             </h1>
 
             <!-- Filtres -->
-            <div class="serviceflow-inv-filters">
-                <a href="<?php echo esc_url( $page_url ); ?>" class="serviceflow-inv-filter <?php echo empty( $filter ) ? 'active' : ''; ?>">
+            <div class="clielo-inv-filters">
+                <a href="<?php echo esc_url( $page_url ); ?>" class="clielo-inv-filter <?php echo empty( $filter ) ? 'active' : ''; ?>">
                     <?php esc_html_e( 'Toutes', 'clielo' ); ?> <span class="count">(<?php echo absint( $counts['all'] ); ?>)</span>
                 </a>
                 <?php foreach ( $labels as $key => $label ) : ?>
-                    <a href="<?php echo esc_url( add_query_arg( 'status', $key, $page_url ) ); ?>" class="serviceflow-inv-filter <?php echo $filter === $key ? 'active' : ''; ?>">
+                    <a href="<?php echo esc_url( add_query_arg( 'status', $key, $page_url ) ); ?>" class="clielo-inv-filter <?php echo $filter === $key ? 'active' : ''; ?>">
                         <?php echo esc_html( $label ); ?> <span class="count">(<?php echo absint( $counts[ $key ] ?? 0 ); ?>)</span>
                     </a>
                 <?php endforeach; ?>
             </div>
 
             <!-- Tableau -->
-            <table class="serviceflow-inv-table">
+            <table class="clielo-inv-table">
                 <thead>
                     <tr>
                         <th><?php esc_html_e( 'N° Facture', 'clielo' ); ?></th>
@@ -1782,7 +1782,7 @@ class Clielo_Invoices {
                             $client_name  = $client_info ? $client_info->name : '—';
                             $badge_color  = $colors[ $inv->status ] ?? '#9ca3af';
                             $status_text  = $labels[ $inv->status ] ?? $inv->status;
-                            $view_url     = admin_url( 'admin.php?page=serviceflow-invoice-view&invoice_id=' . $inv->id );
+                            $view_url     = admin_url( 'admin.php?page=clielo-invoice-view&invoice_id=' . $inv->id );
                             $allowed_next = $transitions_map[ $inv->status ] ?? [];
                         ?>
                         <tr>
@@ -1790,13 +1790,13 @@ class Clielo_Invoices {
                             <td><?php echo esc_html( $client_name ); ?></td>
                             <td><?php echo $inv->order_id ? '#CMD-' . esc_html( $inv->order_id ) : '—'; ?></td>
                             <td>
-                                <div class="serviceflow-inv-status-wrap">
-                                    <span class="serviceflow-inv-badge <?php echo ! empty( $allowed_next ) ? 'clickable' : ''; ?>" style="background:<?php echo esc_attr( $badge_color ); ?>" <?php if ( ! empty( $allowed_next ) ) : ?>data-toggle-dd="dd-<?php echo (int) $inv->id; ?>"<?php endif; ?>><?php echo esc_html( $status_text ); ?></span>
+                                <div class="clielo-inv-status-wrap">
+                                    <span class="clielo-inv-badge <?php echo ! empty( $allowed_next ) ? 'clickable' : ''; ?>" style="background:<?php echo esc_attr( $badge_color ); ?>" <?php if ( ! empty( $allowed_next ) ) : ?>data-toggle-dd="dd-<?php echo (int) $inv->id; ?>"<?php endif; ?>><?php echo esc_html( $status_text ); ?></span>
                                     <?php if ( ! empty( $allowed_next ) ) : ?>
-                                    <div class="serviceflow-inv-status-dd" id="dd-<?php echo (int) $inv->id; ?>">
+                                    <div class="clielo-inv-status-dd" id="dd-<?php echo (int) $inv->id; ?>">
                                         <?php foreach ( $allowed_next as $ns ) : ?>
-                                            <a href="#" class="serviceflow-inv-set-status" data-id="<?php echo (int) $inv->id; ?>" data-status="<?php echo esc_attr( $ns ); ?>">
-                                                <span class="serviceflow-inv-status-dot" style="background:<?php echo esc_attr( $colors[ $ns ] ?? '#999' ); ?>"></span>
+                                            <a href="#" class="clielo-inv-set-status" data-id="<?php echo (int) $inv->id; ?>" data-status="<?php echo esc_attr( $ns ); ?>">
+                                                <span class="clielo-inv-status-dot" style="background:<?php echo esc_attr( $colors[ $ns ] ?? '#999' ); ?>"></span>
                                                 <?php echo esc_html( $labels[ $ns ] ?? $ns ); ?>
                                             </a>
                                         <?php endforeach; ?>
@@ -1807,18 +1807,18 @@ class Clielo_Invoices {
                             <td><strong><?php echo esc_html( number_format( (float) $inv->total, 2, ',', ' ' ) ); ?> &euro;</strong></td>
                             <td><?php echo esc_html( date_i18n( 'd/m/Y', strtotime( $inv->created_at ) ) ); ?></td>
                             <td>
-                                <a href="<?php echo esc_url( $view_url ); ?>" class="serviceflow-inv-act" style="color:<?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Voir', 'clielo' ); ?></a>
+                                <a href="<?php echo esc_url( $view_url ); ?>" class="clielo-inv-act" style="color:<?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Voir', 'clielo' ); ?></a>
                                 <?php if ( $inv->status === self::STATUS_DRAFT ) : ?>
-                                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=serviceflow-invoice-edit&invoice_id=' . $inv->id ) ); ?>" class="serviceflow-inv-act" style="color:#f59e0b"><?php esc_html_e( 'Modifier', 'clielo' ); ?></a>
+                                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=clielo-invoice-edit&invoice_id=' . $inv->id ) ); ?>" class="clielo-inv-act" style="color:#f59e0b"><?php esc_html_e( 'Modifier', 'clielo' ); ?></a>
                                 <?php endif; ?>
                                 <?php if ( in_array( $inv->status, [ self::STATUS_DRAFT, self::STATUS_PENDING ], true ) ) : ?>
-                                    <a class="serviceflow-inv-act serviceflow-inv-action" data-action="clielo_invoice_validate" data-id="<?php echo (int) $inv->id; ?>" style="color:#10b981"><?php esc_html_e( 'Valider', 'clielo' ); ?></a>
+                                    <a class="clielo-inv-act clielo-inv-action" data-action="clielo_invoice_validate" data-id="<?php echo (int) $inv->id; ?>" style="color:#10b981"><?php esc_html_e( 'Valider', 'clielo' ); ?></a>
                                 <?php endif; ?>
                                 <?php if ( $inv->status === self::STATUS_VALIDATED ) : ?>
-                                    <a class="serviceflow-inv-act serviceflow-inv-action" data-action="clielo_invoice_mark_paid" data-id="<?php echo (int) $inv->id; ?>" style="color:#10b981"><?php esc_html_e( 'Payer', 'clielo' ); ?></a>
+                                    <a class="clielo-inv-act clielo-inv-action" data-action="clielo_invoice_mark_paid" data-id="<?php echo (int) $inv->id; ?>" style="color:#10b981"><?php esc_html_e( 'Payer', 'clielo' ); ?></a>
                                 <?php endif; ?>
                                 <?php if ( ! in_array( $inv->status, [ self::STATUS_PAID, self::STATUS_CANCELLED ], true ) ) : ?>
-                                    <a class="serviceflow-inv-act serviceflow-inv-action" data-action="clielo_invoice_cancel" data-id="<?php echo (int) $inv->id; ?>" style="color:#ef4444"><?php esc_html_e( 'Annuler', 'clielo' ); ?></a>
+                                    <a class="clielo-inv-act clielo-inv-action" data-action="clielo_invoice_cancel" data-id="<?php echo (int) $inv->id; ?>" style="color:#ef4444"><?php esc_html_e( 'Annuler', 'clielo' ); ?></a>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -1835,7 +1835,7 @@ class Clielo_Invoices {
                 var nonce   = '<?php echo esc_js( $nonce ); ?>';
 
                 // Actions classiques (Valider, Payer, Annuler)
-                document.querySelectorAll('.serviceflow-inv-action').forEach(function(a){
+                document.querySelectorAll('.clielo-inv-action').forEach(function(a){
                     a.addEventListener('click', function(e){
                         e.preventDefault();
                         var action = this.dataset.action;
@@ -1860,7 +1860,7 @@ class Clielo_Invoices {
                         var ddId = this.dataset.toggleDd;
                         var dd = document.getElementById(ddId);
                         // Fermer les autres
-                        document.querySelectorAll('.serviceflow-inv-status-dd.open').forEach(function(d){
+                        document.querySelectorAll('.clielo-inv-status-dd.open').forEach(function(d){
                             if(d.id !== ddId) d.classList.remove('open');
                         });
                         dd.classList.toggle('open');
@@ -1869,13 +1869,13 @@ class Clielo_Invoices {
 
                 // Fermer dropdown si clic ailleurs
                 document.addEventListener('click', function(){
-                    document.querySelectorAll('.serviceflow-inv-status-dd.open').forEach(function(d){
+                    document.querySelectorAll('.clielo-inv-status-dd.open').forEach(function(d){
                         d.classList.remove('open');
                     });
                 });
 
                 // Changement de statut via dropdown
-                document.querySelectorAll('.serviceflow-inv-set-status').forEach(function(a){
+                document.querySelectorAll('.clielo-inv-set-status').forEach(function(a){
                     a.addEventListener('click', function(e){
                         e.preventDefault();
                         e.stopPropagation();
@@ -1918,45 +1918,45 @@ class Clielo_Invoices {
         // Utilisateurs WP non-admin
         $wp_users = get_users( [ 'role__not_in' => [ 'administrator' ], 'orderby' => 'display_name', 'number' => 200 ] );
         ?>
-        <div class="wrap serviceflow-dashboard">
+        <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <span class="dashicons dashicons-plus-alt" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
                 <?php esc_html_e( 'Clielo — Nouvelle facture', 'clielo' ); ?>
             </h1>
 
-            <div id="serviceflow-newinv-form">
+            <div id="clielo-newinv-form">
                 <!-- Client -->
-                <div class="serviceflow-newinv-section">
+                <div class="clielo-newinv-section">
                     <h2><span class="dashicons dashicons-admin-users"></span> <?php esc_html_e( 'Client', 'clielo' ); ?></h2>
-                    <div class="serviceflow-newinv-radio">
+                    <div class="clielo-newinv-radio">
                         <label><input type="radio" name="clielo_client_type" value="wp" checked /> <?php esc_html_e( 'Utilisateur WordPress', 'clielo' ); ?></label>
                         <label><input type="radio" name="clielo_client_type" value="ext" /> <?php esc_html_e( 'Client externe', 'clielo' ); ?></label>
                     </div>
-                    <div class="serviceflow-newinv-field" id="serviceflow-newinv-wp-client">
+                    <div class="clielo-newinv-field" id="clielo-newinv-wp-client">
                         <label><?php esc_html_e( 'Sélectionner un utilisateur', 'clielo' ); ?></label>
-                        <select id="serviceflow-newinv-client-id">
+                        <select id="clielo-newinv-client-id">
                             <option value=""><?php esc_html_e( '— Choisir —', 'clielo' ); ?></option>
                             <?php foreach ( $wp_users as $u ) : ?>
                                 <option value="<?php echo (int) $u->ID; ?>"><?php echo esc_html( $u->display_name . ' (' . $u->user_email . ')' ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="serviceflow-newinv-field" id="serviceflow-newinv-ext-client" style="display:none">
+                    <div class="clielo-newinv-field" id="clielo-newinv-ext-client" style="display:none">
                         <label><?php esc_html_e( 'Sélectionner un client externe', 'clielo' ); ?></label>
-                        <select id="serviceflow-newinv-ext-id">
+                        <select id="clielo-newinv-ext-id">
                             <option value=""><?php esc_html_e( '— Choisir —', 'clielo' ); ?></option>
                             <?php foreach ( $ext_clients as $ec ) : ?>
                                 <option value="<?php echo (int) $ec->id; ?>"><?php echo esc_html( $ec->name . ( $ec->company ? ' — ' . $ec->company : '' ) ); ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=serviceflow-clients' ) ); ?>" style="font-size:12px"><?php esc_html_e( 'Gérer les clients externes', 'clielo' ); ?></a>
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=clielo-clients' ) ); ?>" style="font-size:12px"><?php esc_html_e( 'Gérer les clients externes', 'clielo' ); ?></a>
                     </div>
                 </div>
 
                 <!-- Articles -->
-                <div class="serviceflow-newinv-section">
+                <div class="clielo-newinv-section">
                     <h2><span class="dashicons dashicons-list-view"></span> <?php esc_html_e( 'Articles', 'clielo' ); ?></h2>
-                    <table class="serviceflow-items-table" id="serviceflow-items-table">
+                    <table class="clielo-items-table" id="clielo-items-table">
                         <thead>
                             <tr>
                                 <th style="width:50%"><?php esc_html_e( 'Description', 'clielo' ); ?></th>
@@ -1966,41 +1966,41 @@ class Clielo_Invoices {
                                 <th style="width:5%"></th>
                             </tr>
                         </thead>
-                        <tbody id="serviceflow-items-body">
-                            <tr class="serviceflow-item-row">
-                                <td><input type="text" class="serviceflow-item-desc" placeholder="<?php esc_attr_e( 'Description du service', 'clielo' ); ?>" /></td>
-                                <td><input type="number" class="serviceflow-item-qty" value="1" min="1" step="1" /></td>
-                                <td><input type="number" class="serviceflow-item-price" value="0" min="0" step="0.01" /></td>
-                                <td class="serviceflow-item-total" style="text-align:right;font-weight:600">0,00 &euro;</td>
-                                <td><button type="button" class="serviceflow-items-rm">&times;</button></td>
+                        <tbody id="clielo-items-body">
+                            <tr class="clielo-item-row">
+                                <td><input type="text" class="clielo-item-desc" placeholder="<?php esc_attr_e( 'Description du service', 'clielo' ); ?>" /></td>
+                                <td><input type="number" class="clielo-item-qty" value="1" min="1" step="1" /></td>
+                                <td><input type="number" class="clielo-item-price" value="0" min="0" step="0.01" /></td>
+                                <td class="clielo-item-total" style="text-align:right;font-weight:600">0,00 &euro;</td>
+                                <td><button type="button" class="clielo-items-rm">&times;</button></td>
                             </tr>
                         </tbody>
                     </table>
-                    <button type="button" id="serviceflow-add-item" class="button">+ <?php esc_html_e( 'Ajouter un article', 'clielo' ); ?></button>
+                    <button type="button" id="clielo-add-item" class="button">+ <?php esc_html_e( 'Ajouter un article', 'clielo' ); ?></button>
 
-                    <div class="serviceflow-newinv-totals" style="margin-top:16px">
-                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="serviceflow-newinv-subtotal">0,00</span> &euro;</div>
-                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="serviceflow-newinv-taxrate-display"><?php echo esc_html( $settings['tax_rate'] ); ?></span>%) : <span id="serviceflow-newinv-tax">0,00</span> &euro;</div>
-                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="serviceflow-newinv-total">0,00</span> &euro;</strong></div>
+                    <div class="clielo-newinv-totals" style="margin-top:16px">
+                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="clielo-newinv-subtotal">0,00</span> &euro;</div>
+                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="clielo-newinv-taxrate-display"><?php echo esc_html( $settings['tax_rate'] ); ?></span>%) : <span id="clielo-newinv-tax">0,00</span> &euro;</div>
+                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="clielo-newinv-total">0,00</span> &euro;</strong></div>
                     </div>
                 </div>
 
                 <!-- TVA et notes -->
-                <div class="serviceflow-newinv-section">
+                <div class="clielo-newinv-section">
                     <h2><span class="dashicons dashicons-editor-alignleft"></span> <?php esc_html_e( 'Détails', 'clielo' ); ?></h2>
-                    <div class="serviceflow-newinv-field" style="max-width:200px">
+                    <div class="clielo-newinv-field" style="max-width:200px">
                         <label><?php esc_html_e( 'Taux TVA (%)', 'clielo' ); ?></label>
-                        <input type="number" id="serviceflow-newinv-taxrate" value="<?php echo esc_attr( $settings['tax_rate'] ); ?>" min="0" max="100" step="0.01" />
+                        <input type="number" id="clielo-newinv-taxrate" value="<?php echo esc_attr( $settings['tax_rate'] ); ?>" min="0" max="100" step="0.01" />
                     </div>
-                    <div class="serviceflow-newinv-field">
+                    <div class="clielo-newinv-field">
                         <label><?php esc_html_e( 'Notes / Conditions', 'clielo' ); ?></label>
-                        <textarea id="serviceflow-newinv-notes"><?php echo esc_textarea( $settings['payment_terms'] ); ?></textarea>
+                        <textarea id="clielo-newinv-notes"><?php echo esc_textarea( $settings['payment_terms'] ); ?></textarea>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <button type="button" class="button serviceflow-newinv-save" data-status="draft" style="margin-right:8px"><?php esc_html_e( 'Enregistrer en brouillon', 'clielo' ); ?></button>
-                <button type="button" class="button button-primary serviceflow-newinv-save" data-status="validated" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Enregistrer et valider', 'clielo' ); ?></button>
+                <button type="button" class="button clielo-newinv-save" data-status="draft" style="margin-right:8px"><?php esc_html_e( 'Enregistrer en brouillon', 'clielo' ); ?></button>
+                <button type="button" class="button button-primary clielo-newinv-save" data-status="validated" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Enregistrer et valider', 'clielo' ); ?></button>
             </div>
 
             <?php
@@ -2013,56 +2013,56 @@ class Clielo_Invoices {
                 // Toggle client type
                 document.querySelectorAll('input[name="clielo_client_type"]').forEach(function(r){
                     r.addEventListener('change', function(){
-                        document.getElementById('serviceflow-newinv-wp-client').style.display = this.value==='wp' ? '' : 'none';
-                        document.getElementById('serviceflow-newinv-ext-client').style.display = this.value==='ext' ? '' : 'none';
+                        document.getElementById('clielo-newinv-wp-client').style.display = this.value==='wp' ? '' : 'none';
+                        document.getElementById('clielo-newinv-ext-client').style.display = this.value==='ext' ? '' : 'none';
                     });
                 });
 
                 // Calcul totaux
                 function recalc(){
                     var subtotal = 0;
-                    document.querySelectorAll('.serviceflow-item-row').forEach(function(row){
-                        var qty   = parseFloat(row.querySelector('.serviceflow-item-qty').value) || 0;
-                        var price = parseFloat(row.querySelector('.serviceflow-item-price').value) || 0;
+                    document.querySelectorAll('.clielo-item-row').forEach(function(row){
+                        var qty   = parseFloat(row.querySelector('.clielo-item-qty').value) || 0;
+                        var price = parseFloat(row.querySelector('.clielo-item-price').value) || 0;
                         var lt    = Math.round(qty * price * 100) / 100;
-                        row.querySelector('.serviceflow-item-total').textContent = lt.toFixed(2).replace('.',',') + ' \u20ac';
+                        row.querySelector('.clielo-item-total').textContent = lt.toFixed(2).replace('.',',') + ' \u20ac';
                         subtotal += lt;
                     });
-                    var rate = parseFloat(document.getElementById('serviceflow-newinv-taxrate').value) || 0;
+                    var rate = parseFloat(document.getElementById('clielo-newinv-taxrate').value) || 0;
                     var tax  = Math.round(subtotal * rate) / 100;
                     var total = subtotal + tax;
-                    document.getElementById('serviceflow-newinv-subtotal').textContent = subtotal.toFixed(2).replace('.',',');
-                    document.getElementById('serviceflow-newinv-tax').textContent = tax.toFixed(2).replace('.',',');
-                    document.getElementById('serviceflow-newinv-total').textContent = total.toFixed(2).replace('.',',');
-                    document.getElementById('serviceflow-newinv-taxrate-display').textContent = rate;
+                    document.getElementById('clielo-newinv-subtotal').textContent = subtotal.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newinv-tax').textContent = tax.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newinv-total').textContent = total.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newinv-taxrate-display').textContent = rate;
                 }
 
                 document.addEventListener('input', function(e){
-                    if(e.target.classList.contains('serviceflow-item-qty') || e.target.classList.contains('serviceflow-item-price') || e.target.id === 'serviceflow-newinv-taxrate') recalc();
+                    if(e.target.classList.contains('clielo-item-qty') || e.target.classList.contains('clielo-item-price') || e.target.id === 'clielo-newinv-taxrate') recalc();
                 });
 
                 // Ajouter article
-                document.getElementById('serviceflow-add-item').addEventListener('click', function(){
+                document.getElementById('clielo-add-item').addEventListener('click', function(){
                     var row = document.createElement('tr');
-                    row.className = 'serviceflow-item-row';
-                    row.innerHTML = '<td><input type="text" class="serviceflow-item-desc" placeholder="<?php echo esc_js( __( 'Description du service', 'clielo' ) ); ?>" /></td>' +
-                        '<td><input type="number" class="serviceflow-item-qty" value="1" min="1" step="1" /></td>' +
-                        '<td><input type="number" class="serviceflow-item-price" value="0" min="0" step="0.01" /></td>' +
-                        '<td class="serviceflow-item-total" style="text-align:right;font-weight:600">0,00 \u20ac</td>' +
-                        '<td><button type="button" class="serviceflow-items-rm">&times;</button></td>';
-                    document.getElementById('serviceflow-items-body').appendChild(row);
+                    row.className = 'clielo-item-row';
+                    row.innerHTML = '<td><input type="text" class="clielo-item-desc" placeholder="<?php echo esc_js( __( 'Description du service', 'clielo' ) ); ?>" /></td>' +
+                        '<td><input type="number" class="clielo-item-qty" value="1" min="1" step="1" /></td>' +
+                        '<td><input type="number" class="clielo-item-price" value="0" min="0" step="0.01" /></td>' +
+                        '<td class="clielo-item-total" style="text-align:right;font-weight:600">0,00 \u20ac</td>' +
+                        '<td><button type="button" class="clielo-items-rm">&times;</button></td>';
+                    document.getElementById('clielo-items-body').appendChild(row);
                 });
 
                 // Supprimer article
                 document.addEventListener('click', function(e){
-                    if(e.target.classList.contains('serviceflow-items-rm')){
-                        var rows = document.querySelectorAll('.serviceflow-item-row');
+                    if(e.target.classList.contains('clielo-items-rm')){
+                        var rows = document.querySelectorAll('.clielo-item-row');
                         if(rows.length > 1){ e.target.closest('tr').remove(); recalc(); }
                     }
                 });
 
                 // Save
-                document.querySelectorAll('.serviceflow-newinv-save').forEach(function(btn){
+                document.querySelectorAll('.clielo-newinv-save').forEach(function(btn){
                     btn.addEventListener('click', function(){
                         var status = this.dataset.status;
                         this.disabled = true;
@@ -2072,17 +2072,17 @@ class Clielo_Invoices {
                         fd.append('action', 'clielo_invoice_save');
                         fd.append('nonce', nonce);
                         fd.append('client_type', clientType);
-                        fd.append('client_id', document.getElementById('serviceflow-newinv-client-id').value);
-                        fd.append('ext_client_id', document.getElementById('serviceflow-newinv-ext-id').value);
-                        fd.append('tax_rate', document.getElementById('serviceflow-newinv-taxrate').value);
-                        fd.append('notes', document.getElementById('serviceflow-newinv-notes').value);
+                        fd.append('client_id', document.getElementById('clielo-newinv-client-id').value);
+                        fd.append('ext_client_id', document.getElementById('clielo-newinv-ext-id').value);
+                        fd.append('tax_rate', document.getElementById('clielo-newinv-taxrate').value);
+                        fd.append('notes', document.getElementById('clielo-newinv-notes').value);
                         fd.append('save_status', status);
 
-                        var rows = document.querySelectorAll('.serviceflow-item-row');
+                        var rows = document.querySelectorAll('.clielo-item-row');
                         rows.forEach(function(row, i){
-                            fd.append('items['+i+'][description]', row.querySelector('.serviceflow-item-desc').value);
-                            fd.append('items['+i+'][quantity]', row.querySelector('.serviceflow-item-qty').value);
-                            fd.append('items['+i+'][unit_price]', row.querySelector('.serviceflow-item-price').value);
+                            fd.append('items['+i+'][description]', row.querySelector('.clielo-item-desc').value);
+                            fd.append('items['+i+'][quantity]', row.querySelector('.clielo-item-qty').value);
+                            fd.append('items['+i+'][unit_price]', row.querySelector('.clielo-item-price').value);
                         });
 
                         fetch(ajaxUrl,{method:'POST',body:fd,credentials:'same-origin'})
@@ -2090,7 +2090,7 @@ class Clielo_Invoices {
                         .then(function(res){
                             btn.disabled = false;
                             if(res.success){
-                                window.location.href = '<?php echo esc_url( admin_url( 'admin.php?page=serviceflow-invoices' ) ); ?>';
+                                window.location.href = '<?php echo esc_url( admin_url( 'admin.php?page=clielo-invoices' ) ); ?>';
                             } else {
                                 alert(res.data && res.data.message ? res.data.message : 'Erreur');
                             }
@@ -2130,7 +2130,7 @@ class Clielo_Invoices {
         $items       = json_decode( $invoice->items, true ) ?: [];
         $is_wp       = ! empty( $invoice->client_id );
         ?>
-        <div class="wrap serviceflow-dashboard">
+        <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <span class="dashicons dashicons-edit" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
                 <?php
@@ -2138,26 +2138,26 @@ class Clielo_Invoices {
                 printf( esc_html__( 'Modifier — %s', 'clielo' ), esc_html( $invoice->invoice_number ) ); ?>
             </h1>
 
-            <div id="serviceflow-newinv-form">
+            <div id="clielo-newinv-form">
                 <!-- Client -->
-                <div class="serviceflow-newinv-section">
+                <div class="clielo-newinv-section">
                     <h2><span class="dashicons dashicons-admin-users"></span> <?php esc_html_e( 'Client', 'clielo' ); ?></h2>
-                    <div class="serviceflow-newinv-radio">
+                    <div class="clielo-newinv-radio">
                         <label><input type="radio" name="clielo_client_type" value="wp" <?php checked( $is_wp ); ?> /> <?php esc_html_e( 'Utilisateur WordPress', 'clielo' ); ?></label>
                         <label><input type="radio" name="clielo_client_type" value="ext" <?php checked( ! $is_wp ); ?> /> <?php esc_html_e( 'Client externe', 'clielo' ); ?></label>
                     </div>
-                    <div class="serviceflow-newinv-field" id="serviceflow-newinv-wp-client" style="<?php echo $is_wp ? '' : 'display:none'; ?>">
+                    <div class="clielo-newinv-field" id="clielo-newinv-wp-client" style="<?php echo $is_wp ? '' : 'display:none'; ?>">
                         <label><?php esc_html_e( 'Sélectionner un utilisateur', 'clielo' ); ?></label>
-                        <select id="serviceflow-newinv-client-id">
+                        <select id="clielo-newinv-client-id">
                             <option value=""><?php esc_html_e( '— Choisir —', 'clielo' ); ?></option>
                             <?php foreach ( $wp_users as $u ) : ?>
                                 <option value="<?php echo (int) $u->ID; ?>" <?php selected( (int) $invoice->client_id, $u->ID ); ?>><?php echo esc_html( $u->display_name . ' (' . $u->user_email . ')' ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="serviceflow-newinv-field" id="serviceflow-newinv-ext-client" style="<?php echo $is_wp ? 'display:none' : ''; ?>">
+                    <div class="clielo-newinv-field" id="clielo-newinv-ext-client" style="<?php echo $is_wp ? 'display:none' : ''; ?>">
                         <label><?php esc_html_e( 'Sélectionner un client externe', 'clielo' ); ?></label>
-                        <select id="serviceflow-newinv-ext-id">
+                        <select id="clielo-newinv-ext-id">
                             <option value=""><?php esc_html_e( '— Choisir —', 'clielo' ); ?></option>
                             <?php foreach ( $ext_clients as $ec ) : ?>
                                 <option value="<?php echo (int) $ec->id; ?>" <?php selected( (int) $invoice->ext_client_id, $ec->id ); ?>><?php echo esc_html( $ec->name . ( $ec->company ? ' — ' . $ec->company : '' ) ); ?></option>
@@ -2167,9 +2167,9 @@ class Clielo_Invoices {
                 </div>
 
                 <!-- Articles -->
-                <div class="serviceflow-newinv-section">
+                <div class="clielo-newinv-section">
                     <h2><span class="dashicons dashicons-list-view"></span> <?php esc_html_e( 'Articles', 'clielo' ); ?></h2>
-                    <table class="serviceflow-items-table" id="serviceflow-items-table">
+                    <table class="clielo-items-table" id="clielo-items-table">
                         <thead>
                             <tr>
                                 <th style="width:50%"><?php esc_html_e( 'Description', 'clielo' ); ?></th>
@@ -2179,44 +2179,44 @@ class Clielo_Invoices {
                                 <th style="width:5%"></th>
                             </tr>
                         </thead>
-                        <tbody id="serviceflow-items-body">
+                        <tbody id="clielo-items-body">
                             <?php foreach ( $items as $item ) : ?>
-                            <tr class="serviceflow-item-row">
-                                <td><input type="text" class="serviceflow-item-desc" value="<?php echo esc_attr( $item['description'] ?? '' ); ?>" /></td>
-                                <td><input type="number" class="serviceflow-item-qty" value="<?php echo esc_attr( $item['quantity'] ?? 1 ); ?>" min="1" step="1" /></td>
-                                <td><input type="number" class="serviceflow-item-price" value="<?php echo esc_attr( $item['unit_price'] ?? 0 ); ?>" min="0" step="0.01" /></td>
-                                <td class="serviceflow-item-total" style="text-align:right;font-weight:600"><?php echo esc_html( number_format( floatval( $item['total'] ?? 0 ), 2, ',', ' ' ) ); ?> &euro;</td>
-                                <td><button type="button" class="serviceflow-items-rm">&times;</button></td>
+                            <tr class="clielo-item-row">
+                                <td><input type="text" class="clielo-item-desc" value="<?php echo esc_attr( $item['description'] ?? '' ); ?>" /></td>
+                                <td><input type="number" class="clielo-item-qty" value="<?php echo esc_attr( $item['quantity'] ?? 1 ); ?>" min="1" step="1" /></td>
+                                <td><input type="number" class="clielo-item-price" value="<?php echo esc_attr( $item['unit_price'] ?? 0 ); ?>" min="0" step="0.01" /></td>
+                                <td class="clielo-item-total" style="text-align:right;font-weight:600"><?php echo esc_html( number_format( floatval( $item['total'] ?? 0 ), 2, ',', ' ' ) ); ?> &euro;</td>
+                                <td><button type="button" class="clielo-items-rm">&times;</button></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <button type="button" id="serviceflow-add-item" class="button">+ <?php esc_html_e( 'Ajouter un article', 'clielo' ); ?></button>
+                    <button type="button" id="clielo-add-item" class="button">+ <?php esc_html_e( 'Ajouter un article', 'clielo' ); ?></button>
 
-                    <div class="serviceflow-newinv-totals" style="margin-top:16px">
-                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="serviceflow-newinv-subtotal"><?php echo esc_html( number_format( (float) $invoice->subtotal, 2, ',', '' ) ); ?></span> &euro;</div>
-                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="serviceflow-newinv-taxrate-display"><?php echo esc_html( $invoice->tax_rate ); ?></span>%) : <span id="serviceflow-newinv-tax"><?php echo esc_html( number_format( (float) $invoice->tax_amount, 2, ',', '' ) ); ?></span> &euro;</div>
-                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="serviceflow-newinv-total"><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', '' ) ); ?></span> &euro;</strong></div>
+                    <div class="clielo-newinv-totals" style="margin-top:16px">
+                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="clielo-newinv-subtotal"><?php echo esc_html( number_format( (float) $invoice->subtotal, 2, ',', '' ) ); ?></span> &euro;</div>
+                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="clielo-newinv-taxrate-display"><?php echo esc_html( $invoice->tax_rate ); ?></span>%) : <span id="clielo-newinv-tax"><?php echo esc_html( number_format( (float) $invoice->tax_amount, 2, ',', '' ) ); ?></span> &euro;</div>
+                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="clielo-newinv-total"><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', '' ) ); ?></span> &euro;</strong></div>
                     </div>
                 </div>
 
                 <!-- TVA et notes -->
-                <div class="serviceflow-newinv-section">
+                <div class="clielo-newinv-section">
                     <h2><span class="dashicons dashicons-editor-alignleft"></span> <?php esc_html_e( 'Détails', 'clielo' ); ?></h2>
-                    <div class="serviceflow-newinv-field" style="max-width:200px">
+                    <div class="clielo-newinv-field" style="max-width:200px">
                         <label><?php esc_html_e( 'Taux TVA (%)', 'clielo' ); ?></label>
-                        <input type="number" id="serviceflow-newinv-taxrate" value="<?php echo esc_attr( $invoice->tax_rate ); ?>" min="0" max="100" step="0.01" />
+                        <input type="number" id="clielo-newinv-taxrate" value="<?php echo esc_attr( $invoice->tax_rate ); ?>" min="0" max="100" step="0.01" />
                     </div>
-                    <div class="serviceflow-newinv-field">
+                    <div class="clielo-newinv-field">
                         <label><?php esc_html_e( 'Notes / Conditions', 'clielo' ); ?></label>
-                        <textarea id="serviceflow-newinv-notes"><?php echo esc_textarea( $invoice->notes ); ?></textarea>
+                        <textarea id="clielo-newinv-notes"><?php echo esc_textarea( $invoice->notes ); ?></textarea>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <button type="button" class="button serviceflow-newinv-save" data-status="draft" style="margin-right:8px"><?php esc_html_e( 'Enregistrer en brouillon', 'clielo' ); ?></button>
-                <button type="button" class="button button-primary serviceflow-newinv-save" data-status="validated" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Enregistrer et valider', 'clielo' ); ?></button>
-                <a href="<?php echo esc_url( admin_url( 'admin.php?page=serviceflow-invoices' ) ); ?>" style="padding:8px 20px;font-size:13px;text-decoration:none;color:#555">&larr; <?php esc_html_e( 'Retour', 'clielo' ); ?></a>
+                <button type="button" class="button clielo-newinv-save" data-status="draft" style="margin-right:8px"><?php esc_html_e( 'Enregistrer en brouillon', 'clielo' ); ?></button>
+                <button type="button" class="button button-primary clielo-newinv-save" data-status="validated" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Enregistrer et valider', 'clielo' ); ?></button>
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=clielo-invoices' ) ); ?>" style="padding:8px 20px;font-size:13px;text-decoration:none;color:#555">&larr; <?php esc_html_e( 'Retour', 'clielo' ); ?></a>
             </div>
 
             <?php
@@ -2229,52 +2229,52 @@ class Clielo_Invoices {
 
                 document.querySelectorAll('input[name="clielo_client_type"]').forEach(function(r){
                     r.addEventListener('change', function(){
-                        document.getElementById('serviceflow-newinv-wp-client').style.display = this.value==='wp' ? '' : 'none';
-                        document.getElementById('serviceflow-newinv-ext-client').style.display = this.value==='ext' ? '' : 'none';
+                        document.getElementById('clielo-newinv-wp-client').style.display = this.value==='wp' ? '' : 'none';
+                        document.getElementById('clielo-newinv-ext-client').style.display = this.value==='ext' ? '' : 'none';
                     });
                 });
 
                 function recalc(){
                     var subtotal = 0;
-                    document.querySelectorAll('.serviceflow-item-row').forEach(function(row){
-                        var qty   = parseFloat(row.querySelector('.serviceflow-item-qty').value) || 0;
-                        var price = parseFloat(row.querySelector('.serviceflow-item-price').value) || 0;
+                    document.querySelectorAll('.clielo-item-row').forEach(function(row){
+                        var qty   = parseFloat(row.querySelector('.clielo-item-qty').value) || 0;
+                        var price = parseFloat(row.querySelector('.clielo-item-price').value) || 0;
                         var lt    = Math.round(qty * price * 100) / 100;
-                        row.querySelector('.serviceflow-item-total').textContent = lt.toFixed(2).replace('.',',') + ' \u20ac';
+                        row.querySelector('.clielo-item-total').textContent = lt.toFixed(2).replace('.',',') + ' \u20ac';
                         subtotal += lt;
                     });
-                    var rate = parseFloat(document.getElementById('serviceflow-newinv-taxrate').value) || 0;
+                    var rate = parseFloat(document.getElementById('clielo-newinv-taxrate').value) || 0;
                     var tax  = Math.round(subtotal * rate) / 100;
                     var total = subtotal + tax;
-                    document.getElementById('serviceflow-newinv-subtotal').textContent = subtotal.toFixed(2).replace('.',',');
-                    document.getElementById('serviceflow-newinv-tax').textContent = tax.toFixed(2).replace('.',',');
-                    document.getElementById('serviceflow-newinv-total').textContent = total.toFixed(2).replace('.',',');
-                    document.getElementById('serviceflow-newinv-taxrate-display').textContent = rate;
+                    document.getElementById('clielo-newinv-subtotal').textContent = subtotal.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newinv-tax').textContent = tax.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newinv-total').textContent = total.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newinv-taxrate-display').textContent = rate;
                 }
 
                 document.addEventListener('input', function(e){
-                    if(e.target.classList.contains('serviceflow-item-qty') || e.target.classList.contains('serviceflow-item-price') || e.target.id === 'serviceflow-newinv-taxrate') recalc();
+                    if(e.target.classList.contains('clielo-item-qty') || e.target.classList.contains('clielo-item-price') || e.target.id === 'clielo-newinv-taxrate') recalc();
                 });
 
-                document.getElementById('serviceflow-add-item').addEventListener('click', function(){
+                document.getElementById('clielo-add-item').addEventListener('click', function(){
                     var row = document.createElement('tr');
-                    row.className = 'serviceflow-item-row';
-                    row.innerHTML = '<td><input type="text" class="serviceflow-item-desc" placeholder="<?php echo esc_js( __( 'Description du service', 'clielo' ) ); ?>" /></td>' +
-                        '<td><input type="number" class="serviceflow-item-qty" value="1" min="1" step="1" /></td>' +
-                        '<td><input type="number" class="serviceflow-item-price" value="0" min="0" step="0.01" /></td>' +
-                        '<td class="serviceflow-item-total" style="text-align:right;font-weight:600">0,00 \u20ac</td>' +
-                        '<td><button type="button" class="serviceflow-items-rm">&times;</button></td>';
-                    document.getElementById('serviceflow-items-body').appendChild(row);
+                    row.className = 'clielo-item-row';
+                    row.innerHTML = '<td><input type="text" class="clielo-item-desc" placeholder="<?php echo esc_js( __( 'Description du service', 'clielo' ) ); ?>" /></td>' +
+                        '<td><input type="number" class="clielo-item-qty" value="1" min="1" step="1" /></td>' +
+                        '<td><input type="number" class="clielo-item-price" value="0" min="0" step="0.01" /></td>' +
+                        '<td class="clielo-item-total" style="text-align:right;font-weight:600">0,00 \u20ac</td>' +
+                        '<td><button type="button" class="clielo-items-rm">&times;</button></td>';
+                    document.getElementById('clielo-items-body').appendChild(row);
                 });
 
                 document.addEventListener('click', function(e){
-                    if(e.target.classList.contains('serviceflow-items-rm')){
-                        var rows = document.querySelectorAll('.serviceflow-item-row');
+                    if(e.target.classList.contains('clielo-items-rm')){
+                        var rows = document.querySelectorAll('.clielo-item-row');
                         if(rows.length > 1){ e.target.closest('tr').remove(); recalc(); }
                     }
                 });
 
-                document.querySelectorAll('.serviceflow-newinv-save').forEach(function(btn){
+                document.querySelectorAll('.clielo-newinv-save').forEach(function(btn){
                     btn.addEventListener('click', function(){
                         var status = this.dataset.status;
                         this.disabled = true;
@@ -2285,17 +2285,17 @@ class Clielo_Invoices {
                         fd.append('nonce', nonce);
                         fd.append('invoice_id', invoiceId);
                         fd.append('client_type', clientType);
-                        fd.append('client_id', document.getElementById('serviceflow-newinv-client-id').value);
-                        fd.append('ext_client_id', document.getElementById('serviceflow-newinv-ext-id').value);
-                        fd.append('tax_rate', document.getElementById('serviceflow-newinv-taxrate').value);
-                        fd.append('notes', document.getElementById('serviceflow-newinv-notes').value);
+                        fd.append('client_id', document.getElementById('clielo-newinv-client-id').value);
+                        fd.append('ext_client_id', document.getElementById('clielo-newinv-ext-id').value);
+                        fd.append('tax_rate', document.getElementById('clielo-newinv-taxrate').value);
+                        fd.append('notes', document.getElementById('clielo-newinv-notes').value);
                         fd.append('save_status', status);
 
-                        var rows = document.querySelectorAll('.serviceflow-item-row');
+                        var rows = document.querySelectorAll('.clielo-item-row');
                         rows.forEach(function(row, i){
-                            fd.append('items['+i+'][description]', row.querySelector('.serviceflow-item-desc').value);
-                            fd.append('items['+i+'][quantity]', row.querySelector('.serviceflow-item-qty').value);
-                            fd.append('items['+i+'][unit_price]', row.querySelector('.serviceflow-item-price').value);
+                            fd.append('items['+i+'][description]', row.querySelector('.clielo-item-desc').value);
+                            fd.append('items['+i+'][quantity]', row.querySelector('.clielo-item-qty').value);
+                            fd.append('items['+i+'][unit_price]', row.querySelector('.clielo-item-price').value);
                         });
 
                         fetch(ajaxUrl,{method:'POST',body:fd,credentials:'same-origin'})
@@ -2303,7 +2303,7 @@ class Clielo_Invoices {
                         .then(function(res){
                             btn.disabled = false;
                             if(res.success){
-                                window.location.href = '<?php echo esc_url( admin_url( 'admin.php?page=serviceflow-invoices' ) ); ?>';
+                                window.location.href = '<?php echo esc_url( admin_url( 'admin.php?page=clielo-invoices' ) ); ?>';
                             } else {
                                 alert(res.data && res.data.message ? res.data.message : 'Erreur');
                             }
@@ -2360,21 +2360,21 @@ class Clielo_Invoices {
         $badge_color = $colors[ $invoice->status ] ?? '#9ca3af';
         $status_text = $labels[ $invoice->status ] ?? $invoice->status;
         ?>
-        <div class="serviceflow-invoice-page">
+        <div class="clielo-invoice-page">
             <!-- Header : logo + entreprise à gauche, infos facture à droite -->
-            <div class="serviceflow-inv-header">
-                <div class="serviceflow-inv-header-left">
+            <div class="clielo-inv-header">
+                <div class="clielo-inv-header-left">
                     <?php if ( ! empty( $s['company_logo'] ) ) : ?>
-                        <div class="serviceflow-inv-logo">
+                        <div class="clielo-inv-logo">
                             <img src="<?php echo esc_url( $s['company_logo'] ); ?>" alt="" />
                         </div>
                     <?php else : ?>
-                        <div class="serviceflow-inv-company">
+                        <div class="clielo-inv-company">
                             <strong><?php echo esc_html( $s['company_name'] ); ?></strong>
                         </div>
                     <?php endif; ?>
                 </div>
-                <div class="serviceflow-inv-header-right">
+                <div class="clielo-inv-header-right">
                     <h3><?php
                         $invoice_type_val = $invoice->invoice_type ?? 'single';
                         if ( $invoice_type_val === 'acompte' ) {
@@ -2402,8 +2402,8 @@ class Clielo_Invoices {
             </div>
 
             <!-- Émetteur + Client côte à côte -->
-            <div class="serviceflow-inv-parties">
-                <div class="serviceflow-inv-emetteur">
+            <div class="clielo-inv-parties">
+                <div class="clielo-inv-emetteur">
                     <h3><?php esc_html_e( 'Émetteur', 'clielo' ); ?></h3>
                     <p>
                         <strong><?php echo esc_html( $s['company_name'] ); ?></strong><br />
@@ -2416,7 +2416,7 @@ class Clielo_Invoices {
                         <?php if ( $s['siret_ifu'] ) : ?><?php echo esc_html( $s['siret_label'] ?: 'SIRET/IFU' ); ?> : <?php echo esc_html( $s['siret_ifu'] ); ?><?php endif; ?>
                     </p>
                 </div>
-                <div class="serviceflow-inv-client">
+                <div class="clielo-inv-client">
                 <h3><?php esc_html_e( 'Client', 'clielo' ); ?></h3>
                 <?php if ( $client_info ) : ?>
                     <p>
@@ -2434,7 +2434,7 @@ class Clielo_Invoices {
             </div>
 
             <!-- Tableau articles -->
-            <table class="serviceflow-inv-items-table">
+            <table class="clielo-inv-items-table">
                 <thead>
                     <tr>
                         <th><?php esc_html_e( 'Description', 'clielo' ); ?></th>
@@ -2468,27 +2468,27 @@ class Clielo_Invoices {
             </table>
 
             <!-- Totaux -->
-            <div class="serviceflow-inv-totals">
+            <div class="clielo-inv-totals">
                 <?php if ( floatval( $invoice->tax_rate ) > 0 ) : ?>
-                    <div class="serviceflow-inv-totals-row">
+                    <div class="clielo-inv-totals-row">
                         <span><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?></span>
                         <span><?php echo esc_html( number_format( (float) $invoice->subtotal, 2, ',', ' ' ) ); ?> &euro;</span>
                     </div>
-                    <div class="serviceflow-inv-totals-row">
+                    <div class="clielo-inv-totals-row">
                         <span><?php esc_html_e( 'TVA', 'clielo' ); ?> (<?php echo esc_html( $invoice->tax_rate ); ?>%)</span>
                         <span><?php echo esc_html( number_format( (float) $invoice->tax_amount, 2, ',', ' ' ) ); ?> &euro;</span>
                     </div>
-                    <div class="serviceflow-inv-totals-row total-row">
+                    <div class="clielo-inv-totals-row total-row">
                         <span><?php esc_html_e( 'Total TTC', 'clielo' ); ?></span>
                         <span><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', ' ' ) ); ?> &euro;</span>
                     </div>
                 <?php else : ?>
-                    <div class="serviceflow-inv-totals-row total-row">
+                    <div class="clielo-inv-totals-row total-row">
                         <span><?php esc_html_e( 'Total', 'clielo' ); ?></span>
                         <span><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', ' ' ) ); ?> &euro;</span>
                     </div>
                     <?php if ( ! empty( $s['tax_notice'] ) ) : ?>
-                        <div class="serviceflow-inv-totals-row" style="font-size:11px;color:#888;font-style:italic;border-top:none;padding-top:4px">
+                        <div class="clielo-inv-totals-row" style="font-size:11px;color:#888;font-style:italic;border-top:none;padding-top:4px">
                             <span><?php echo esc_html( $s['tax_notice'] ); ?></span>
                         </div>
                     <?php endif; ?>
@@ -2497,7 +2497,7 @@ class Clielo_Invoices {
 
             <!-- Notes -->
             <?php if ( ! empty( $invoice->notes ) ) : ?>
-                <div class="serviceflow-inv-notes">
+                <div class="clielo-inv-notes">
                     <strong><?php esc_html_e( 'Conditions', 'clielo' ); ?></strong><br />
                     <?php echo nl2br( esc_html( $invoice->notes ) ); ?>
                 </div>
@@ -2505,32 +2505,32 @@ class Clielo_Invoices {
 
             <!-- Footer -->
             <?php if ( ! empty( $s['footer_text'] ) ) : ?>
-                <div class="serviceflow-inv-footer-text"><?php echo nl2br( esc_html( $s['footer_text'] ) ); ?></div>
+                <div class="clielo-inv-footer-text"><?php echo nl2br( esc_html( $s['footer_text'] ) ); ?></div>
             <?php endif; ?>
         </div>
 
         <!-- Actions (non imprimables) -->
-        <div class="serviceflow-inv-actions no-print" style="max-width:800px;margin:0 auto">
+        <div class="clielo-inv-actions no-print" style="max-width:800px;margin:0 auto">
             <button onclick="clieloPrintInvoice()" style="background:<?php echo esc_attr( $color ); ?>;color:#fff">
                 <?php esc_html_e( 'Imprimer', 'clielo' ); ?>
             </button>
             <?php if ( $is_admin ) : ?>
                 <?php if ( in_array( $invoice->status, [ self::STATUS_DRAFT, self::STATUS_PENDING ], true ) ) : ?>
-                    <button class="serviceflow-inv-view-action" data-action="clielo_invoice_validate" data-id="<?php echo (int) $invoice->id; ?>" style="background:#10b981;color:#fff">
+                    <button class="clielo-inv-view-action" data-action="clielo_invoice_validate" data-id="<?php echo (int) $invoice->id; ?>" style="background:#10b981;color:#fff">
                         <?php esc_html_e( 'Valider', 'clielo' ); ?>
                     </button>
                 <?php endif; ?>
                 <?php if ( $invoice->status === self::STATUS_VALIDATED ) : ?>
-                    <button class="serviceflow-inv-view-action" data-action="clielo_invoice_mark_paid" data-id="<?php echo (int) $invoice->id; ?>" style="background:#10b981;color:#fff">
+                    <button class="clielo-inv-view-action" data-action="clielo_invoice_mark_paid" data-id="<?php echo (int) $invoice->id; ?>" style="background:#10b981;color:#fff">
                         <?php esc_html_e( 'Marquer comme payée', 'clielo' ); ?>
                     </button>
                 <?php endif; ?>
                 <?php if ( ! in_array( $invoice->status, [ self::STATUS_PAID, self::STATUS_CANCELLED ], true ) ) : ?>
-                    <button class="serviceflow-inv-view-action" data-action="clielo_invoice_cancel" data-id="<?php echo (int) $invoice->id; ?>" style="background:#ef4444;color:#fff">
+                    <button class="clielo-inv-view-action" data-action="clielo_invoice_cancel" data-id="<?php echo (int) $invoice->id; ?>" style="background:#ef4444;color:#fff">
                         <?php esc_html_e( 'Annuler', 'clielo' ); ?>
                     </button>
                 <?php endif; ?>
-                <a href="<?php echo esc_url( admin_url( 'admin.php?page=serviceflow-invoices' ) ); ?>" style="padding:8px 20px;font-size:13px;text-decoration:none;color:#555">&larr; <?php esc_html_e( 'Retour à la liste', 'clielo' ); ?></a>
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=clielo-invoices' ) ); ?>" style="padding:8px 20px;font-size:13px;text-decoration:none;color:#555">&larr; <?php esc_html_e( 'Retour à la liste', 'clielo' ); ?></a>
             <?php endif; ?>
         </div>
 
@@ -2538,13 +2538,13 @@ class Clielo_Invoices {
         wp_add_inline_script(
             'clielo-invoices-js',
             'function clieloPrintInvoice(){' .
-            'var content=document.querySelector(".serviceflow-invoice-page");' .
+            'var content=document.querySelector(".clielo-invoice-page");' .
             'if(!content){window.print();return;}' .
             'var styles="";' .
             'document.querySelectorAll("link[rel=\'stylesheet\'],style").forEach(function(el){styles+=el.outerHTML;});' .
             'var win=window.open("","_blank","width=900,height=700");' .
             'if(!win){window.print();return;}' .
-            'win.document.write("<!DOCTYPE html><html><head><meta charset=\'utf-8\'>"+styles+"<style>.no-print,.serviceflow-inv-actions{display:none!important}</style></head><body>");' .
+            'win.document.write("<!DOCTYPE html><html><head><meta charset=\'utf-8\'>"+styles+"<style>.no-print,.clielo-inv-actions{display:none!important}</style></head><body>");' .
             'win.document.write(content.outerHTML);' .
             'win.document.write("</body></html>");' .
             'win.document.close();' .
@@ -2558,7 +2558,7 @@ class Clielo_Invoices {
             (function(){
                 var ajaxUrl = '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
                 var nonce   = '<?php echo esc_js( $nonce ); ?>';
-                document.querySelectorAll('.serviceflow-inv-view-action').forEach(function(btn){
+                document.querySelectorAll('.clielo-inv-view-action').forEach(function(btn){
                     btn.addEventListener('click', function(){
                         if(!confirm('<?php echo esc_js( __( 'Confirmer cette action ?', 'clielo' ) ); ?>')) return;
                         btn.disabled = true;

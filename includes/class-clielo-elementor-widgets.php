@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -22,6 +22,7 @@ class Clielo_Elementor_Widgets {
         $widgets_manager->register( new Clielo_Widget_Pack() );
         $widgets_manager->register( new Clielo_Widget_Option() );
         $widgets_manager->register( new Clielo_Widget_Advanced_Price() );
+        $widgets_manager->register( new Clielo_Widget_Service_Options() );
     }
 }
 
@@ -418,5 +419,125 @@ class Clielo_Widget_Advanced_Price extends Clielo_Widget_Base {
         $price = (float) get_post_meta( $post_id, $key, true );
 
         $this->render_text( esc_html( number_format( $price, 2, ',', ' ' ) . ' ' . $currency ) );
+    }
+}
+
+/* ================================================================
+ *  WIDGET OPTIONS DE SERVICE (packs + options + bouton commander)
+ * ================================================================ */
+
+class Clielo_Widget_Service_Options extends \Elementor\Widget_Base {
+
+    public function get_name(): string  { return 'clielo_service_options'; }
+    public function get_title(): string { return __( 'Clielo — Options de service', 'clielo' ); }
+    public function get_icon(): string  { return 'eicon-form-horizontal'; }
+    public function get_categories(): array { return [ 'clielo' ]; }
+    public function get_keywords(): array { return [ 'clielo', 'service', 'pack', 'options', 'prix' ]; }
+
+    protected function register_controls(): void {
+
+        /* ── Contenu ── */
+        $this->start_controls_section( 'section_content', [
+            'label' => __( 'Contenu', 'clielo' ),
+        ] );
+
+        $this->add_control( 'post_id', [
+            'label'       => __( 'ID du service', 'clielo' ),
+            'type'        => \Elementor\Controls_Manager::NUMBER,
+            'description' => __( 'Laisser vide pour utiliser le service de la page courante.', 'clielo' ),
+            'min'         => 0,
+            'default'     => '',
+        ] );
+
+        $this->add_control( 'show_order_button', [
+            'label'        => __( 'Afficher bouton commander', 'clielo' ),
+            'type'         => \Elementor\Controls_Manager::SWITCHER,
+            'label_on'     => __( 'Oui', 'clielo' ),
+            'label_off'    => __( 'Non', 'clielo' ),
+            'return_value' => 'yes',
+            'default'      => 'yes',
+        ] );
+
+        $this->add_control( 'show_chat_bubble', [
+            'label'        => __( 'Afficher bouton chat flottant', 'clielo' ),
+            'type'         => \Elementor\Controls_Manager::SWITCHER,
+            'label_on'     => __( 'Oui', 'clielo' ),
+            'label_off'    => __( 'Non', 'clielo' ),
+            'return_value' => 'yes',
+            'default'      => 'yes',
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style ── */
+        $this->start_controls_section( 'section_style', [
+            'label' => __( 'Style', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'color_override', [
+            'label'       => __( 'Couleur principale', 'clielo' ),
+            'type'        => \Elementor\Controls_Manager::COLOR,
+            'description' => __( 'Laisser vide pour utiliser la couleur du plugin.', 'clielo' ),
+            'default'     => '',
+        ] );
+
+        $this->add_control( 'card_border_radius', [
+            'label'      => __( 'Rayon de la carte', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 32 ] ],
+            'default'    => [ 'size' => 12, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} #clielo-sc-card' => 'border-radius: {{SIZE}}{{UNIT}} !important;' ],
+        ] );
+
+        $this->add_control( 'button_border_radius', [
+            'label'      => __( 'Rayon du bouton commander', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 32 ] ],
+            'default'    => [ 'size' => 8, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} #clielo-sc-order' => 'border-radius: {{SIZE}}{{UNIT}} !important;' ],
+        ] );
+
+        $this->add_control( 'button_color', [
+            'label'     => __( 'Couleur du bouton commander', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} #clielo-sc-order' => 'background: {{VALUE}} !important;' ],
+        ] );
+
+        $this->add_control( 'button_text_color', [
+            'label'     => __( 'Couleur texte bouton', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '#ffffff',
+            'selectors' => [ '{{WRAPPER}} #clielo-sc-order' => 'color: {{VALUE}} !important;' ],
+        ] );
+
+        $this->end_controls_section();
+    }
+
+    protected function render(): void {
+        $s                 = $this->get_settings_for_display();
+        $post_id           = ! empty( $s['post_id'] ) ? absint( $s['post_id'] ) : 0;
+        $color             = ! empty( $s['color_override'] ) ? sanitize_hex_color( $s['color_override'] ) : '';
+        $show_order_button = 'yes' === ( $s['show_order_button'] ?? 'yes' );
+        $show_chat_bubble  = 'yes' === ( $s['show_chat_bubble'] ?? 'yes' );
+
+        $args = [
+            'show_order_button' => $show_order_button,
+        ];
+        if ( $post_id ) {
+            $args['post_id'] = $post_id;
+        }
+        if ( $color ) {
+            $args['color'] = $color;
+        }
+
+        if ( ! $show_chat_bubble ) {
+            echo '<style>#clielo-toggle{display:none !important}</style>';
+        }
+
+        echo Clielo_Front::render_options_card( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML already escaped in render_options_card().
     }
 }

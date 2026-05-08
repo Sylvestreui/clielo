@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -38,7 +38,7 @@ class Clielo_Notifications {
     }
 
     public static function enqueue_admin_assets( string $hook ): void {
-        if ( strpos( $hook, 'serviceflow-notifications' ) === false ) {
+        if ( strpos( $hook, 'clielo-notifications' ) === false ) {
             return;
         }
         if ( ! wp_script_is( 'clielo-notif-admin-js', 'registered' ) ) {
@@ -49,35 +49,35 @@ class Clielo_Notifications {
         $color = esc_attr( Clielo_Admin::get_color() );
         wp_add_inline_style(
             'wp-admin',
-            '.serviceflow-notif-section{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}' .
-            '.serviceflow-notif-section h2{font-size:15px;font-weight:700;color:#222;margin:0 0 16px 0;padding:0 0 12px 0;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}' .
-            '.serviceflow-notif-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f5f5}' .
-            '.serviceflow-notif-row:last-child{border-bottom:none}' .
-            '.serviceflow-notif-row-label{font-size:14px;color:#333;font-weight:500}' .
-            '.serviceflow-notif-row-desc{font-size:12px;color:#888;margin-top:2px}' .
-            '.serviceflow-toggle-sw{position:relative;width:44px;height:24px;flex-shrink:0}' .
-            '.serviceflow-toggle-sw input{opacity:0;width:0;height:0;position:absolute}' .
-            '.serviceflow-toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:24px;transition:.3s}' .
-            '.serviceflow-toggle-slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}' .
-            '.serviceflow-toggle-sw input:checked + .serviceflow-toggle-slider{background:' . $color . '}' .
-            '.serviceflow-toggle-sw input:checked + .serviceflow-toggle-slider:before{transform:translateX(20px)}' .
-            '.serviceflow-notif-input{width:100%;max-width:400px;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px}' .
-            '.serviceflow-notif-input:focus{border-color:' . $color . ';outline:none;box-shadow:0 0 0 2px ' . $color . '33}' .
-            '.serviceflow-notif-field{margin-bottom:16px}' .
-            '.serviceflow-notif-field:last-child{margin-bottom:0}' .
-            '.serviceflow-notif-field label{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:6px}' .
-            '.serviceflow-tpl-block{background:#fafafa;border:1px solid #eee;border-radius:6px;padding:16px;margin-bottom:16px}' .
-            '.serviceflow-tpl-block:last-child{margin-bottom:0}' .
-            '.serviceflow-tpl-block h3{margin:0 0 12px 0;font-size:14px;font-weight:600;color:#333}' .
-            '.serviceflow-tpl-block label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px}' .
-            '.serviceflow-tpl-block input[type="text"],.serviceflow-tpl-block textarea{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;box-sizing:border-box}' .
-            '.serviceflow-tpl-block input[type="text"]:focus,.serviceflow-tpl-block textarea:focus{border-color:' . $color . ';outline:none;box-shadow:0 0 0 2px ' . $color . '33}' .
-            '.serviceflow-tpl-block textarea{min-height:80px;resize:vertical}' .
-            '.serviceflow-tpl-vars{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}' .
-            '.serviceflow-tpl-var{display:inline-block;background:' . $color . '15;color:' . $color . ';font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:monospace;cursor:pointer}' .
-            '.serviceflow-tpl-var:hover{background:' . $color . '25}' .
-            '.serviceflow-tpl-field{margin-bottom:10px}' .
-            '.serviceflow-tpl-field:last-child{margin-bottom:0}'
+            '.clielo-notif-section{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}' .
+            '.clielo-notif-section h2{font-size:15px;font-weight:700;color:#222;margin:0 0 16px 0;padding:0 0 12px 0;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}' .
+            '.clielo-notif-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f5f5}' .
+            '.clielo-notif-row:last-child{border-bottom:none}' .
+            '.clielo-notif-row-label{font-size:14px;color:#333;font-weight:500}' .
+            '.clielo-notif-row-desc{font-size:12px;color:#888;margin-top:2px}' .
+            '.clielo-toggle-sw{position:relative;width:44px;height:24px;flex-shrink:0}' .
+            '.clielo-toggle-sw input{opacity:0;width:0;height:0;position:absolute}' .
+            '.clielo-toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:24px;transition:.3s}' .
+            '.clielo-toggle-slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}' .
+            '.clielo-toggle-sw input:checked + .clielo-toggle-slider{background:' . $color . '}' .
+            '.clielo-toggle-sw input:checked + .clielo-toggle-slider:before{transform:translateX(20px)}' .
+            '.clielo-notif-input{width:100%;max-width:400px;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px}' .
+            '.clielo-notif-input:focus{border-color:' . $color . ';outline:none;box-shadow:0 0 0 2px ' . $color . '33}' .
+            '.clielo-notif-field{margin-bottom:16px}' .
+            '.clielo-notif-field:last-child{margin-bottom:0}' .
+            '.clielo-notif-field label{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:6px}' .
+            '.clielo-tpl-block{background:#fafafa;border:1px solid #eee;border-radius:6px;padding:16px;margin-bottom:16px}' .
+            '.clielo-tpl-block:last-child{margin-bottom:0}' .
+            '.clielo-tpl-block h3{margin:0 0 12px 0;font-size:14px;font-weight:600;color:#333}' .
+            '.clielo-tpl-block label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px}' .
+            '.clielo-tpl-block input[type="text"],.clielo-tpl-block textarea{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;box-sizing:border-box}' .
+            '.clielo-tpl-block input[type="text"]:focus,.clielo-tpl-block textarea:focus{border-color:' . $color . ';outline:none;box-shadow:0 0 0 2px ' . $color . '33}' .
+            '.clielo-tpl-block textarea{min-height:80px;resize:vertical}' .
+            '.clielo-tpl-vars{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}' .
+            '.clielo-tpl-var{display:inline-block;background:' . $color . '15;color:' . $color . ';font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:monospace;cursor:pointer}' .
+            '.clielo-tpl-var:hover{background:' . $color . '25}' .
+            '.clielo-tpl-field{margin-bottom:10px}' .
+            '.clielo-tpl-field:last-child{margin-bottom:0}'
         );
     }
 
@@ -155,7 +155,7 @@ class Clielo_Notifications {
             __( 'Notifications', 'clielo' ),
             __( 'Notifications', 'clielo' ),
             'manage_options',
-            'serviceflow-notifications',
+            'clielo-notifications',
             [ __CLASS__, 'render_settings_page' ]
         );
     }
@@ -205,7 +205,7 @@ class Clielo_Notifications {
         $settings = self::get_settings();
         $color    = Clielo_Admin::get_color();
         ?>
-        <div class="wrap serviceflow-dashboard">
+        <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <span class="dashicons dashicons-bell" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
                 <?php esc_html_e( 'Clielo — Notifications', 'clielo' ); ?>
@@ -216,86 +216,86 @@ class Clielo_Notifications {
 
 
                 <!-- Section Expéditeur -->
-                <div class="serviceflow-notif-section">
+                <div class="clielo-notif-section">
                     <h2>
                         <span class="dashicons dashicons-email" style="color:<?php echo esc_attr( $color ); ?>"></span>
                         <?php esc_html_e( 'Expéditeur des emails', 'clielo' ); ?>
                     </h2>
 
-                    <div class="serviceflow-notif-field">
+                    <div class="clielo-notif-field">
                         <label for="clielo_sender_name"><?php esc_html_e( 'Nom de l\'expéditeur', 'clielo' ); ?></label>
                         <input type="text" id="clielo_sender_name"
                                name="clielo_notif_settings[sender_name]"
                                value="<?php echo esc_attr( $settings['sender_name'] ); ?>"
-                               class="serviceflow-notif-input"
+                               class="clielo-notif-input"
                                placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
                     </div>
 
-                    <div class="serviceflow-notif-field">
+                    <div class="clielo-notif-field">
                         <label for="clielo_sender_email"><?php esc_html_e( 'Adresse email de l\'expéditeur', 'clielo' ); ?></label>
                         <input type="email" id="clielo_sender_email"
                                name="clielo_notif_settings[sender_email]"
                                value="<?php echo esc_attr( $settings['sender_email'] ); ?>"
-                               class="serviceflow-notif-input"
+                               class="clielo-notif-input"
                                placeholder="<?php echo esc_attr( get_bloginfo( 'admin_email' ) ); ?>">
                     </div>
                 </div>
 
                 <!-- Section Notifications par email -->
-                <div class="serviceflow-notif-section">
+                <div class="clielo-notif-section">
                     <h2>
                         <span class="dashicons dashicons-bell" style="color:<?php echo esc_attr( $color ); ?>"></span>
                         <?php esc_html_e( 'Notifications par email', 'clielo' ); ?>
                     </h2>
 
-                    <div class="serviceflow-notif-row">
+                    <div class="clielo-notif-row">
                         <div>
-                            <div class="serviceflow-notif-row-label"><?php esc_html_e( 'Nouveau message', 'clielo' ); ?></div>
-                            <div class="serviceflow-notif-row-desc"><?php esc_html_e( 'Envoyer un email lorsqu\'un nouveau message est reçu dans le chat.', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-label"><?php esc_html_e( 'Nouveau message', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-desc"><?php esc_html_e( 'Envoyer un email lorsqu\'un nouveau message est reçu dans le chat.', 'clielo' ); ?></div>
                         </div>
-                        <label class="serviceflow-toggle-sw">
+                        <label class="clielo-toggle-sw">
                             <input type="checkbox" name="clielo_notif_settings[email_new_message]" value="1" <?php checked( $settings['email_new_message'], '1' ); ?>>
-                            <span class="serviceflow-toggle-slider"></span>
+                            <span class="clielo-toggle-slider"></span>
                         </label>
                     </div>
 
-                    <div class="serviceflow-notif-row">
+                    <div class="clielo-notif-row">
                         <div>
-                            <div class="serviceflow-notif-row-label"><?php esc_html_e( 'Nouvelle commande', 'clielo' ); ?></div>
-                            <div class="serviceflow-notif-row-desc"><?php esc_html_e( 'Envoyer un email à l\'administrateur lorsqu\'une nouvelle commande est passée.', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-label"><?php esc_html_e( 'Nouvelle commande', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-desc"><?php esc_html_e( 'Envoyer un email à l\'administrateur lorsqu\'une nouvelle commande est passée.', 'clielo' ); ?></div>
                         </div>
-                        <label class="serviceflow-toggle-sw">
+                        <label class="clielo-toggle-sw">
                             <input type="checkbox" name="clielo_notif_settings[email_new_order]" value="1" <?php checked( $settings['email_new_order'], '1' ); ?>>
-                            <span class="serviceflow-toggle-slider"></span>
+                            <span class="clielo-toggle-slider"></span>
                         </label>
                     </div>
 
-                    <div class="serviceflow-notif-row">
+                    <div class="clielo-notif-row">
                         <div>
-                            <div class="serviceflow-notif-row-label"><?php esc_html_e( 'Changement de statut de commande', 'clielo' ); ?></div>
-                            <div class="serviceflow-notif-row-desc"><?php esc_html_e( 'Envoyer un email lorsque le statut d\'une commande change (démarrée, terminée, retouche, etc.).', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-label"><?php esc_html_e( 'Changement de statut de commande', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-desc"><?php esc_html_e( 'Envoyer un email lorsque le statut d\'une commande change (démarrée, terminée, retouche, etc.).', 'clielo' ); ?></div>
                         </div>
-                        <label class="serviceflow-toggle-sw">
+                        <label class="clielo-toggle-sw">
                             <input type="checkbox" name="clielo_notif_settings[email_order_status]" value="1" <?php checked( $settings['email_order_status'], '1' ); ?>>
-                            <span class="serviceflow-toggle-slider"></span>
+                            <span class="clielo-toggle-slider"></span>
                         </label>
                     </div>
 
-                    <div class="serviceflow-notif-row">
+                    <div class="clielo-notif-row">
                         <div>
-                            <div class="serviceflow-notif-row-label"><?php esc_html_e( 'Lien de paiement mensualité', 'clielo' ); ?></div>
-                            <div class="serviceflow-notif-row-desc"><?php esc_html_e( 'Envoyer un email au client avec le lien de paiement Stripe lorsqu\'une mensualité est envoyée.', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-label"><?php esc_html_e( 'Lien de paiement mensualité', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-desc"><?php esc_html_e( 'Envoyer un email au client avec le lien de paiement Stripe lorsqu\'une mensualité est envoyée.', 'clielo' ); ?></div>
                         </div>
-                        <label class="serviceflow-toggle-sw">
+                        <label class="clielo-toggle-sw">
                             <input type="checkbox" name="clielo_notif_settings[email_payment_link]" value="1" <?php checked( $settings['email_payment_link'], '1' ); ?>>
-                            <span class="serviceflow-toggle-slider"></span>
+                            <span class="clielo-toggle-slider"></span>
                         </label>
                     </div>
 
-                    <div class="serviceflow-notif-row">
+                    <div class="clielo-notif-row">
                         <div>
-                            <div class="serviceflow-notif-row-label"><?php esc_html_e( 'Rappel de paiement', 'clielo' ); ?></div>
-                            <div class="serviceflow-notif-row-desc">
+                            <div class="clielo-notif-row-label"><?php esc_html_e( 'Rappel de paiement', 'clielo' ); ?></div>
+                            <div class="clielo-notif-row-desc">
                                 <?php esc_html_e( 'Envoyer un rappel email avant la date d\'échéance d\'une mensualité.', 'clielo' ); ?>
                                 <br>
                                 <label style="margin-top:6px;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#555">
@@ -307,15 +307,15 @@ class Clielo_Notifications {
                                 </label>
                             </div>
                         </div>
-                        <label class="serviceflow-toggle-sw">
+                        <label class="clielo-toggle-sw">
                             <input type="checkbox" name="clielo_notif_settings[email_payment_reminder]" value="1" <?php checked( $settings['email_payment_reminder'], '1' ); ?>>
-                            <span class="serviceflow-toggle-slider"></span>
+                            <span class="clielo-toggle-slider"></span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Section Templates d'emails -->
-                <div class="serviceflow-notif-section">
+                <div class="clielo-notif-section">
                     <h2>
                         <span class="dashicons dashicons-edit" style="color:<?php echo esc_attr( $color ); ?>"></span>
                         <?php esc_html_e( 'Templates d\'emails', 'clielo' ); ?>
@@ -326,94 +326,94 @@ class Clielo_Notifications {
 
 
                     <!-- Template : Nouveau message -->
-                    <div class="serviceflow-tpl-block" data-email-type="new_message">
+                    <div class="clielo-tpl-block" data-email-type="new_message">
                         <h3><?php esc_html_e( 'Nouveau message', 'clielo' ); ?></h3>
-                        <div class="serviceflow-tpl-vars">
-                            <span class="serviceflow-tpl-var" data-var="{sender_name}">{sender_name}</span>
-                            <span class="serviceflow-tpl-var" data-var="{service_name}">{service_name}</span>
-                            <span class="serviceflow-tpl-var" data-var="{excerpt}">{excerpt}</span>
-                            <span class="serviceflow-tpl-var" data-var="{recipient_name}">{recipient_name}</span>
+                        <div class="clielo-tpl-vars">
+                            <span class="clielo-tpl-var" data-var="{sender_name}">{sender_name}</span>
+                            <span class="clielo-tpl-var" data-var="{service_name}">{service_name}</span>
+                            <span class="clielo-tpl-var" data-var="{excerpt}">{excerpt}</span>
+                            <span class="clielo-tpl-var" data-var="{recipient_name}">{recipient_name}</span>
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Sujet', 'clielo' ); ?></label>
                             <input type="text" name="clielo_notif_settings[tpl_subject_new_message]" value="<?php echo esc_attr( $settings['tpl_subject_new_message'] ); ?>">
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Corps du message', 'clielo' ); ?></label>
                             <textarea name="clielo_notif_settings[tpl_body_new_message]"><?php echo esc_textarea( $settings['tpl_body_new_message'] ); ?></textarea>
                         </div>
                     </div>
 
                     <!-- Template : Nouvelle commande -->
-                    <div class="serviceflow-tpl-block" data-email-type="new_order">
+                    <div class="clielo-tpl-block" data-email-type="new_order">
                         <h3><?php esc_html_e( 'Nouvelle commande', 'clielo' ); ?></h3>
-                        <div class="serviceflow-tpl-vars">
-                            <span class="serviceflow-tpl-var" data-var="{client_name}">{client_name}</span>
-                            <span class="serviceflow-tpl-var" data-var="{service_name}">{service_name}</span>
-                            <span class="serviceflow-tpl-var" data-var="{total_price}">{total_price}</span>
-                            <span class="serviceflow-tpl-var" data-var="{order_number}">{order_number}</span>
-                            <span class="serviceflow-tpl-var" data-var="{recipient_name}">{recipient_name}</span>
+                        <div class="clielo-tpl-vars">
+                            <span class="clielo-tpl-var" data-var="{client_name}">{client_name}</span>
+                            <span class="clielo-tpl-var" data-var="{service_name}">{service_name}</span>
+                            <span class="clielo-tpl-var" data-var="{total_price}">{total_price}</span>
+                            <span class="clielo-tpl-var" data-var="{order_number}">{order_number}</span>
+                            <span class="clielo-tpl-var" data-var="{recipient_name}">{recipient_name}</span>
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Sujet', 'clielo' ); ?></label>
                             <input type="text" name="clielo_notif_settings[tpl_subject_new_order]" value="<?php echo esc_attr( $settings['tpl_subject_new_order'] ); ?>">
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Corps du message', 'clielo' ); ?></label>
                             <textarea name="clielo_notif_settings[tpl_body_new_order]"><?php echo esc_textarea( $settings['tpl_body_new_order'] ); ?></textarea>
                         </div>
                     </div>
 
                     <!-- Template : Changement de statut -->
-                    <div class="serviceflow-tpl-block" data-email-type="order_status">
+                    <div class="clielo-tpl-block" data-email-type="order_status">
                         <h3><?php esc_html_e( 'Changement de statut de commande', 'clielo' ); ?></h3>
-                        <div class="serviceflow-tpl-vars">
-                            <span class="serviceflow-tpl-var" data-var="{order_number}">{order_number}</span>
-                            <span class="serviceflow-tpl-var" data-var="{status_label}">{status_label}</span>
-                            <span class="serviceflow-tpl-var" data-var="{service_name}">{service_name}</span>
-                            <span class="serviceflow-tpl-var" data-var="{recipient_name}">{recipient_name}</span>
+                        <div class="clielo-tpl-vars">
+                            <span class="clielo-tpl-var" data-var="{order_number}">{order_number}</span>
+                            <span class="clielo-tpl-var" data-var="{status_label}">{status_label}</span>
+                            <span class="clielo-tpl-var" data-var="{service_name}">{service_name}</span>
+                            <span class="clielo-tpl-var" data-var="{recipient_name}">{recipient_name}</span>
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Sujet', 'clielo' ); ?></label>
                             <input type="text" name="clielo_notif_settings[tpl_subject_order_status]" value="<?php echo esc_attr( $settings['tpl_subject_order_status'] ); ?>">
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Corps du message', 'clielo' ); ?></label>
                             <textarea name="clielo_notif_settings[tpl_body_order_status]"><?php echo esc_textarea( $settings['tpl_body_order_status'] ); ?></textarea>
                         </div>
                     </div>
 
                     <!-- Lien de paiement -->
-                    <div class="serviceflow-tpl-block" data-email-type="payment_link">
+                    <div class="clielo-tpl-block" data-email-type="payment_link">
                         <h3>💳 <?php esc_html_e( 'Lien de paiement mensualité', 'clielo' ); ?></h3>
-                        <div class="serviceflow-tpl-vars">
+                        <div class="clielo-tpl-vars">
                             <?php foreach ( [ '{service_name}', '{order_number}', '{installment_label}', '{amount}', '{recipient_name}' ] as $v ) : ?>
-                                <span class="serviceflow-tpl-var" data-var="<?php echo esc_attr( $v ); ?>"><?php echo esc_html( $v ); ?></span>
+                                <span class="clielo-tpl-var" data-var="<?php echo esc_attr( $v ); ?>"><?php echo esc_html( $v ); ?></span>
                             <?php endforeach; ?>
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Sujet', 'clielo' ); ?></label>
                             <input type="text" name="clielo_notif_settings[tpl_subject_payment_link]" value="<?php echo esc_attr( $settings['tpl_subject_payment_link'] ); ?>">
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Corps du message', 'clielo' ); ?></label>
                             <textarea name="clielo_notif_settings[tpl_body_payment_link]"><?php echo esc_textarea( $settings['tpl_body_payment_link'] ); ?></textarea>
                         </div>
                     </div>
 
                     <!-- Rappel de paiement -->
-                    <div class="serviceflow-tpl-block" data-email-type="payment_reminder">
+                    <div class="clielo-tpl-block" data-email-type="payment_reminder">
                         <h3>⏰ <?php esc_html_e( 'Rappel de paiement', 'clielo' ); ?></h3>
-                        <div class="serviceflow-tpl-vars">
+                        <div class="clielo-tpl-vars">
                             <?php foreach ( [ '{service_name}', '{order_number}', '{installment_label}', '{amount}', '{due_date}', '{recipient_name}' ] as $v ) : ?>
-                                <span class="serviceflow-tpl-var" data-var="<?php echo esc_attr( $v ); ?>"><?php echo esc_html( $v ); ?></span>
+                                <span class="clielo-tpl-var" data-var="<?php echo esc_attr( $v ); ?>"><?php echo esc_html( $v ); ?></span>
                             <?php endforeach; ?>
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Sujet', 'clielo' ); ?></label>
                             <input type="text" name="clielo_notif_settings[tpl_subject_payment_reminder]" value="<?php echo esc_attr( $settings['tpl_subject_payment_reminder'] ); ?>">
                         </div>
-                        <div class="serviceflow-tpl-field">
+                        <div class="clielo-tpl-field">
                             <label><?php esc_html_e( 'Corps du message', 'clielo' ); ?></label>
                             <textarea name="clielo_notif_settings[tpl_body_payment_reminder]"><?php echo esc_textarea( $settings['tpl_body_payment_reminder'] ); ?></textarea>
                         </div>
@@ -450,9 +450,9 @@ class Clielo_Notifications {
                 ob_start();
                 ?>
                 /* Variables cliquables */
-                document.querySelectorAll('.serviceflow-tpl-var').forEach(function(el){
+                document.querySelectorAll('.clielo-tpl-var').forEach(function(el){
                     el.addEventListener('click',function(){
-                        var block=this.closest('.serviceflow-tpl-block');
+                        var block=this.closest('.clielo-tpl-block');
                         var textarea=block.querySelector('textarea');
                         if(!textarea) return;
                         var v=this.getAttribute('data-var');
@@ -1173,22 +1173,22 @@ class Clielo_Notifications {
 
         ob_start();
         ?>
-        <div id="serviceflow-notif-wrap-<?php echo absint( $n ); ?>" style="position:relative !important;display:inline-block !important;vertical-align:middle !important">
+        <div id="clielo-notif-wrap-<?php echo absint( $n ); ?>" style="position:relative !important;display:inline-block !important;vertical-align:middle !important">
             <!-- Bouton cloche -->
-            <button id="serviceflow-notif-btn-<?php echo absint( $n ); ?>" type="button" style="background:none !important;border:none !important;cursor:pointer !important;padding:6px !important;position:relative !important;display:flex !important;align-items:center !important;justify-content:center !important;line-height:1 !important">
+            <button id="clielo-notif-btn-<?php echo absint( $n ); ?>" type="button" style="background:none !important;border:none !important;cursor:pointer !important;padding:6px !important;position:relative !important;display:flex !important;align-items:center !important;justify-content:center !important;line-height:1 !important">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $color ); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block !important"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <span id="serviceflow-notif-badge-<?php echo absint( $n ); ?>" style="position:absolute !important;top:0 !important;right:0 !important;background:#ef4444 !important;color:#fff !important;font-size:10px !important;font-weight:700 !important;min-width:18px !important;height:18px !important;line-height:18px !important;text-align:center !important;border-radius:9px !important;padding:0 4px !important;box-sizing:border-box !important;display:<?php echo $count > 0 ? 'block' : 'none'; ?> !important"><?php echo absint( $count ); ?></span>
+                <span id="clielo-notif-badge-<?php echo absint( $n ); ?>" style="position:absolute !important;top:0 !important;right:0 !important;background:#ef4444 !important;color:#fff !important;font-size:10px !important;font-weight:700 !important;min-width:18px !important;height:18px !important;line-height:18px !important;text-align:center !important;border-radius:9px !important;padding:0 4px !important;box-sizing:border-box !important;display:<?php echo $count > 0 ? 'block' : 'none'; ?> !important"><?php echo absint( $count ); ?></span>
             </button>
 
             <!-- Dropdown -->
-            <div id="serviceflow-notif-drop-<?php echo absint( $n ); ?>" style="display:none !important;position:absolute !important;top:calc(100% + 6px) !important;right:0 !important;width:360px !important;max-width:calc(100vw - 32px) !important;background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;box-shadow:0 8px 30px rgba(0,0,0,0.12) !important;z-index:999999 !important;overflow:hidden !important">
+            <div id="clielo-notif-drop-<?php echo absint( $n ); ?>" style="display:none !important;position:absolute !important;top:calc(100% + 6px) !important;right:0 !important;width:360px !important;max-width:calc(100vw - 32px) !important;background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;box-shadow:0 8px 30px rgba(0,0,0,0.12) !important;z-index:999999 !important;overflow:hidden !important">
                 <!-- Header -->
                 <div style="padding:14px 16px !important;border-bottom:1px solid #eee !important;display:flex !important;align-items:center !important;justify-content:space-between !important">
                     <span style="font-size:15px !important;font-weight:700 !important;color:#222 !important"><?php esc_html_e( 'Notifications', 'clielo' ); ?></span>
-                    <button id="serviceflow-notif-readall-<?php echo absint( $n ); ?>" type="button" style="background:none !important;border:none !important;color:<?php echo esc_attr( $color ); ?> !important;font-size:12px !important;font-weight:600 !important;cursor:pointer !important;padding:0 !important"><?php esc_html_e( 'Tout marquer comme lu', 'clielo' ); ?></button>
+                    <button id="clielo-notif-readall-<?php echo absint( $n ); ?>" type="button" style="background:none !important;border:none !important;color:<?php echo esc_attr( $color ); ?> !important;font-size:12px !important;font-weight:600 !important;cursor:pointer !important;padding:0 !important"><?php esc_html_e( 'Tout marquer comme lu', 'clielo' ); ?></button>
                 </div>
                 <!-- Liste -->
-                <div id="serviceflow-notif-list-<?php echo absint( $n ); ?>" style="max-height:360px !important;overflow-y:auto !important">
+                <div id="clielo-notif-list-<?php echo absint( $n ); ?>" style="max-height:360px !important;overflow-y:auto !important">
                     <div style="padding:30px 16px !important;text-align:center !important;color:#999 !important;font-size:13px !important"><?php esc_html_e( 'Chargement…', 'clielo' ); ?></div>
                 </div>
             </div>
@@ -1203,11 +1203,11 @@ class Clielo_Notifications {
                 nonce='<?php echo esc_js( $nonce ); ?>',
                 color='<?php echo esc_js( $color ); ?>';
 
-            var btn=document.getElementById('serviceflow-notif-btn-'+n),
-                drop=document.getElementById('serviceflow-notif-drop-'+n),
-                badge=document.getElementById('serviceflow-notif-badge-'+n),
-                list=document.getElementById('serviceflow-notif-list-'+n),
-                readAllBtn=document.getElementById('serviceflow-notif-readall-'+n),
+            var btn=document.getElementById('clielo-notif-btn-'+n),
+                drop=document.getElementById('clielo-notif-drop-'+n),
+                badge=document.getElementById('clielo-notif-badge-'+n),
+                list=document.getElementById('clielo-notif-list-'+n),
+                readAllBtn=document.getElementById('clielo-notif-readall-'+n),
                 isOpen=false;
 
             function hexToRgba(hex,a){

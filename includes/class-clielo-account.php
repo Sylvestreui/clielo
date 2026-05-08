@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -29,29 +29,29 @@ class Clielo_Account {
         $color = esc_attr( Clielo_Admin::get_color() );
         wp_add_inline_style(
             'clielo-account-css',
-            '#serviceflow-myaccount{width:100%!important;max-width:100%!important;margin:0 auto!important;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif!important;padding:0!important;box-sizing:border-box!important}' .
-            '.serviceflow-ma-layout{display:flex!important;gap:32px!important;width:100%!important;box-sizing:border-box!important;align-items:flex-start!important}' .
-            '.serviceflow-ma-sidebar{width:220px!important;min-width:220px!important;max-width:220px!important;flex-shrink:0!important}' .
-            '.serviceflow-ma-sidebar nav{display:flex!important;flex-direction:column!important;gap:4px!important;position:sticky!important;top:100px!important}' .
-            '.serviceflow-ma-tab{display:flex!important;align-items:center!important;gap:10px!important;padding:10px 14px!important;border:none!important;background:none!important;font-size:14px!important;font-weight:500!important;cursor:pointer!important;color:#555!important;border-radius:8px!important;text-align:left!important;font-family:inherit!important;transition:all .15s!important;width:100%!important;box-sizing:border-box!important}' .
-            '.serviceflow-ma-tab:hover{background:#f5f5f5!important;color:#333!important}' .
-            '.serviceflow-ma-tab.serviceflow-tab-active{background:' . $color . '!important;color:#fff!important;font-weight:600!important}' .
-            '.serviceflow-ma-tab.serviceflow-tab-active:hover{background:' . $color . '!important;color:#fff!important}' .
-            '.serviceflow-ma-tab.serviceflow-tab-logout{color:#ef4444!important;margin-top:12px!important;border-top:1px solid #f0f0f0!important;padding-top:14px!important;border-radius:8px!important}' .
-            '.serviceflow-ma-tab.serviceflow-tab-logout:hover{background:#fef2f2!important;color:#dc2626!important}' .
-            '.serviceflow-ma-content{flex:1 1 0%!important;min-width:0!important;max-width:calc(100% - 252px)!important;width:100%!important;box-sizing:border-box!important}' .
-            '.serviceflow-ma-panel{width:100%!important;box-sizing:border-box!important}' .
+            '#clielo-myaccount{width:100%!important;max-width:100%!important;margin:0 auto!important;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif!important;padding:0!important;box-sizing:border-box!important}' .
+            '.clielo-ma-layout{display:flex!important;gap:32px!important;width:100%!important;box-sizing:border-box!important;align-items:flex-start!important}' .
+            '.clielo-ma-sidebar{width:220px!important;min-width:220px!important;max-width:220px!important;flex-shrink:0!important}' .
+            '.clielo-ma-sidebar nav{display:flex!important;flex-direction:column!important;gap:4px!important;position:sticky!important;top:100px!important}' .
+            '.clielo-ma-tab{display:flex!important;align-items:center!important;gap:10px!important;padding:10px 14px!important;border:none!important;background:none!important;font-size:14px!important;font-weight:500!important;cursor:pointer!important;color:#555!important;border-radius:8px!important;text-align:left!important;font-family:inherit!important;transition:all .15s!important;width:100%!important;box-sizing:border-box!important}' .
+            '.clielo-ma-tab:hover{background:#f5f5f5!important;color:#333!important}' .
+            '.clielo-ma-tab.clielo-tab-active{background:' . $color . '!important;color:#fff!important;font-weight:600!important}' .
+            '.clielo-ma-tab.clielo-tab-active:hover{background:' . $color . '!important;color:#fff!important}' .
+            '.clielo-ma-tab.clielo-tab-logout{color:#ef4444!important;margin-top:12px!important;border-top:1px solid #f0f0f0!important;padding-top:14px!important;border-radius:8px!important}' .
+            '.clielo-ma-tab.clielo-tab-logout:hover{background:#fef2f2!important;color:#dc2626!important}' .
+            '.clielo-ma-content{flex:1 1 0%!important;min-width:0!important;max-width:calc(100% - 252px)!important;width:100%!important;box-sizing:border-box!important}' .
+            '.clielo-ma-panel{width:100%!important;box-sizing:border-box!important}' .
             '@media(max-width:768px){' .
-                '.serviceflow-ma-layout{flex-direction:column!important;gap:0!important}' .
-                '.serviceflow-ma-sidebar{width:100%!important;min-width:100%!important;max-width:100%!important}' .
-                '.serviceflow-ma-sidebar nav{flex-direction:row!important;overflow-x:auto!important;gap:4px!important;padding:0 0 12px 0!important;position:static!important;border-bottom:1px solid #e0e0e0!important;margin-bottom:20px!important}' .
-                '.serviceflow-ma-tab{white-space:nowrap!important;padding:8px 14px!important;font-size:13px!important}' .
-                '.serviceflow-ma-tab.serviceflow-tab-logout{margin-top:0!important;border-top:none!important;padding-top:8px!important}' .
-                '.serviceflow-ma-content{max-width:100%!important}' .
-                '.serviceflow-dash-stats{grid-template-columns:repeat(2,1fr)!important}' .
-                '.serviceflow-dash-quick{grid-template-columns:repeat(3,1fr)!important}' .
+                '.clielo-ma-layout{flex-direction:column!important;gap:0!important}' .
+                '.clielo-ma-sidebar{width:100%!important;min-width:100%!important;max-width:100%!important}' .
+                '.clielo-ma-sidebar nav{flex-direction:row!important;overflow-x:auto!important;gap:4px!important;padding:0 0 12px 0!important;position:static!important;border-bottom:1px solid #e0e0e0!important;margin-bottom:20px!important}' .
+                '.clielo-ma-tab{white-space:nowrap!important;padding:8px 14px!important;font-size:13px!important}' .
+                '.clielo-ma-tab.clielo-tab-logout{margin-top:0!important;border-top:none!important;padding-top:8px!important}' .
+                '.clielo-ma-content{max-width:100%!important}' .
+                '.clielo-dash-stats{grid-template-columns:repeat(2,1fr)!important}' .
+                '.clielo-dash-quick{grid-template-columns:repeat(3,1fr)!important}' .
             '}' .
-            '@keyframes serviceflow-spin{to{transform:rotate(360deg)}}'
+            '@keyframes clielo-spin{to{transform:rotate(360deg)}}'
         );
     }
 
@@ -223,8 +223,8 @@ class Clielo_Account {
             $avatar_sm  = self::get_user_avatar( $user->ID, 40 );
             $acct_url   = self::get_account_page_url();
             $logout_url = wp_logout_url( get_permalink() );
-            $toggle_id  = 'serviceflow-acct-toggle-' . $n;
-            $drop_id    = 'serviceflow-acct-drop-' . $n;
+            $toggle_id  = 'clielo-acct-toggle-' . $n;
+            $drop_id    = 'clielo-acct-drop-' . $n;
             ?>
             <div style="position:relative !important;display:inline-block !important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important">
                 <button id="<?php echo esc_attr( $toggle_id ); ?>" type="button"
@@ -337,28 +337,28 @@ class Clielo_Account {
         $esc_color      = esc_attr( $color );
         ?>
         <?php $logout_url = wp_logout_url( get_permalink() ); ?>
-        <div id="serviceflow-myaccount" style="width:100% !important;max-width:100% !important;margin:0 auto !important;padding:0 !important;box-sizing:border-box !important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important">
-            <div class="serviceflow-ma-layout" style="display:flex !important;gap:32px !important;width:100% !important;box-sizing:border-box !important;align-items:flex-start !important">
+        <div id="clielo-myaccount" style="width:100% !important;max-width:100% !important;margin:0 auto !important;padding:0 !important;box-sizing:border-box !important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important">
+            <div class="clielo-ma-layout" style="display:flex !important;gap:32px !important;width:100% !important;box-sizing:border-box !important;align-items:flex-start !important">
                 <!-- Sidebar menu vertical -->
-                <div class="serviceflow-ma-sidebar" style="width:220px !important;min-width:220px !important;max-width:220px !important;flex-shrink:0 !important;flex-grow:0 !important;box-sizing:border-box !important">
+                <div class="clielo-ma-sidebar" style="width:220px !important;min-width:220px !important;max-width:220px !important;flex-shrink:0 !important;flex-grow:0 !important;box-sizing:border-box !important">
                     <nav style="display:flex !important;flex-direction:column !important;gap:4px !important;position:sticky !important;top:100px !important">
-                        <button class="serviceflow-ma-tab serviceflow-tab-active" data-tab="dashboard">
+                        <button class="clielo-ma-tab clielo-tab-active" data-tab="dashboard">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                             <?php esc_html_e( 'Tableau de bord', 'clielo' ); ?>
                         </button>
-                        <button class="serviceflow-ma-tab" data-tab="commandes">
+                        <button class="clielo-ma-tab" data-tab="commandes">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                             <?php esc_html_e( 'Mes commandes', 'clielo' ); ?>
                         </button>
-                        <button class="serviceflow-ma-tab" data-tab="factures">
+                        <button class="clielo-ma-tab" data-tab="factures">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                             <?php esc_html_e( 'Mes factures', 'clielo' ); ?>
                         </button>
-                        <button class="serviceflow-ma-tab" data-tab="profil">
+                        <button class="clielo-ma-tab" data-tab="profil">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             <?php esc_html_e( 'Mon profil', 'clielo' ); ?>
                         </button>
-                        <a href="<?php echo esc_url( $logout_url ); ?>" class="serviceflow-ma-tab serviceflow-tab-logout">
+                        <a href="<?php echo esc_url( $logout_url ); ?>" class="clielo-ma-tab clielo-tab-logout">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             <?php esc_html_e( 'Déconnexion', 'clielo' ); ?>
                         </a>
@@ -366,17 +366,17 @@ class Clielo_Account {
                 </div>
 
                 <!-- Contenu principal -->
-                <div class="serviceflow-ma-content" style="flex:1 1 0% !important;min-width:0 !important;max-width:calc(100% - 252px) !important;box-sizing:border-box !important">
-                    <div id="serviceflow-ma-panel-dashboard" class="serviceflow-ma-panel" style="display:block">
+                <div class="clielo-ma-content" style="flex:1 1 0% !important;min-width:0 !important;max-width:calc(100% - 252px) !important;box-sizing:border-box !important">
+                    <div id="clielo-ma-panel-dashboard" class="clielo-ma-panel" style="display:block">
                         <?php echo $dashboard_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generated internally by render_dashboard_section(). ?>
                     </div>
-                    <div id="serviceflow-ma-panel-commandes" class="serviceflow-ma-panel" style="display:none">
+                    <div id="clielo-ma-panel-commandes" class="clielo-ma-panel" style="display:none">
                         <?php echo $orders_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generated internally by render_orders_section(). ?>
                     </div>
-                    <div id="serviceflow-ma-panel-factures" class="serviceflow-ma-panel" style="display:none">
+                    <div id="clielo-ma-panel-factures" class="clielo-ma-panel" style="display:none">
                         <?php echo self::render_invoices_section( $color ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output from internal static method. ?>
                     </div>
-                    <div id="serviceflow-ma-panel-profil" class="serviceflow-ma-panel" style="display:none">
+                    <div id="clielo-ma-panel-profil" class="clielo-ma-panel" style="display:none">
                         <?php echo $profile_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generated internally by render_profile_section(). ?>
                     </div>
                 </div>
@@ -390,14 +390,14 @@ class Clielo_Account {
             var color='<?php echo esc_js( $color ); ?>';
 
             /* Onglets verticaux */
-            var tabs=document.querySelectorAll('.serviceflow-ma-tab[data-tab]');
-            var panels=document.querySelectorAll('.serviceflow-ma-panel');
+            var tabs=document.querySelectorAll('.clielo-ma-tab[data-tab]');
+            var panels=document.querySelectorAll('.clielo-ma-panel');
             tabs.forEach(function(tab){
                 tab.addEventListener('click',function(){
-                    tabs.forEach(function(t){ t.classList.remove('serviceflow-tab-active'); });
+                    tabs.forEach(function(t){ t.classList.remove('clielo-tab-active'); });
                     panels.forEach(function(p){ p.style.display='none'; });
-                    tab.classList.add('serviceflow-tab-active');
-                    var p=document.getElementById('serviceflow-ma-panel-'+tab.dataset.tab);
+                    tab.classList.add('clielo-tab-active');
+                    var p=document.getElementById('clielo-ma-panel-'+tab.dataset.tab);
                     if(p) p.style.display='block';
                     window.location.hash=tab.dataset.tab==='dashboard'?'':tab.dataset.tab;
                 });
@@ -407,7 +407,7 @@ class Clielo_Account {
             function applyHash(){
                 var hash=window.location.hash.replace('#','');
                 if(hash==='profil'||hash==='factures'||hash==='commandes'||hash==='dashboard'){
-                    var ht=document.querySelector('.serviceflow-ma-tab[data-tab="'+hash+'"]');
+                    var ht=document.querySelector('.clielo-ma-tab[data-tab="'+hash+'"]');
                     if(ht) ht.click();
                 }
             }
@@ -415,21 +415,21 @@ class Clielo_Account {
             window.addEventListener('hashchange', applyHash);
 
             /* Boutons accès rapide dashboard */
-            var gotos=document.querySelectorAll('.serviceflow-dash-goto');
+            var gotos=document.querySelectorAll('.clielo-dash-goto');
             gotos.forEach(function(btn){
                 btn.addEventListener('click',function(){
                     var target=btn.dataset.goto;
                     if(target){
-                        var ht=document.querySelector('.serviceflow-ma-tab[data-tab="'+target+'"]');
+                        var ht=document.querySelector('.clielo-ma-tab[data-tab="'+target+'"]');
                         if(ht) ht.click();
                     }
                 });
             });
 
             /* Filtres commandes */
-            var filters=document.querySelectorAll('.serviceflow-ma-filter');
-            var cards=document.querySelectorAll('.serviceflow-ma-order');
-            var emptyEl=document.getElementById('serviceflow-ma-empty');
+            var filters=document.querySelectorAll('.clielo-ma-filter');
+            var cards=document.querySelectorAll('.clielo-ma-order');
+            var emptyEl=document.getElementById('clielo-ma-empty');
             filters.forEach(function(f){
                 f.addEventListener('click',function(){
                     var st=f.dataset.status;
@@ -521,7 +521,7 @@ class Clielo_Account {
         </div>
 
         <!-- Stats -->
-        <div class="serviceflow-dash-stats" style="display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:12px !important;margin:0 0 20px 0 !important">
+        <div class="clielo-dash-stats" style="display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:12px !important;margin:0 0 20px 0 !important">
             <?php
             $stats = $is_admin_view ? [
                 [ 'label' => __( 'Total commandes', 'clielo' ), 'value' => $total_orders, 'color' => '#3b82f6', 'icon' => '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>' ],
@@ -547,18 +547,18 @@ class Clielo_Account {
         </div>
 
         <!-- Accès rapides -->
-        <div class="serviceflow-dash-quick" style="display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:12px !important;margin:0 0 20px 0 !important">
-            <button type="button" class="serviceflow-dash-goto" data-goto="commandes"
+        <div class="clielo-dash-quick" style="display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:12px !important;margin:0 0 20px 0 !important">
+            <button type="button" class="clielo-dash-goto" data-goto="commandes"
                     style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;cursor:pointer !important;text-align:center !important;font-family:inherit !important;transition:border-color .15s !important">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $esc_color ); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block !important;margin:0 auto 8px !important"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                 <span style="font-size:13px !important;font-weight:600 !important;color:#333 !important"><?php esc_html_e( 'Mes commandes', 'clielo' ); ?></span>
             </button>
-            <button type="button" class="serviceflow-dash-goto" data-goto="factures"
+            <button type="button" class="clielo-dash-goto" data-goto="factures"
                     style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;cursor:pointer !important;text-align:center !important;font-family:inherit !important;transition:border-color .15s !important">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $esc_color ); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block !important;margin:0 auto 8px !important"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                 <span style="font-size:13px !important;font-weight:600 !important;color:#333 !important"><?php esc_html_e( 'Mes factures', 'clielo' ); ?></span>
             </button>
-            <button type="button" class="serviceflow-dash-goto" data-goto="profil"
+            <button type="button" class="clielo-dash-goto" data-goto="profil"
                     style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;cursor:pointer !important;text-align:center !important;font-family:inherit !important;transition:border-color .15s !important">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $esc_color ); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block !important;margin:0 auto 8px !important"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 <span style="font-size:13px !important;font-weight:600 !important;color:#333 !important"><?php esc_html_e( 'Mon profil', 'clielo' ); ?></span>
@@ -570,7 +570,7 @@ class Clielo_Account {
             <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;margin:0 0 16px 0 !important">
                 <h3 style="font-size:15px !important;font-weight:700 !important;color:#222 !important;margin:0 !important"><?php esc_html_e( 'Dernières commandes', 'clielo' ); ?></h3>
                 <?php if ( $total_orders > 3 ) : ?>
-                <button type="button" class="serviceflow-dash-goto" data-goto="commandes" style="background:none !important;border:none !important;cursor:pointer !important;font-size:12px !important;font-weight:600 !important;color:<?php echo esc_attr( $esc_color ); ?> !important;font-family:inherit !important;padding:0 !important"><?php esc_html_e( 'Tout voir', 'clielo' ); ?> &rarr;</button>
+                <button type="button" class="clielo-dash-goto" data-goto="commandes" style="background:none !important;border:none !important;cursor:pointer !important;font-size:12px !important;font-weight:600 !important;color:<?php echo esc_attr( $esc_color ); ?> !important;font-family:inherit !important;padding:0 !important"><?php esc_html_e( 'Tout voir', 'clielo' ); ?> &rarr;</button>
                 <?php endif; ?>
             </div>
             <?php if ( empty( $recent_orders ) ) : ?>
@@ -605,7 +605,7 @@ class Clielo_Account {
                     ),
                     $unpaid_invoices // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Integer value passed to printf %d format.
                 ); ?>
-                <button type="button" class="serviceflow-dash-goto" data-goto="factures" style="background:none !important;border:none !important;cursor:pointer !important;font-weight:700 !important;color:#92400e !important;text-decoration:underline !important;font-family:inherit !important;font-size:inherit !important;padding:0 !important"><?php esc_html_e( 'Voir les factures', 'clielo' ); ?></button>
+                <button type="button" class="clielo-dash-goto" data-goto="factures" style="background:none !important;border:none !important;cursor:pointer !important;font-weight:700 !important;color:#92400e !important;text-decoration:underline !important;font-family:inherit !important;font-size:inherit !important;padding:0 !important"><?php esc_html_e( 'Voir les factures', 'clielo' ); ?></button>
             </span>
         </div>
         <?php endif; ?>
@@ -643,7 +643,7 @@ class Clielo_Account {
         ?>
         <div style="display:flex !important;gap:8px !important;margin:0 0 20px 0 !important;flex-wrap:wrap !important">
             <?php $first = true; foreach ( $filter_items as $key => $label ) : ?>
-            <button class="serviceflow-ma-filter" data-status="<?php echo esc_attr( $key ); ?>"
+            <button class="clielo-ma-filter" data-status="<?php echo esc_attr( $key ); ?>"
                     style="padding:6px 14px !important;border-radius:20px !important;border:1px solid <?php echo $first ? $esc_color : '#e0e0e0'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Value was passed through esc_attr() at assignment. ?> !important;background:<?php echo $first ? $esc_color : '#fff'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Value was passed through esc_attr() at assignment. ?> !important;color:<?php echo $first ? '#fff' : '#666'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Value was passed through esc_attr() at assignment. ?> !important;font-size:12px !important;font-weight:600 !important;cursor:pointer !important;font-family:inherit !important;display:inline-flex !important;align-items:center !important;gap:5px !important">
                 <?php echo esc_html( $label ); ?>
                 <span style="background:<?php echo $first ? 'rgba(255,255,255,0.3)' : '#f0f0f0'; ?> !important;padding:1px 7px !important;border-radius:10px !important;font-size:11px !important"><?php echo esc_html( $counts[ $key ] ); ?></span>
@@ -652,12 +652,12 @@ class Clielo_Account {
         </div>
 
         <?php if ( empty( $orders ) ) : ?>
-            <div id="serviceflow-ma-empty" style="display:block !important;text-align:center !important;padding:40px 20px !important;color:#999 !important;font-size:14px !important">
+            <div id="clielo-ma-empty" style="display:block !important;text-align:center !important;padding:40px 20px !important;color:#999 !important;font-size:14px !important">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px !important;display:block !important"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
                 <p style="margin:0 !important"><?php esc_html_e( 'Aucune commande pour le moment.', 'clielo' ); ?></p>
             </div>
         <?php else : ?>
-            <div id="serviceflow-ma-empty" style="display:none !important;text-align:center !important;padding:40px 20px !important;color:#999 !important;font-size:14px !important">
+            <div id="clielo-ma-empty" style="display:none !important;text-align:center !important;padding:40px 20px !important;color:#999 !important;font-size:14px !important">
                 <p style="margin:0 !important"><?php esc_html_e( 'Aucune commande dans cette catégorie.', 'clielo' ); ?></p>
             </div>
             <?php foreach ( $orders as $o ) :
@@ -665,7 +665,7 @@ class Clielo_Account {
                 $s_color = $colors[ $o->status ] ?? '#888';
                 $permalink = get_permalink( $o->post_id );
             ?>
-            <div class="serviceflow-ma-order" data-status="<?php echo esc_attr( $o->status ); ?>"
+            <div class="clielo-ma-order" data-status="<?php echo esc_attr( $o->status ); ?>"
                  style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;margin:0 0 12px 0 !important;display:block !important">
 
                 <!-- N° + Statut -->
@@ -758,23 +758,23 @@ class Clielo_Account {
         <div style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:12px !important;padding:24px !important;width:100% !important;box-sizing:border-box !important">
             <!-- Avatar + info -->
             <div style="display:flex;align-items:center;gap:16px;margin:0 0 24px 0">
-                <div id="serviceflow-avatar-wrap" style="position:relative;width:68px;height:68px;flex-shrink:0;cursor:pointer">
-                    <img src="<?php echo esc_url( $avatar_url ); ?>" id="serviceflow-profile-avatar"
+                <div id="clielo-avatar-wrap" style="position:relative;width:68px;height:68px;flex-shrink:0;cursor:pointer">
+                    <img src="<?php echo esc_url( $avatar_url ); ?>" id="clielo-profile-avatar"
                          style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid <?php echo esc_attr( $esc_color ); ?>" />
-                    <div id="serviceflow-avatar-overlay"
+                    <div id="clielo-avatar-overlay"
                          style="position:absolute;top:0;left:0;width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border:2px solid transparent">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                     </div>
-                    <input type="file" id="serviceflow-avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none" />
+                    <input type="file" id="clielo-avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none" />
                 </div>
                 <div>
-                    <div style="font-size:18px;font-weight:700;color:#222" id="serviceflow-profile-heading"><?php echo esc_html( $user->display_name ); ?></div>
+                    <div style="font-size:18px;font-weight:700;color:#222" id="clielo-profile-heading"><?php echo esc_html( $user->display_name ); ?></div>
                     <div style="font-size:13px;color:#888"><?php echo esc_html( $user->user_email ); ?> &middot; <?php esc_html_e( 'Membre depuis', 'clielo' ); ?> <?php echo esc_html( date_i18n( 'd/m/Y', strtotime( $user->user_registered ) ) ); ?></div>
                 </div>
             </div>
 
             <!-- Formulaire -->
-            <form id="serviceflow-profile-form">
+            <form id="clielo-profile-form">
                 <?php wp_nonce_field( 'clielo_profile_nonce', 'clielo_profile_nonce_field' ); ?>
 
                 <div style="margin-bottom:16px">
@@ -814,9 +814,9 @@ class Clielo_Account {
                            style="width:100%;padding:10px 14px;border:1px solid #d0d5dd;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box" />
                 </div>
 
-                <div id="serviceflow-profile-msg" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:12px"></div>
+                <div id="clielo-profile-msg" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:12px"></div>
 
-                <button type="submit" id="serviceflow-profile-save"
+                <button type="submit" id="clielo-profile-save"
                         style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border:none;border-radius:8px;background:<?php echo esc_attr( $esc_color ); ?>;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                     <?php esc_html_e( 'Enregistrer', 'clielo' ); ?>
@@ -828,12 +828,12 @@ class Clielo_Account {
         ob_start();
         ?>
         (function(){
-            var form = document.getElementById('serviceflow-profile-form');
+            var form = document.getElementById('clielo-profile-form');
             if(!form) return;
             form.addEventListener('submit', function(e){
                 e.preventDefault();
-                var btn = document.getElementById('serviceflow-profile-save');
-                var msg = document.getElementById('serviceflow-profile-msg');
+                var btn = document.getElementById('clielo-profile-save');
+                var msg = document.getElementById('clielo-profile-msg');
                 btn.disabled = true;
                 btn.style.opacity = '0.6';
 
@@ -848,7 +848,7 @@ class Clielo_Account {
                         msg.style.background = '#ecfdf5';
                         msg.style.color = '#065f46';
                         msg.textContent = res.data.message || '<?php echo esc_js( __( 'Profil mis à jour.', 'clielo' ) ); ?>';
-                        var heading = document.getElementById('serviceflow-profile-heading');
+                        var heading = document.getElementById('clielo-profile-heading');
                         if(heading && res.data.display_name) heading.textContent = res.data.display_name;
                     } else {
                         msg.style.background = '#fef2f2';
@@ -870,10 +870,10 @@ class Clielo_Account {
             });
 
             /* Avatar upload */
-            var avatarWrap = document.getElementById('serviceflow-avatar-wrap');
-            var avatarImg = document.getElementById('serviceflow-profile-avatar');
-            var avatarOverlay = document.getElementById('serviceflow-avatar-overlay');
-            var avatarInput = document.getElementById('serviceflow-avatar-input');
+            var avatarWrap = document.getElementById('clielo-avatar-wrap');
+            var avatarImg = document.getElementById('clielo-profile-avatar');
+            var avatarOverlay = document.getElementById('clielo-avatar-overlay');
+            var avatarInput = document.getElementById('clielo-avatar-input');
             if(avatarWrap && avatarImg && avatarOverlay && avatarInput){
                 avatarWrap.addEventListener('mouseenter', function(){ avatarOverlay.style.opacity='1'; });
                 avatarWrap.addEventListener('mouseleave', function(){ avatarOverlay.style.opacity='0'; });
@@ -884,7 +884,7 @@ class Clielo_Account {
                     fd.append('action', 'clielo_upload_avatar');
                     fd.append('clielo_profile_nonce_field', form.querySelector('[name="clielo_profile_nonce_field"]').value);
                     fd.append('avatar', this.files[0]);
-                    avatarOverlay.innerHTML = '<div style="width:20px;height:20px;border:3px solid #fff;border-top-color:transparent;border-radius:50%;animation:serviceflow-spin .6s linear infinite"></div>';
+                    avatarOverlay.innerHTML = '<div style="width:20px;height:20px;border:3px solid #fff;border-top-color:transparent;border-radius:50%;animation:clielo-spin .6s linear infinite"></div>';
                     avatarOverlay.style.opacity = '1';
                     fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {method:'POST',body:fd})
                     .then(function(r){return r.json();})

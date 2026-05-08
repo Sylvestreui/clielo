@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -80,7 +80,7 @@ class Clielo_Stripe {
             __( 'Clielo - Paiement', 'clielo' ),
             __( 'Paiement', 'clielo' ),
             'manage_options',
-            'serviceflow-stripe',
+            'clielo-stripe',
             [ __CLASS__, 'render_settings_page' ]
         );
     }
@@ -163,9 +163,9 @@ class Clielo_Stripe {
                     <div style="margin-bottom:20px">
                         <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px"><?php esc_html_e( 'URL du webhook', 'clielo' ); ?></label>
                         <div style="display:flex;gap:8px">
-                            <input type="text" readonly value="<?php echo esc_attr( self::get_webhook_url() ); ?>" id="serviceflow-webhook-url"
+                            <input type="text" readonly value="<?php echo esc_attr( self::get_webhook_url() ); ?>" id="clielo-webhook-url"
                                    style="flex:1;padding:8px 12px;border:1px solid #d0d5dd;border-radius:6px;background:#f9fafb;font-family:monospace;font-size:12px" />
-                            <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('serviceflow-webhook-url').value);this.textContent='<?php esc_attr_e( 'Copié !', 'clielo' ); ?>';setTimeout(()=>{this.textContent='<?php esc_attr_e( 'Copier', 'clielo' ); ?>'},2000)"
+                            <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('clielo-webhook-url').value);this.textContent='<?php esc_attr_e( 'Copié !', 'clielo' ); ?>';setTimeout(()=>{this.textContent='<?php esc_attr_e( 'Copier', 'clielo' ); ?>'},2000)"
                                     style="padding:8px 16px;border:1px solid #d0d5dd;border-radius:6px;background:#fff;cursor:pointer;font-size:13px"><?php esc_html_e( 'Copier', 'clielo' ); ?></button>
                         </div>
                     </div>
@@ -558,7 +558,7 @@ class Clielo_Stripe {
     public static function register_webhook_route(): void {
         // Conservé pour compatibilité ascendante si l'URL REST était déjà configurée
         if ( function_exists( 'register_rest_route' ) ) {
-            register_rest_route( 'serviceflow/v1', '/stripe-webhook', [
+            register_rest_route( 'clielo/v1', '/stripe-webhook', [
                 'methods'             => 'POST',
                 'callback'            => [ __CLASS__, 'handle_webhook_rest' ],
                 'permission_callback' => '__return_true',

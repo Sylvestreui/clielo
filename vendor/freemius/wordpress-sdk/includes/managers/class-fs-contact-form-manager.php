@@ -77,7 +77,7 @@
 			$query_params = $this->get_query_params( $fs );
 
 			$query_params['is_standalone'] = 'true';
-			$query_params['parent_url']    = admin_url( add_query_arg( '', '' ) );
+			$query_params['parent_url']    = admin_url( add_query_arg( null, null ) );
 
 			return WP_FS__ADDRESS . '/contact/?' . http_build_query( $query_params );
 		}

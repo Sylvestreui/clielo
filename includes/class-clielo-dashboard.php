@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -21,56 +21,56 @@ class Clielo_Dashboard {
         wp_enqueue_script( 'clielo-admin-js' );
 
         wp_add_inline_style( 'wp-admin', '
-            .serviceflow-stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-            .serviceflow-stat-card { flex: 1; min-width: 180px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 16px; }
-            .serviceflow-stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-            .serviceflow-stat-icon .dashicons { font-size: 24px; width: 24px; height: 24px; color: #fff; }
-            .serviceflow-stat-number { font-size: 28px; font-weight: 700; line-height: 1; color: #222; margin-bottom: 4px; }
-            .serviceflow-stat-label { font-size: 13px; color: #888; }
-            .serviceflow-section { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; }
-            .serviceflow-section-title { padding: 14px 20px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: 600; color: #333; margin: 0; display: flex; align-items: center; gap: 8px; }
-            .serviceflow-section table { width: 100%; border-collapse: collapse; }
-            .serviceflow-section th { text-align: left; padding: 10px 16px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #888; border-bottom: 1px solid #eee; background: #fafafa; }
-            .serviceflow-section td { padding: 10px 16px; font-size: 13px; color: #444; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
-            .serviceflow-section tr:last-child td { border-bottom: none; }
-            .serviceflow-section tr:hover td { background: #f9fafb; }
-            .serviceflow-status-badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; color: #fff; line-height: 1.6; }
-            .serviceflow-empty-row td { text-align: center; color: #999; padding: 30px 16px; }
-            .serviceflow-msg-excerpt { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-            @media (max-width: 782px) { .serviceflow-stats { flex-direction: column; } .serviceflow-stat-card { min-width: auto; } }
-            .serviceflow-sc-list { display:flex; flex-direction:column; gap:16px; }
-            .serviceflow-sc-card { background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:flex; gap:20px; align-items:flex-start; }
-            .serviceflow-sc-card-icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-            .serviceflow-sc-card-icon .dashicons { font-size:24px; width:24px; height:24px; color:#fff; }
-            .serviceflow-sc-card-body { flex:1; min-width:0; }
-            .serviceflow-sc-card-title { font-size:15px; font-weight:700; color:#222; margin:0 0 6px 0; }
-            .serviceflow-sc-card-code { display:inline-flex; align-items:center; gap:8px; background:#f4f4f5; border:1px solid #e0e0e0; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:13px; color:#333; margin:0 0 10px 0; cursor:pointer; user-select:all; }
-            .serviceflow-sc-card-code:hover { background:#eee; }
-            .serviceflow-sc-card-code .dashicons { font-size:16px; width:16px; height:16px; color:#888; }
-            .serviceflow-sc-card-desc { font-size:13px; color:#555; line-height:1.6; margin:0 0 8px 0; }
-            .serviceflow-sc-card-where { font-size:12px; color:#888; display:flex; align-items:center; gap:4px; }
-            .serviceflow-sc-card-where .dashicons { font-size:14px; width:14px; height:14px; }
-            .serviceflow-sc-copied { display:none; font-size:11px; color:#10b981; font-weight:600; margin-left:4px; }
-            .serviceflow-sc-section { background:#fff; border:1px solid #e0e0e0; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); overflow:hidden; margin-bottom:0; }
-            .serviceflow-sc-section-header { display:flex; align-items:center; gap:14px; padding:18px 24px; border-bottom:1px solid #f0f0f0; }
-            .serviceflow-sc-section-icon { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-            .serviceflow-sc-section-icon .dashicons { font-size:20px; width:20px; height:20px; color:#fff; }
-            .serviceflow-sc-section-title { font-size:14px; font-weight:700; color:#222; margin:0 0 2px 0; }
-            .serviceflow-sc-section-desc { font-size:12px; color:#888; margin:0; }
-            .serviceflow-sc-fields { display:flex; flex-direction:column; }
-            .serviceflow-sc-field-row { display:flex; align-items:center; gap:16px; padding:10px 24px; border-bottom:1px solid #f9f9f9; }
-            .serviceflow-sc-field-row:last-child { border-bottom:none; }
-            .serviceflow-sc-field-label { font-size:13px; color:#555; flex:0 0 220px; }
-            .serviceflow-sc-field-code { display:inline-flex; align-items:center; gap:6px; background:#f4f4f5; border:1px solid #e8e8e8; border-radius:5px; padding:4px 10px; font-family:monospace; font-size:12px; color:#333; cursor:pointer; user-select:all; }
-            .serviceflow-sc-field-code:hover { background:#eee; }
-            .serviceflow-sc-field-code .dashicons { font-size:13px; width:13px; height:13px; color:#aaa; }
-            .serviceflow-sc-section-heading { font-size:13px; font-weight:700; color:#444; margin:28px 0 10px 0; text-transform:uppercase; letter-spacing:.05em; }
-            @media (max-width:600px) { .serviceflow-sc-card { flex-direction:column; } .serviceflow-sc-field-row { flex-direction:column; align-items:flex-start; gap:6px; } .serviceflow-sc-field-label { flex:none; } }
+            .clielo-stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+            .clielo-stat-card { flex: 1; min-width: 180px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 16px; }
+            .clielo-stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+            .clielo-stat-icon .dashicons { font-size: 24px; width: 24px; height: 24px; color: #fff; }
+            .clielo-stat-number { font-size: 28px; font-weight: 700; line-height: 1; color: #222; margin-bottom: 4px; }
+            .clielo-stat-label { font-size: 13px; color: #888; }
+            .clielo-section { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; }
+            .clielo-section-title { padding: 14px 20px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: 600; color: #333; margin: 0; display: flex; align-items: center; gap: 8px; }
+            .clielo-section table { width: 100%; border-collapse: collapse; }
+            .clielo-section th { text-align: left; padding: 10px 16px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #888; border-bottom: 1px solid #eee; background: #fafafa; }
+            .clielo-section td { padding: 10px 16px; font-size: 13px; color: #444; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+            .clielo-section tr:last-child td { border-bottom: none; }
+            .clielo-section tr:hover td { background: #f9fafb; }
+            .clielo-status-badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; color: #fff; line-height: 1.6; }
+            .clielo-empty-row td { text-align: center; color: #999; padding: 30px 16px; }
+            .clielo-msg-excerpt { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            @media (max-width: 782px) { .clielo-stats { flex-direction: column; } .clielo-stat-card { min-width: auto; } }
+            .clielo-sc-list { display:flex; flex-direction:column; gap:16px; }
+            .clielo-sc-card { background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:flex; gap:20px; align-items:flex-start; }
+            .clielo-sc-card-icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+            .clielo-sc-card-icon .dashicons { font-size:24px; width:24px; height:24px; color:#fff; }
+            .clielo-sc-card-body { flex:1; min-width:0; }
+            .clielo-sc-card-title { font-size:15px; font-weight:700; color:#222; margin:0 0 6px 0; }
+            .clielo-sc-card-code { display:inline-flex; align-items:center; gap:8px; background:#f4f4f5; border:1px solid #e0e0e0; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:13px; color:#333; margin:0 0 10px 0; cursor:pointer; user-select:all; }
+            .clielo-sc-card-code:hover { background:#eee; }
+            .clielo-sc-card-code .dashicons { font-size:16px; width:16px; height:16px; color:#888; }
+            .clielo-sc-card-desc { font-size:13px; color:#555; line-height:1.6; margin:0 0 8px 0; }
+            .clielo-sc-card-where { font-size:12px; color:#888; display:flex; align-items:center; gap:4px; }
+            .clielo-sc-card-where .dashicons { font-size:14px; width:14px; height:14px; }
+            .clielo-sc-copied { display:none; font-size:11px; color:#10b981; font-weight:600; margin-left:4px; }
+            .clielo-sc-section { background:#fff; border:1px solid #e0e0e0; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); overflow:hidden; margin-bottom:0; }
+            .clielo-sc-section-header { display:flex; align-items:center; gap:14px; padding:18px 24px; border-bottom:1px solid #f0f0f0; }
+            .clielo-sc-section-icon { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+            .clielo-sc-section-icon .dashicons { font-size:20px; width:20px; height:20px; color:#fff; }
+            .clielo-sc-section-title { font-size:14px; font-weight:700; color:#222; margin:0 0 2px 0; }
+            .clielo-sc-section-desc { font-size:12px; color:#888; margin:0; }
+            .clielo-sc-fields { display:flex; flex-direction:column; }
+            .clielo-sc-field-row { display:flex; align-items:center; gap:16px; padding:10px 24px; border-bottom:1px solid #f9f9f9; }
+            .clielo-sc-field-row:last-child { border-bottom:none; }
+            .clielo-sc-field-label { font-size:13px; color:#555; flex:0 0 220px; }
+            .clielo-sc-field-code { display:inline-flex; align-items:center; gap:6px; background:#f4f4f5; border:1px solid #e8e8e8; border-radius:5px; padding:4px 10px; font-family:monospace; font-size:12px; color:#333; cursor:pointer; user-select:all; }
+            .clielo-sc-field-code:hover { background:#eee; }
+            .clielo-sc-field-code .dashicons { font-size:13px; width:13px; height:13px; color:#aaa; }
+            .clielo-sc-section-heading { font-size:13px; font-weight:700; color:#444; margin:28px 0 10px 0; text-transform:uppercase; letter-spacing:.05em; }
+            @media (max-width:600px) { .clielo-sc-card { flex-direction:column; } .clielo-sc-field-row { flex-direction:column; align-items:flex-start; gap:6px; } .clielo-sc-field-label { flex:none; } }
         ' );
 
         wp_add_inline_script( 'clielo-admin-js', '
-            function serviceflowCopySC(el){
-                var text = el.querySelector(".serviceflow-sc-code-text").textContent;
+            function clieloCopySC(el){
+                var text = el.querySelector(".clielo-sc-code-text").textContent;
                 if(navigator.clipboard){
                     navigator.clipboard.writeText(text);
                 } else {
@@ -81,7 +81,7 @@ class Clielo_Dashboard {
                     document.execCommand("copy");
                     document.body.removeChild(ta);
                 }
-                var badge = el.querySelector(".serviceflow-sc-copied");
+                var badge = el.querySelector(".clielo-sc-copied");
                 if(badge){ badge.style.display = "inline"; setTimeout(function(){ badge.style.display = "none"; }, 1500); }
             }
         ' );
@@ -115,7 +115,7 @@ class Clielo_Dashboard {
             __( 'Shortcodes', 'clielo' ),
             __( 'Shortcodes', 'clielo' ),
             'manage_options',
-            'serviceflow-shortcodes',
+            'clielo-shortcodes',
             [ __CLASS__, 'render_shortcodes' ]
         );
     }
@@ -242,7 +242,7 @@ class Clielo_Dashboard {
 
         $color = Clielo_Admin::get_color();
         ?>
-        <div class="wrap serviceflow-dashboard">
+        <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <span class="dashicons dashicons-format-chat" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
                 <?php esc_html_e( 'Clielo — Tableau de bord', 'clielo' ); ?>
@@ -252,75 +252,75 @@ class Clielo_Dashboard {
             </h1>
 
             <!-- Cartes stats -->
-            <div class="serviceflow-stats">
-                <div class="serviceflow-stat-card">
-                    <div class="serviceflow-stat-icon" style="background:#6366f1">
+            <div class="clielo-stats">
+                <div class="clielo-stat-card">
+                    <div class="clielo-stat-icon" style="background:#6366f1">
                         <span class="dashicons dashicons-cart"></span>
                     </div>
                     <div>
-                        <div class="serviceflow-stat-number"><?php echo esc_html( $stats['total_orders'] ); ?></div>
-                        <div class="serviceflow-stat-label"><?php esc_html_e( 'Commandes totales', 'clielo' ); ?></div>
+                        <div class="clielo-stat-number"><?php echo esc_html( $stats['total_orders'] ); ?></div>
+                        <div class="clielo-stat-label"><?php esc_html_e( 'Commandes totales', 'clielo' ); ?></div>
                     </div>
                 </div>
-                <div class="serviceflow-stat-card">
-                    <div class="serviceflow-stat-icon" style="background:#f59e0b">
+                <div class="clielo-stat-card">
+                    <div class="clielo-stat-icon" style="background:#f59e0b">
                         <span class="dashicons dashicons-clock"></span>
                     </div>
                     <div>
-                        <div class="serviceflow-stat-number"><?php echo esc_html( $stats['pending'] ); ?></div>
-                        <div class="serviceflow-stat-label"><?php esc_html_e( 'En attente', 'clielo' ); ?></div>
+                        <div class="clielo-stat-number"><?php echo esc_html( $stats['pending'] ); ?></div>
+                        <div class="clielo-stat-label"><?php esc_html_e( 'En attente', 'clielo' ); ?></div>
                     </div>
                 </div>
-                <div class="serviceflow-stat-card">
-                    <div class="serviceflow-stat-icon" style="background:#3b82f6">
+                <div class="clielo-stat-card">
+                    <div class="clielo-stat-icon" style="background:#3b82f6">
                         <span class="dashicons dashicons-update"></span>
                     </div>
                     <div>
-                        <div class="serviceflow-stat-number"><?php echo esc_html( $stats['in_progress'] ); ?></div>
-                        <div class="serviceflow-stat-label"><?php esc_html_e( 'En cours', 'clielo' ); ?></div>
+                        <div class="clielo-stat-number"><?php echo esc_html( $stats['in_progress'] ); ?></div>
+                        <div class="clielo-stat-label"><?php esc_html_e( 'En cours', 'clielo' ); ?></div>
                     </div>
                 </div>
-                <div class="serviceflow-stat-card">
-                    <div class="serviceflow-stat-icon" style="background:#10b981">
+                <div class="clielo-stat-card">
+                    <div class="clielo-stat-icon" style="background:#10b981">
                         <span class="dashicons dashicons-yes-alt"></span>
                     </div>
                     <div>
-                        <div class="serviceflow-stat-number"><?php echo esc_html( $stats['completed'] ); ?></div>
-                        <div class="serviceflow-stat-label"><?php esc_html_e( 'Terminées / Acceptées', 'clielo' ); ?></div>
+                        <div class="clielo-stat-number"><?php echo esc_html( $stats['completed'] ); ?></div>
+                        <div class="clielo-stat-label"><?php esc_html_e( 'Terminées / Acceptées', 'clielo' ); ?></div>
                     </div>
                 </div>
-                <div class="serviceflow-stat-card">
-                    <div class="serviceflow-stat-icon" style="background:<?php echo esc_attr( $color ); ?>">
+                <div class="clielo-stat-card">
+                    <div class="clielo-stat-icon" style="background:<?php echo esc_attr( $color ); ?>">
                         <span class="dashicons dashicons-admin-comments"></span>
                     </div>
                     <div>
-                        <div class="serviceflow-stat-number"><?php echo esc_html( $stats['conversations'] ); ?></div>
-                        <div class="serviceflow-stat-label"><?php esc_html_e( 'Conversations', 'clielo' ); ?></div>
+                        <div class="clielo-stat-number"><?php echo esc_html( $stats['conversations'] ); ?></div>
+                        <div class="clielo-stat-label"><?php esc_html_e( 'Conversations', 'clielo' ); ?></div>
                     </div>
                 </div>
-                <div class="serviceflow-stat-card">
-                    <div class="serviceflow-stat-icon" style="background:#059669">
+                <div class="clielo-stat-card">
+                    <div class="clielo-stat-icon" style="background:#059669">
                         <span class="dashicons dashicons-money-alt"></span>
                     </div>
                     <div>
-                        <div class="serviceflow-stat-number"><?php echo esc_html( number_format( $stats['total_invoiced'], 2, ',', ' ' ) ); ?> &euro;</div>
-                        <div class="serviceflow-stat-label"><?php esc_html_e( 'Total facturé', 'clielo' ); ?></div>
+                        <div class="clielo-stat-number"><?php echo esc_html( number_format( $stats['total_invoiced'], 2, ',', ' ' ) ); ?> &euro;</div>
+                        <div class="clielo-stat-label"><?php esc_html_e( 'Total facturé', 'clielo' ); ?></div>
                     </div>
                 </div>
-                <div class="serviceflow-stat-card">
-                    <div class="serviceflow-stat-icon" style="background:#f59e0b">
+                <div class="clielo-stat-card">
+                    <div class="clielo-stat-icon" style="background:#f59e0b">
                         <span class="dashicons dashicons-media-text"></span>
                     </div>
                     <div>
-                        <div class="serviceflow-stat-number"><?php echo esc_html( $stats['pending_invoices'] ); ?></div>
-                        <div class="serviceflow-stat-label"><?php esc_html_e( 'Factures à valider', 'clielo' ); ?></div>
+                        <div class="clielo-stat-number"><?php echo esc_html( $stats['pending_invoices'] ); ?></div>
+                        <div class="clielo-stat-label"><?php esc_html_e( 'Factures à valider', 'clielo' ); ?></div>
                     </div>
                 </div>
             </div>
 
             <!-- Commandes récentes -->
-            <div class="serviceflow-section">
-                <h2 class="serviceflow-section-title">
+            <div class="clielo-section">
+                <h2 class="clielo-section-title">
                     <span class="dashicons dashicons-list-view" style="color:#6366f1"></span>
                     <?php esc_html_e( 'Commandes récentes', 'clielo' ); ?>
                 </h2>
@@ -338,7 +338,7 @@ class Clielo_Dashboard {
                     </thead>
                     <tbody>
                         <?php if ( empty( $orders ) ) : ?>
-                            <tr class="serviceflow-empty-row"><td colspan="7"><?php esc_html_e( 'Aucune commande.', 'clielo' ); ?></td></tr>
+                            <tr class="clielo-empty-row"><td colspan="7"><?php esc_html_e( 'Aucune commande.', 'clielo' ); ?></td></tr>
                         <?php else : ?>
                             <?php foreach ( $orders as $o ) :
                                 $s_label = $status_labels[ $o->status ] ?? $o->status;
@@ -355,7 +355,7 @@ class Clielo_Dashboard {
                                         <?php echo esc_html( $o->service_name ?: '—' ); ?>
                                     <?php endif; ?>
                                 </td>
-                                <td><span class="serviceflow-status-badge" style="background:<?php echo esc_attr( $s_color ); ?>"><?php echo esc_html( $s_label ); ?></span></td>
+                                <td><span class="clielo-status-badge" style="background:<?php echo esc_attr( $s_color ); ?>"><?php echo esc_html( $s_label ); ?></span></td>
                                 <td>
                                     <?php echo esc_html( number_format( (float) $o->total_price, 2, ',', ' ' ) ); ?> &euro;
                                     <?php if ( ! empty( $o->payment_mode ) && $o->payment_mode !== 'single' ) : ?>
@@ -379,8 +379,8 @@ class Clielo_Dashboard {
             </div>
 
             <!-- Activité récente -->
-            <div class="serviceflow-section">
-                <h2 class="serviceflow-section-title">
+            <div class="clielo-section">
+                <h2 class="clielo-section-title">
                     <span class="dashicons dashicons-admin-comments" style="color:<?php echo esc_attr( $color ); ?>"></span>
                     <?php esc_html_e( 'Activité récente', 'clielo' ); ?>
                 </h2>
@@ -395,13 +395,13 @@ class Clielo_Dashboard {
                     </thead>
                     <tbody>
                         <?php if ( empty( $messages ) ) : ?>
-                            <tr class="serviceflow-empty-row"><td colspan="4"><?php esc_html_e( 'Aucun message.', 'clielo' ); ?></td></tr>
+                            <tr class="clielo-empty-row"><td colspan="4"><?php esc_html_e( 'Aucun message.', 'clielo' ); ?></td></tr>
                         <?php else : ?>
                             <?php foreach ( $messages as $m ) : ?>
                             <tr>
                                 <td><?php echo esc_html( $m->display_name ?: '—' ); ?></td>
                                 <td><?php echo esc_html( mb_strimwidth( $m->service_name ?: '—', 0, 35, '…' ) ); ?></td>
-                                <td><div class="serviceflow-msg-excerpt"><?php echo esc_html( mb_strimwidth( $m->message, 0, 80, '…' ) ); ?></div></td>
+                                <td><div class="clielo-msg-excerpt"><?php echo esc_html( mb_strimwidth( $m->message, 0, 80, '…' ) ); ?></div></td>
                                 <td><?php echo esc_html( date_i18n( 'd/m/Y H:i', strtotime( $m->created_at ) ) ); ?></td>
                             </tr>
                             <?php endforeach; ?>
@@ -500,7 +500,7 @@ class Clielo_Dashboard {
             ],
         ];
         ?>
-        <div class="wrap serviceflow-dashboard">
+        <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
                 <span class="dashicons dashicons-shortcode" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
                 <?php esc_html_e( 'Clielo — Shortcodes', 'clielo' ); ?>
@@ -510,22 +510,22 @@ class Clielo_Dashboard {
             </p>
 
             <!-- Shortcodes principaux -->
-            <p class="serviceflow-sc-section-heading"><?php esc_html_e( 'Shortcodes principaux', 'clielo' ); ?></p>
-            <div class="serviceflow-sc-list">
+            <p class="clielo-sc-section-heading"><?php esc_html_e( 'Shortcodes principaux', 'clielo' ); ?></p>
+            <div class="clielo-sc-list">
                 <?php foreach ( $main_shortcodes as $sc ) : ?>
-                <div class="serviceflow-sc-card">
-                    <div class="serviceflow-sc-card-icon" style="background:<?php echo esc_attr( $sc['color'] ); ?>">
+                <div class="clielo-sc-card">
+                    <div class="clielo-sc-card-icon" style="background:<?php echo esc_attr( $sc['color'] ); ?>">
                         <span class="dashicons <?php echo esc_attr( $sc['icon'] ); ?>"></span>
                     </div>
-                    <div class="serviceflow-sc-card-body">
-                        <div class="serviceflow-sc-card-title"><?php echo esc_html( $sc['title'] ); ?></div>
-                        <div class="serviceflow-sc-card-code" onclick="serviceflowCopySC(this)" title="<?php esc_attr_e( 'Cliquer pour copier', 'clielo' ); ?>">
+                    <div class="clielo-sc-card-body">
+                        <div class="clielo-sc-card-title"><?php echo esc_html( $sc['title'] ); ?></div>
+                        <div class="clielo-sc-card-code" onclick="clieloCopySC(this)" title="<?php esc_attr_e( 'Cliquer pour copier', 'clielo' ); ?>">
                             <span class="dashicons dashicons-clipboard"></span>
-                            <span class="serviceflow-sc-code-text"><?php echo esc_html( $sc['code'] ); ?></span>
-                            <span class="serviceflow-sc-copied"><?php esc_html_e( 'Copié !', 'clielo' ); ?></span>
+                            <span class="clielo-sc-code-text"><?php echo esc_html( $sc['code'] ); ?></span>
+                            <span class="clielo-sc-copied"><?php esc_html_e( 'Copié !', 'clielo' ); ?></span>
                         </div>
-                        <p class="serviceflow-sc-card-desc"><?php echo esc_html( $sc['desc'] ); ?></p>
-                        <div class="serviceflow-sc-card-where">
+                        <p class="clielo-sc-card-desc"><?php echo esc_html( $sc['desc'] ); ?></p>
+                        <div class="clielo-sc-card-where">
                             <span class="dashicons dashicons-location"></span>
                             <?php echo esc_html( $sc['where'] ); ?>
                         </div>
@@ -535,28 +535,28 @@ class Clielo_Dashboard {
             </div>
 
             <!-- Champs dynamiques -->
-            <p class="serviceflow-sc-section-heading"><?php esc_html_e( 'Champs dynamiques (Dynamic Tags)', 'clielo' ); ?></p>
+            <p class="clielo-sc-section-heading"><?php esc_html_e( 'Champs dynamiques (Dynamic Tags)', 'clielo' ); ?></p>
             <p style="font-size:13px;color:#666;margin:-4px 0 14px 0"><?php esc_html_e( 'À utiliser dans les templates Elementor des pages de service. Tous acceptent un attribut post_id="123" optionnel.', 'clielo' ); ?></p>
-            <div class="serviceflow-sc-list">
+            <div class="clielo-sc-list">
                 <?php foreach ( $field_sections as $section ) : ?>
-                <div class="serviceflow-sc-section">
-                    <div class="serviceflow-sc-section-header">
-                        <div class="serviceflow-sc-section-icon" style="background:<?php echo esc_attr( $section['color'] ); ?>">
+                <div class="clielo-sc-section">
+                    <div class="clielo-sc-section-header">
+                        <div class="clielo-sc-section-icon" style="background:<?php echo esc_attr( $section['color'] ); ?>">
                             <span class="dashicons <?php echo esc_attr( $section['icon'] ); ?>"></span>
                         </div>
                         <div>
-                            <p class="serviceflow-sc-section-title"><?php echo esc_html( $section['title'] ); ?></p>
-                            <p class="serviceflow-sc-section-desc"><?php echo esc_html( $section['desc'] ); ?></p>
+                            <p class="clielo-sc-section-title"><?php echo esc_html( $section['title'] ); ?></p>
+                            <p class="clielo-sc-section-desc"><?php echo esc_html( $section['desc'] ); ?></p>
                         </div>
                     </div>
-                    <div class="serviceflow-sc-fields">
+                    <div class="clielo-sc-fields">
                         <?php foreach ( $section['fields'] as $field ) : ?>
-                        <div class="serviceflow-sc-field-row">
-                            <span class="serviceflow-sc-field-label"><?php echo esc_html( $field['label'] ); ?></span>
-                            <div class="serviceflow-sc-field-code" onclick="serviceflowCopySC(this)" title="<?php esc_attr_e( 'Cliquer pour copier', 'clielo' ); ?>">
+                        <div class="clielo-sc-field-row">
+                            <span class="clielo-sc-field-label"><?php echo esc_html( $field['label'] ); ?></span>
+                            <div class="clielo-sc-field-code" onclick="clieloCopySC(this)" title="<?php esc_attr_e( 'Cliquer pour copier', 'clielo' ); ?>">
                                 <span class="dashicons dashicons-clipboard"></span>
-                                <span class="serviceflow-sc-code-text"><?php echo esc_html( $field['code'] ); ?></span>
-                                <span class="serviceflow-sc-copied"><?php esc_html_e( 'Copié !', 'clielo' ); ?></span>
+                                <span class="clielo-sc-code-text"><?php echo esc_html( $field['code'] ); ?></span>
+                                <span class="clielo-sc-copied"><?php esc_html_e( 'Copié !', 'clielo' ); ?></span>
                             </div>
                         </div>
                         <?php endforeach; ?>

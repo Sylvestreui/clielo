@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -17,9 +17,52 @@ class Clielo_Admin {
             __( 'Clielo - Settings', 'clielo' ),
             __( 'Settings', 'clielo' ),
             'manage_options',
-            'serviceflow-settings',
+            'clielo-settings',
             [ __CLASS__, 'render_settings_page' ]
         );
+
+        if ( function_exists( 'clielo_fs' ) && ! clielo_fs()->is_paying() ) {
+            add_submenu_page(
+                'clielo',
+                __( 'Activer la licence', 'clielo' ),
+                '🔑 ' . __( 'Activer la licence', 'clielo' ),
+                'manage_options',
+                'clielo-activate',
+                [ __CLASS__, 'render_activate_page' ]
+            );
+        }
+    }
+
+    public static function render_activate_page(): void {
+        if ( ! function_exists( 'clielo_fs' ) ) {
+            return;
+        }
+        $fs = clielo_fs();
+
+        if ( $fs->is_paying() ) {
+            echo '<div class="wrap"><h1>' . esc_html__( 'Licence active ✓', 'clielo' ) . '</h1><p>' . esc_html__( 'Votre licence premium est active. Toutes les fonctionnalités sont débloquées.', 'clielo' ) . '</p></div>';
+            return;
+        }
+
+        $connect_url  = $fs->is_registered() ? $fs->get_account_url() : admin_url( 'admin.php?page=clielo-account' );
+        $upgrade_url  = $fs->get_upgrade_url();
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Activer votre licence Clielo', 'clielo' ); ?></h1>
+            <div style="max-width:560px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:28px 32px;margin-top:16px">
+                <h2 style="margin-top:0"><?php esc_html_e( 'Vous avez déjà une licence ?', 'clielo' ); ?></h2>
+                <p><?php esc_html_e( 'Connectez-vous à votre compte Freemius pour activer les fonctionnalités premium (Stripe, Factures, Todos, Emails…).', 'clielo' ); ?></p>
+                <a href="<?php echo esc_url( $connect_url ); ?>" class="button button-primary button-large">
+                    <?php esc_html_e( 'Connecter mon compte &amp; activer la licence', 'clielo' ); ?>
+                </a>
+                <hr style="margin:24px 0">
+                <h2 style="margin-top:0"><?php esc_html_e( 'Pas encore de licence ?', 'clielo' ); ?></h2>
+                <a href="<?php echo esc_url( $upgrade_url ); ?>" class="button button-secondary button-large">
+                    <?php esc_html_e( 'Voir les plans premium', 'clielo' ); ?>
+                </a>
+            </div>
+        </div>
+        <?php
     }
 
     public static function register_settings(): void {
@@ -49,14 +92,14 @@ class Clielo_Admin {
             'clielo_main_section',
             __( 'General settings', 'clielo' ),
             null,
-            'serviceflow-settings'
+            'clielo-settings'
         );
 
         add_settings_field(
             'clielo_post_type',
             __( 'Custom Post Type', 'clielo' ),
             [ __CLASS__, 'render_post_type_field' ],
-            'serviceflow-settings',
+            'clielo-settings',
             'clielo_main_section'
         );
 
@@ -65,14 +108,14 @@ class Clielo_Admin {
             'clielo_style_section',
             __( 'Appearance', 'clielo' ),
             null,
-            'serviceflow-settings'
+            'clielo-settings'
         );
 
         add_settings_field(
             'clielo_color',
             __( 'Couleur du chat', 'clielo' ),
             [ __CLASS__, 'render_color_field' ],
-            'serviceflow-settings',
+            'clielo-settings',
             'clielo_style_section'
         );
 
@@ -80,7 +123,7 @@ class Clielo_Admin {
             'clielo_position',
             __( 'Position du bouton', 'clielo' ),
             [ __CLASS__, 'render_position_field' ],
-            'serviceflow-settings',
+            'clielo-settings',
             'clielo_style_section'
         );
 
@@ -145,7 +188,7 @@ class Clielo_Admin {
             <form action="options.php" method="post">
                 <?php
                 settings_fields( 'clielo_settings' );
-                do_settings_sections( 'serviceflow-settings' );
+                do_settings_sections( 'clielo-settings' );
                 submit_button( __( 'Enregistrer', 'clielo' ) );
                 ?>
             </form>

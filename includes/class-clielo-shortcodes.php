@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -124,7 +124,7 @@ class Clielo_Shortcodes {
 
         if ( $atts['format'] === 'list' ) {
             $items = array_map( fn( $f ) => '<li>' . esc_html( $f ) . '</li>', $features );
-            return '<ul class="serviceflow-features-list">' . implode( '', $items ) . '</ul>';
+            return '<ul class="clielo-features-list">' . implode( '', $items ) . '</ul>';
         }
 
         return esc_html( implode( $atts['separator'], $features ) );
