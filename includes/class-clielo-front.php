@@ -13,7 +13,7 @@ class Clielo_Front {
     }
 
     public static function enqueue_assets(): void {
-        if ( ! self::is_chat_page() ) {
+        if ( ! self::is_chat_page() && ! self::is_elementor_editor() ) {
             return;
         }
 
@@ -280,8 +280,8 @@ class Clielo_Front {
             </div>
             <?php endif; ?>
 
-            <!-- Total + Délai + Commander (masqué pour admin) -->
-            <?php if ( ! current_user_can( 'manage_options' ) && $show_order_button ) : ?>
+            <!-- Total + Délai + Commander (masqué pour admin, visible en éditeur Elementor) -->
+            <?php if ( ( ! current_user_can( 'manage_options' ) || self::is_elementor_editor() ) && $show_order_button ) : ?>
             <?php
                 $first_tva   = $tax_rate > 0 ? round( $first_price * $tax_rate / 100, 2 ) : 0;
                 $first_total = round( $first_price + $first_tva, 2 );
@@ -321,7 +321,7 @@ class Clielo_Front {
             <?php endif; ?>
         </div>
 
-        <?php if ( ! current_user_can( 'manage_options' ) && $show_order_button ) : ?>
+        <?php if ( ( ! current_user_can( 'manage_options' ) || self::is_elementor_editor() ) && $show_order_button ) : ?>
         <!-- Barre sticky mobile : visible uniquement quand la carte options n'est pas à l'écran -->
         <div id="clielo-mobile-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:2147483645;background:#fff;box-shadow:0 -2px 12px rgba(0,0,0,0.12);padding:12px 16px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
@@ -380,7 +380,8 @@ class Clielo_Front {
      * Popup chat (bouton flottant + panneau messages).
      */
     public static function render_chat(): void {
-        if ( ! self::is_chat_page() ) {
+        $is_editor = self::is_elementor_editor();
+        if ( ! self::is_chat_page() && ! $is_editor ) {
             return;
         }
 
@@ -439,6 +440,14 @@ class Clielo_Front {
             $popup_v . ' !important',
             $horizontal . ':24px !important',
         ] );
+
+        // Éditeur Elementor sur une page non-CPT : bouton de prévisualisation statique uniquement.
+        if ( $is_editor && ! self::is_chat_page() ) {
+            // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
+            echo '<style>#clielo-toggle{--clielo-chat-btn-bg:' . esc_attr( $color ) . ';--clielo-chat-btn-size:60px;--clielo-chat-btn-radius:50%}#clielo-chatbox{--clielo-chat-popup-bg:#fff;--clielo-chat-popup-radius:16px;--clielo-chat-popup-width:380px;--clielo-chat-popup-height:520px}</style>';
+            echo '<button id="clielo-toggle" style="' . esc_attr( $btn_style ) . '" aria-label="Chat"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>';
+            return;
+        }
 
         $packs   = Clielo_Options::get_packs( $post_id );
         $options = Clielo_Options::get_options( $post_id );
@@ -1583,5 +1592,11 @@ class Clielo_Front {
 
     private static function is_chat_page(): bool {
         return is_singular( Clielo_Admin::get_post_type() );
+    }
+
+    private static function is_elementor_editor(): bool {
+        return class_exists( '\Elementor\Plugin' )
+            && isset( \Elementor\Plugin::$instance->preview )
+            && \Elementor\Plugin::$instance->preview->is_preview_mode();
     }
 }

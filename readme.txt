@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,11 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.0.8 =
+* Elementor widget: footer recap (subtotal, TVA, total, order button) now visible in Elementor editor/preview mode even when logged in as admin
+* Elementor widget: floating chat button now visible in Elementor editor/preview mode, including on non-service pages where the widget is placed
+* Elementor widget: plugin CSS assets loaded in Elementor preview so all styles apply correctly during editing
 
 = 1.0.7 =
 * Elementor widget: full Typography group controls (font family, style, weight, size, transform, line-height, letter-spacing) for all text elements — section labels, pack names/prices/delays, features, option names/prices, order button
