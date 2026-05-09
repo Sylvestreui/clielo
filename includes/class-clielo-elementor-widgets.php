@@ -106,7 +106,7 @@ abstract class Clielo_Widget_Base extends \Elementor\Widget_Base {
 class Clielo_Widget_Pack extends Clielo_Widget_Base {
 
     public function get_name(): string  { return 'sf_pack'; }
-    public function get_title(): string { return __( 'SF — Pack', 'clielo' ); }
+    public function get_title(): string { return __( 'Clielo — Pack', 'clielo' ); }
     public function get_icon(): string  { return 'eicon-archive'; }
 
     protected function register_controls(): void {
@@ -279,7 +279,7 @@ class Clielo_Widget_Pack extends Clielo_Widget_Base {
 class Clielo_Widget_Option extends Clielo_Widget_Base {
 
     public function get_name(): string  { return 'sf_option'; }
-    public function get_title(): string { return __( 'SF — Option', 'clielo' ); }
+    public function get_title(): string { return __( 'Clielo — Option', 'clielo' ); }
     public function get_icon(): string  { return 'eicon-plus-circle'; }
 
     protected function register_controls(): void {
@@ -371,7 +371,7 @@ class Clielo_Widget_Option extends Clielo_Widget_Base {
 class Clielo_Widget_Advanced_Price extends Clielo_Widget_Base {
 
     public function get_name(): string  { return 'sf_advanced_price'; }
-    public function get_title(): string { return __( 'SF — Prix avancé', 'clielo' ); }
+    public function get_title(): string { return __( 'Clielo — Prix avancé', 'clielo' ); }
     public function get_icon(): string  { return 'eicon-price-table'; }
 
     protected function register_controls(): void {
