@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,12 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.0.7 =
+* Elementor widget: full Typography group controls (font family, style, weight, size, transform, line-height, letter-spacing) for all text elements — section labels, pack names/prices/delays, features, option names/prices, order button
+* Elementor widget: pack card states now fully customizable — separate Default, Hover and Selected controls (background + border each)
+* Service card: footer recap no longer sticky on desktop — sticky only on mobile (≤768 px)
+* Fix chat button color: Elementor controls now correctly override PHP defaults via higher-specificity selectors
 
 = 1.0.6 =
 * Elementor widget: add comprehensive style controls for all service card elements — section labels, pack state (selected/unselected bg + border), option prices, footer recap (background, separators, subtotal, total, delay)
