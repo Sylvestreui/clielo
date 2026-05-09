@@ -124,8 +124,8 @@ class Clielo_Front {
         ob_start();
         ?>
         <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- per-instance CSS vars need inline style; wp_add_inline_style not usable after wp_head. ?>
-        <style>.<?php echo esc_html( $uid ); ?>{--clielo-c:<?php echo esc_attr( $color ); ?>;--clielo-c-muted:<?php echo esc_attr( $c_muted ); ?>;--clielo-c-light:<?php echo esc_attr( $c_light ); ?>;--clielo-card-radius:12px;--clielo-btn-radius:8px;--clielo-card-bg:#fff;--clielo-btn-bg:var(--clielo-c);--clielo-btn-color:#fff;--clielo-btn-size:14px;--clielo-btn-weight:600;--clielo-pack-name-size:14px;--clielo-pack-name-weight:700;--clielo-pack-name-color:#222;--clielo-pack-price-size:14px;--clielo-pack-price-weight:800;--clielo-pack-price-color:var(--clielo-c-muted);--clielo-pack-feat-size:12px;--clielo-pack-feat-color:#555;--clielo-opt-name-size:13px;--clielo-opt-name-weight:500;--clielo-opt-name-color:#333;--clielo-label-color:#888;--clielo-label-size:12px;--clielo-pack-bg:#fff;--clielo-pack-border:#e0e0e0;--clielo-pack-dot-border:#ccc;--clielo-pack-hover-bg:var(--clielo-c-light);--clielo-pack-hover-border:var(--clielo-c-muted);--clielo-pack-selected-bg:var(--clielo-c-light);--clielo-pack-selected-border:var(--clielo-c-muted);--clielo-pack-delay-color:#888;--clielo-pack-delay-size:11px;--clielo-opt-price-color:#555;--clielo-opt-price-size:13px;--clielo-opt-desc-color:#999;--clielo-footer-bg:#fafafa;--clielo-footer-border:#e8e8e8;--clielo-summary-color:#888;--clielo-total-color:#222;--clielo-total-value-color:var(--clielo-c-muted);--clielo-delay-color:#888;--clielo-delay-value-color:#555}
-        .<?php echo esc_html( $uid ); ?> .clielo-sc-pack{border:2px solid var(--clielo-pack-border);border-radius:10px;padding:12px;cursor:pointer;background:var(--clielo-pack-bg);position:relative;box-sizing:border-box;margin:0;transition:border-color .15s,background .15s}
+        <style>.<?php echo esc_html( $uid ); ?>{--clielo-c:<?php echo esc_attr( $color ); ?>;--clielo-c-muted:<?php echo esc_attr( $c_muted ); ?>;--clielo-c-light:<?php echo esc_attr( $c_light ); ?>;--clielo-card-radius:12px;--clielo-btn-radius:8px;--clielo-card-bg:#fff;--clielo-btn-bg:var(--clielo-c);--clielo-btn-color:#fff;--clielo-btn-size:14px;--clielo-btn-weight:600;--clielo-pack-name-size:14px;--clielo-pack-name-weight:700;--clielo-pack-name-color:#222;--clielo-pack-price-size:14px;--clielo-pack-price-weight:800;--clielo-pack-price-color:var(--clielo-c-muted);--clielo-pack-feat-size:12px;--clielo-pack-feat-color:#555;--clielo-opt-name-size:13px;--clielo-opt-name-weight:500;--clielo-opt-name-color:#333;--clielo-label-color:#888;--clielo-label-size:12px;--clielo-pack-bg:#fff;--clielo-pack-border:#e0e0e0;--clielo-pack-dot-border:#ccc;--clielo-pack-hover-bg:var(--clielo-c-light);--clielo-pack-hover-border:var(--clielo-c-muted);--clielo-pack-selected-bg:var(--clielo-c-light);--clielo-pack-selected-border:var(--clielo-c-muted);--clielo-pack-delay-color:#888;--clielo-pack-delay-size:11px;--clielo-opt-price-color:#555;--clielo-opt-price-size:13px;--clielo-opt-desc-color:#999;--clielo-footer-bg:#fafafa;--clielo-footer-border:#e8e8e8;--clielo-summary-color:#888;--clielo-total-color:#222;--clielo-total-value-color:var(--clielo-c-muted);--clielo-delay-color:#888;--clielo-delay-value-color:#555;--clielo-pack-radius:10px;--clielo-opt-check-color:var(--clielo-c);--clielo-adv-label-color:#333;--clielo-adv-price-color:#999;--clielo-adv-icon-color:var(--clielo-c)}
+        .<?php echo esc_html( $uid ); ?> .clielo-sc-pack{border:2px solid var(--clielo-pack-border);border-radius:var(--clielo-pack-radius);padding:12px;cursor:pointer;background:var(--clielo-pack-bg);position:relative;box-sizing:border-box;margin:0;transition:border-color .15s,background .15s}
         .<?php echo esc_html( $uid ); ?> .clielo-sc-pack:hover{border-color:var(--clielo-pack-hover-border);background:var(--clielo-pack-hover-bg)}
         .<?php echo esc_html( $uid ); ?> .clielo-sc-pack[data-selected]{border-color:var(--clielo-pack-selected-border);background:var(--clielo-pack-selected-bg)}
         .<?php echo esc_html( $uid ); ?> .clielo-pack-dot{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;border:2px solid var(--clielo-pack-dot-border);background:transparent;display:flex;align-items:center;justify-content:center}
@@ -139,6 +139,14 @@ class Clielo_Front {
         .clielo-opt-name{font-size:var(--clielo-opt-name-size);font-weight:var(--clielo-opt-name-weight);color:var(--clielo-opt-name-color)}
         .clielo-opt-price{font-size:var(--clielo-opt-price-size);font-weight:600;color:var(--clielo-opt-price-color);white-space:nowrap}
         .clielo-opt-desc{font-size:11px;color:var(--clielo-opt-desc-color);line-height:1.3;margin:2px 0 0;padding:0}
+        .clielo-adv-label{font-size:13px;font-weight:500;color:var(--clielo-adv-label-color)}
+        .clielo-adv-price{font-size:11px;color:var(--clielo-adv-price-color);white-space:nowrap}
+        .clielo-adv-icon{stroke:var(--clielo-adv-icon-color);flex-shrink:0}
+        .clielo-footer-summary{font-size:12px;color:var(--clielo-summary-color)}
+        .clielo-footer-total{font-size:16px;font-weight:700;color:var(--clielo-total-color)}
+        .clielo-footer-total-val{font-size:16px;font-weight:700;color:var(--clielo-total-value-color)}
+        .clielo-footer-delay{font-size:13px;color:var(--clielo-delay-color)}
+        .clielo-footer-delay-val{font-size:13px;font-weight:600;color:var(--clielo-delay-value-color)}
         </style>
         <div class="clielo-sc-wrapper <?php echo esc_attr( $uid ); ?>">
         <div id="clielo-sc-card" style="font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important;border:1px solid #e0e0e0 !important;border-radius:var(--clielo-card-radius) !important;overflow-x:hidden !important;overflow-y:auto !important;max-height:calc(100vh - 80px) !important;background:var(--clielo-card-bg) !important;box-shadow:0 2px 8px rgba(0,0,0,0.06) !important;max-width:100% !important;padding:0 !important;margin:0 0 20px 0 !important">
@@ -198,7 +206,7 @@ class Clielo_Front {
                 $opt_delay = absint( $opt['delay'] ?? 0 );
             ?>
             <div class="clielo-sc-opt-wrap" style="display:flex !important;align-items:flex-start !important;gap:10px !important;padding:10px 16px !important;cursor:pointer !important;border-bottom:1px solid #f5f5f5 !important;margin:0 !important">
-                <input type="checkbox" class="clielo-sc-check" data-index="<?php echo absint( $i ); ?>" data-price="<?php echo esc_attr( $opt['price'] ); ?>" data-delay="<?php echo esc_attr( $opt_delay ); ?>" style="width:18px !important;height:18px !important;min-width:18px !important;margin:2px 0 0 0 !important;flex-shrink:0 !important;cursor:pointer !important" />
+                <input type="checkbox" class="clielo-sc-check" data-index="<?php echo absint( $i ); ?>" data-price="<?php echo esc_attr( $opt['price'] ); ?>" data-delay="<?php echo esc_attr( $opt_delay ); ?>" style="width:18px !important;height:18px !important;min-width:18px !important;margin:2px 0 0 0 !important;flex-shrink:0 !important;cursor:pointer !important;accent-color:var(--clielo-opt-check-color) !important" />
                 <div style="flex:1 !important;min-width:0 !important">
                     <div style="display:flex !important;justify-content:space-between !important;align-items:baseline !important;gap:8px !important;margin:0 !important;padding:0 !important">
                         <span class="clielo-opt-name"><?php echo esc_html( $opt['name'] ); ?></span>
@@ -243,7 +251,7 @@ class Clielo_Front {
                 ?>
                 <div style="display:flex !important;align-items:center !important;gap:10px !important;padding:8px 16px !important;border-top:1px solid #f5f5f5 !important;margin:0 !important">
                     <?php if ( $is_counter ) : ?>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke:var(--clielo-c)" stroke-width="2" style="flex-shrink:0 !important"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="clielo-adv-icon" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                     <?php else : ?>
                     <input type="checkbox" id="<?php echo esc_attr( $opt_id ); ?>-check"
                            class="clielo-sc-check sf-adv-opt-check"
@@ -251,11 +259,11 @@ class Clielo_Front {
                            data-opt-mode="<?php echo esc_attr( $opt_mode ); ?>"
                            data-opt-price="<?php echo esc_attr( $opt_price ); ?>"
                            data-opt-label="<?php echo esc_attr( $opt['label'] ?? '' ); ?>"
-                           style="width:18px !important;height:18px !important;min-width:18px !important;margin:0 !important;flex-shrink:0 !important;cursor:pointer !important" />
+                           style="width:18px !important;height:18px !important;min-width:18px !important;margin:0 !important;flex-shrink:0 !important;cursor:pointer !important;accent-color:var(--clielo-opt-check-color) !important" />
                     <?php endif; ?>
                     <div style="flex:1 !important;min-width:0 !important">
-                        <div style="font-size:13px !important;font-weight:500 !important;color:#333 !important"><?php echo esc_html( $opt['label'] ?? '' ); ?></div>
-                        <div style="font-size:11px !important;color:#999 !important"><?php echo $price_fmt; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped via esc_html() when built. ?> &euro;<?php echo esc_html( $mode_suffix ); ?></div>
+                        <div class="clielo-adv-label"><?php echo esc_html( $opt['label'] ?? '' ); ?></div>
+                        <div class="clielo-adv-price"><?php echo $price_fmt; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped via esc_html() when built. ?> &euro;<?php echo esc_html( $mode_suffix ); ?></div>
                     </div>
                     <?php if ( $is_counter ) : ?>
                     <div style="display:flex !important;align-items:center !important;gap:6px !important">
@@ -273,7 +281,7 @@ class Clielo_Front {
                                 style="width:28px !important;height:28px !important;border:1px solid #ddd !important;border-radius:6px !important;background:#fff !important;cursor:pointer !important;font-size:16px !important;line-height:1 !important;color:#555 !important;display:flex !important;align-items:center !important;justify-content:center !important">+</button>
                     </div>
                     <?php else : ?>
-                    <span style="font-size:13px !important;font-weight:600 !important;color:#555 !important;white-space:nowrap !important"><?php echo $price_fmt; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped via esc_html() when built. ?> &euro;<?php echo esc_html( $mode_suffix ); ?></span>
+                    <span class="clielo-adv-price" style="font-weight:600 !important"><?php echo $price_fmt; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped via esc_html() when built. ?> &euro;<?php echo esc_html( $mode_suffix ); ?></span>
                     <?php endif; ?>
                 </div>
                 <?php endforeach; ?>
@@ -287,31 +295,31 @@ class Clielo_Front {
                 $first_total = round( $first_price + $first_tva, 2 );
             ?>
             <div id="clielo-sc-footer" style="padding:14px 16px !important;border-top:2px solid var(--clielo-footer-border) !important;background:var(--clielo-footer-bg) !important;margin:0 !important;border-radius:0 0 var(--clielo-card-radius) var(--clielo-card-radius) !important">
-                <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:12px !important;color:var(--clielo-summary-color) !important;margin:0 0 2px 0 !important;padding:0 !important">
-                    <span><?php esc_html_e( 'Sous-total', 'clielo' ); ?></span>
-                    <span id="clielo-sc-subtotal-val"><?php echo esc_html( number_format( $first_price, 2, ',', ' ' ) ); ?> &euro;</span>
+                <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;margin:0 0 2px 0 !important;padding:0 !important">
+                    <span class="clielo-footer-summary"><?php esc_html_e( 'Sous-total', 'clielo' ); ?></span>
+                    <span class="clielo-footer-summary" id="clielo-sc-subtotal-val"><?php echo esc_html( number_format( $first_price, 2, ',', ' ' ) ); ?> &euro;</span>
                 </div>
-                <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:12px !important;color:var(--clielo-summary-color) !important;margin:0 0 6px 0 !important;padding:0 !important">
+                <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;margin:0 0 6px 0 !important;padding:0 !important">
                     <?php if ( $tax_rate > 0 ) : ?>
-                        <span><?php esc_html_e( 'TVA', 'clielo' ); ?> (<?php echo esc_html( $tax_rate ); ?>%)</span>
-                        <span id="clielo-sc-tva-val"><?php echo esc_html( number_format( $first_tva, 2, ',', ' ' ) ); ?> &euro;</span>
+                        <span class="clielo-footer-summary"><?php esc_html_e( 'TVA', 'clielo' ); ?> (<?php echo esc_html( $tax_rate ); ?>%)</span>
+                        <span class="clielo-footer-summary" id="clielo-sc-tva-val"><?php echo esc_html( number_format( $first_tva, 2, ',', ' ' ) ); ?> &euro;</span>
                     <?php else : ?>
-                        <span id="clielo-sc-tva-val" style="font-style:italic !important"><?php esc_html_e( 'TVA : 0% (non applicable)', 'clielo' ); ?></span>
+                        <span class="clielo-footer-summary" id="clielo-sc-tva-val" style="font-style:italic !important"><?php esc_html_e( 'TVA : 0% (non applicable)', 'clielo' ); ?></span>
                         <span></span>
                     <?php endif; ?>
                 </div>
-                <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:16px !important;font-weight:700 !important;color:var(--clielo-total-color) !important;margin:0 0 4px 0 !important;padding:0 !important;border-top:1px solid var(--clielo-footer-border) !important;padding-top:6px !important">
-                    <span style="font-size:16px !important;font-weight:700 !important;color:var(--clielo-total-color) !important"><?php esc_html_e( 'Total', 'clielo' ); ?></span>
-                    <span id="clielo-sc-total-val" style="font-size:16px !important;font-weight:700 !important;color:var(--clielo-total-value-color) !important"><?php echo esc_html( number_format( $first_total, 2, ',', ' ' ) ); ?> &euro;</span>
+                <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;margin:0 0 4px 0 !important;padding:0 !important;border-top:1px solid var(--clielo-footer-border) !important;padding-top:6px !important">
+                    <span class="clielo-footer-total"><?php esc_html_e( 'Total', 'clielo' ); ?></span>
+                    <span class="clielo-footer-total-val" id="clielo-sc-total-val"><?php echo esc_html( number_format( $first_total, 2, ',', ' ' ) ); ?> &euro;</span>
                 </div>
                 <?php if ( $payment_mode !== 'single' ) : ?>
                 <div id="clielo-sc-breakdown" style="background:var(--clielo-c-light) !important;border-radius:6px !important;padding:8px 10px !important;margin:6px 0 8px 0 !important;font-size:12px !important;color:#555 !important"></div>
                 <?php else : ?>
                 <div id="clielo-sc-breakdown" style="display:none !important"></div>
                 <?php endif; ?>
-                <div id="clielo-sc-delay-row" style="display:flex !important;justify-content:space-between !important;align-items:center !important;font-size:13px !important;color:var(--clielo-delay-color) !important;margin:0 0 12px 0 !important;padding:0 !important">
-                    <span style="font-size:13px !important;color:var(--clielo-delay-color) !important">&#9201; <?php esc_html_e( 'Délai estimé', 'clielo' ); ?></span>
-                    <span id="clielo-sc-delay-val" style="font-size:13px !important;font-weight:600 !important;color:var(--clielo-delay-value-color) !important"><?php echo esc_html( $first_delay ); ?> <?php esc_html_e( 'jour(s)', 'clielo' ); ?></span>
+                <div id="clielo-sc-delay-row" style="display:flex !important;justify-content:space-between !important;align-items:center !important;margin:0 0 12px 0 !important;padding:0 !important">
+                    <span class="clielo-footer-delay">&#9201; <?php esc_html_e( 'Délai estimé', 'clielo' ); ?></span>
+                    <span class="clielo-footer-delay-val" id="clielo-sc-delay-val"><?php echo esc_html( $first_delay ); ?> <?php esc_html_e( 'jour(s)', 'clielo' ); ?></span>
                 </div>
                 <button type="button" id="clielo-sc-order" style="display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;width:100% !important;padding:12px !important;border:none !important;border-radius:var(--clielo-btn-radius) !important;background:var(--clielo-btn-bg) !important;color:var(--clielo-btn-color) !important;font-size:var(--clielo-btn-size) !important;font-weight:var(--clielo-btn-weight) !important;cursor:pointer !important;font-family:inherit !important;margin:0 !important;line-height:1.4 !important">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>

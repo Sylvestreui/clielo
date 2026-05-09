@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,13 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.0.9 =
+* Elementor widget: reorganize Style tab — pack name/price/delay/features/border-radius/states all in one "Packs" section
+* Elementor widget: add "Options avancées" section — Typography + color for title, price/unit and icon color
+* Elementor widget: add "Case à cocher" color control (accent-color) in Options supplémentaires
+* Elementor widget: add Typography group controls for all Récapitulatif text elements (sous-total, total label, total value, delay label, delay value)
+* Service card: footer text elements use CSS classes — Elementor Typography controls can now override all footer text
 
 = 1.0.8 =
 * Elementor widget: footer recap (subtotal, TVA, total, order button) now visible in Elementor editor/preview mode even when logged in as admin
