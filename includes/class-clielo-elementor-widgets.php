@@ -494,6 +494,36 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
 
         $this->end_controls_section();
 
+        /* ── Style — En-tête ── */
+        $this->start_controls_section( 'section_style_header', [
+            'label' => __( 'En-tête', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'header_bg', [
+            'label'     => __( 'Couleur de fond', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-header-bg: {{VALUE}};' ],
+        ] );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [ 'name' => 'header_typography', 'selector' => '{{WRAPPER}} .clielo-sc-header-text' ]
+        );
+
+        $this->add_control( 'header_text_color', [
+            'label'     => __( 'Couleur du texte', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [
+                '{{WRAPPER}} .clielo-sc-wrapper'    => '--clielo-header-color: {{VALUE}};',
+                '{{WRAPPER}} .clielo-sc-header-text' => 'color: {{VALUE}};',
+            ],
+        ] );
+
+        $this->end_controls_section();
+
         /* ── Style — Titres de section ── */
         $this->start_controls_section( 'section_style_labels', [
             'label' => __( 'Titres de section', 'clielo' ),
