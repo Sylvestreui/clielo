@@ -672,6 +672,170 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
 
         $this->end_controls_section();
 
+        /* ── Style — Titres de section ── */
+        $this->start_controls_section( 'section_style_labels', [
+            'label' => __( 'Titres de section', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'label_color', [
+            'label'     => __( 'Couleur', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-label-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'label_size', [
+            'label'      => __( 'Taille', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 9, 'max' => 16 ] ],
+            'default'    => [ 'size' => 12, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-label-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style — État des packs ── */
+        $this->start_controls_section( 'section_style_pack_state', [
+            'label' => __( 'État des packs', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'pack_bg', [
+            'label'     => __( 'Fond (non sélectionné)', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-bg: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'pack_border', [
+            'label'     => __( 'Bordure (non sélectionné)', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-border: {{VALUE}}; --clielo-pack-dot-border: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'pack_selected_bg', [
+            'label'     => __( 'Fond (sélectionné)', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-selected-bg: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'pack_selected_border', [
+            'label'     => __( 'Bordure (sélectionné)', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-selected-border: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'pack_delay_color', [
+            'label'     => __( 'Couleur délai', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-delay-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'pack_delay_size', [
+            'label'      => __( 'Taille délai', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 9, 'max' => 16 ] ],
+            'default'    => [ 'size' => 11, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-pack-delay-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style — Prix des options ── */
+        $this->start_controls_section( 'section_style_opt_price', [
+            'label' => __( 'Prix des options', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'opt_price_color', [
+            'label'     => __( 'Couleur prix', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-opt-price-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'opt_price_size', [
+            'label'      => __( 'Taille prix', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 9, 'max' => 20 ] ],
+            'default'    => [ 'size' => 13, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-opt-price-size: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->add_control( 'opt_desc_color', [
+            'label'     => __( 'Couleur description', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-opt-desc-color: {{VALUE}};' ],
+        ] );
+
+        $this->end_controls_section();
+
+        /* ── Style — Récapitulatif ── */
+        $this->start_controls_section( 'section_style_recap', [
+            'label' => __( 'Récapitulatif', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'footer_bg', [
+            'label'     => __( 'Fond récapitulatif', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-footer-bg: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'footer_border', [
+            'label'     => __( 'Couleur séparateurs', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-footer-border: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'summary_color', [
+            'label'     => __( 'Couleur sous-total / TVA', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-summary-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'total_color', [
+            'label'     => __( 'Couleur libellé total', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-total-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'total_value_color', [
+            'label'     => __( 'Couleur montant total', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-total-value-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'delay_color', [
+            'label'     => __( 'Couleur délai estimé', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-delay-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'delay_value_color', [
+            'label'     => __( 'Couleur valeur délai', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-delay-value-color: {{VALUE}};' ],
+        ] );
+
+        $this->end_controls_section();
+
         /* ── Style — Bouton chat flottant ── */
         $this->start_controls_section( 'section_style_chat_btn', [
             'label' => __( 'Bouton chat flottant', 'clielo' ),

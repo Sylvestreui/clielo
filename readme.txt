@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,11 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.0.6 =
+* Elementor widget: add comprehensive style controls for all service card elements — section labels, pack state (selected/unselected bg + border), option prices, footer recap (background, separators, subtotal, total, delay)
+* Elementor widget: JS pack switching now uses CSS variables — pack colors update live when Elementor controls change
+* Elementor widget: all new controls update live in Elementor editor with zero PHP re-render
 
 = 1.0.5 =
 * Elementor widget: add style controls for chat button (color, size, radius) and chat popup (background, radius, width, height)
