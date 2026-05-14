@@ -5,7 +5,7 @@
 | Propriété | Valeur |
 |---|---|
 | Type | Plugin WordPress premium (freemium via Freemius) |
-| Version | `1.0.0` — **NE PAS changer ce numéro de version** |
+| Version | `1.2.1` — bumper à chaque déploiement WP.org (voir règle #1 en bas) |
 | Emplacement | `c:/Users/Ecompresta/Documents/Projets plugins/serviceflow/` |
 | Repo GitHub | https://github.com/SylvestreUi/serviceflow |
 | Statut | En test sur staging, pas encore soumis sur WordPress.org |
@@ -411,7 +411,7 @@ powershell -ExecutionPolicy Bypass -File build.ps1
 
 ## Points d'attention critiques
 
-1. **Ne jamais bumper `SERVICEFLOW_VERSION`** — version figée à `1.0.0` pour la release publique. Toute migration DB utilise une option dédiée.
+1. **Bumper la version à chaque déploiement WP.org** — dès qu'un ensemble de modifications est commité sur SVN trunk, bumper `CLIELO_VERSION` (ex. `1.2.0` → `1.2.1`), mettre à jour `Stable tag` dans `readme.txt`, puis créer le tag SVN correspondant (`svn copy trunk/ tags/X.Y.Z/`). Les migrations DB ponctuelles utilisent des options dédiées (ex. `clielo_orders_extra_cols`) sans dépendre du numéro de version.
 
 2. **Webhook Stripe via admin-ajax** — NE PAS passer par REST API (retourne 404 sur certains hébergements). URL : `admin_url('admin-ajax.php?action=serviceflow_stripe_webhook')`.
 
