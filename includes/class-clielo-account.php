@@ -204,14 +204,14 @@ class Clielo_Account {
             $can_register = get_option( 'users_can_register' );
             ?>
             <div style="display:inline-flex !important;gap:8px !important;align-items:center !important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important">
-                <a href="<?php echo esc_url( $login_url ); ?>"
-                   style="display:inline-flex !important;align-items:center !important;gap:6px !important;padding:8px 16px !important;border-radius:8px !important;background:<?php echo esc_attr( $color ); ?> !important;color:#fff !important;font-size:13px !important;font-weight:600 !important;text-decoration:none !important;white-space:nowrap !important;border:none !important;cursor:pointer !important;line-height:1.4 !important">
+                <a href="<?php echo esc_url( $login_url ); ?>" class="clielo-acct-login"
+                   style="display:inline-flex !important;align-items:center !important;gap:6px !important;padding:8px 16px !important;border-radius:8px !important;background:<?php echo esc_attr( $color ); ?>;color:#fff;font-size:13px !important;font-weight:600 !important;text-decoration:none !important;white-space:nowrap !important;border:none !important;cursor:pointer !important;line-height:1.4 !important">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0 !important"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     <?php esc_html_e( 'Se connecter', 'clielo' ); ?>
                 </a>
                 <?php if ( $can_register ) : ?>
-                <a href="<?php echo esc_url( wp_registration_url() ); ?>"
-                   style="display:inline-flex !important;align-items:center !important;gap:6px !important;padding:8px 16px !important;border-radius:8px !important;background:transparent !important;color:<?php echo esc_attr( $color ); ?> !important;font-size:13px !important;font-weight:600 !important;text-decoration:none !important;white-space:nowrap !important;border:2px solid <?php echo esc_attr( $color ); ?> !important;cursor:pointer !important;line-height:1.4 !important">
+                <a href="<?php echo esc_url( wp_registration_url() ); ?>" class="clielo-acct-register"
+                   style="display:inline-flex !important;align-items:center !important;gap:6px !important;padding:8px 16px !important;border-radius:8px !important;background:transparent !important;color:<?php echo esc_attr( $color ); ?>;font-size:13px !important;font-weight:600 !important;text-decoration:none !important;white-space:nowrap !important;border:2px solid <?php echo esc_attr( $color ); ?>;cursor:pointer !important;line-height:1.4 !important">
                     <?php esc_html_e( "S'inscrire", 'clielo' ); ?>
                 </a>
                 <?php endif; ?>
@@ -226,14 +226,14 @@ class Clielo_Account {
             $toggle_id  = 'clielo-acct-toggle-' . $n;
             $drop_id    = 'clielo-acct-drop-' . $n;
             ?>
-            <div style="position:relative !important;display:inline-block !important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important">
-                <button id="<?php echo esc_attr( $toggle_id ); ?>" type="button"
-                        style="width:40px !important;height:40px !important;border-radius:50% !important;border:2px solid <?php echo esc_attr( $color ); ?> !important;padding:0 !important;margin:0 !important;cursor:pointer !important;overflow:hidden !important;background:none !important;display:flex !important;align-items:center !important;justify-content:center !important">
+            <div class="clielo-acct-wrap" style="position:relative !important;display:inline-block !important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif !important">
+                <button id="<?php echo esc_attr( $toggle_id ); ?>" type="button" class="clielo-acct-toggle"
+                        style="width:40px !important;height:40px !important;border-radius:50% !important;border:2px solid <?php echo esc_attr( $color ); ?>;padding:0 !important;margin:0 !important;cursor:pointer !important;overflow:hidden !important;background:none !important;display:flex !important;align-items:center !important;justify-content:center !important">
                     <img src="<?php echo esc_url( $avatar_url ); ?>" alt="<?php echo esc_attr( $user->display_name ); ?>"
                          style="width:100% !important;height:100% !important;object-fit:cover !important;border-radius:50% !important" />
                 </button>
 
-                <div id="<?php echo esc_attr( $drop_id ); ?>"
+                <div id="<?php echo esc_attr( $drop_id ); ?>" class="clielo-acct-drop"
                      style="display:none !important;position:absolute !important;top:48px !important;right:0 !important;min-width:220px !important;background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;box-shadow:0 4px 16px rgba(0,0,0,0.12) !important;z-index:9999 !important;overflow:hidden !important;padding:0 !important;margin:0 !important">
                     <!-- Info utilisateur -->
                     <div style="padding:12px 16px !important;border-bottom:1px solid #f0f0f0 !important;display:flex !important;align-items:center !important;gap:10px !important">

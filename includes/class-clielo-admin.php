@@ -85,6 +85,28 @@ class Clielo_Admin {
             'clielo_style_section'
         );
 
+        // Section internationalisation
+        add_settings_section(
+            'clielo_i18n_section',
+            __( 'Langue', 'clielo' ),
+            null,
+            'clielo-settings'
+        );
+
+        register_setting( 'clielo_settings', 'clielo_locale', [
+            'type'              => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default'           => '',
+        ] );
+
+        add_settings_field(
+            'clielo_locale',
+            __( 'Locale du plugin', 'clielo' ),
+            [ __CLASS__, 'render_locale_field' ],
+            'clielo-settings',
+            'clielo_i18n_section'
+        );
+
     }
 
     public static function render_post_type_field(): void {
@@ -134,6 +156,30 @@ class Clielo_Admin {
             );
         }
         echo '</select>';
+    }
+
+    public static function render_locale_field(): void {
+        $current = get_option( 'clielo_locale', '' );
+        $locales = [
+            ''      => __( 'Locale WordPress (automatique)', 'clielo' ),
+            'fr_FR' => 'Français (fr_FR)',
+            'en_US' => 'English (en_US)',
+            'es_ES' => 'Español (es_ES)',
+            'de_DE' => 'Deutsch (de_DE)',
+            'it_IT' => 'Italiano (it_IT)',
+            'pt_PT' => 'Português (pt_PT)',
+        ];
+        echo '<select name="clielo_locale" id="clielo_locale">';
+        foreach ( $locales as $value => $label ) {
+            printf(
+                '<option value="%s" %s>%s</option>',
+                esc_attr( $value ),
+                selected( $current, $value, false ),
+                esc_html( $label )
+            );
+        }
+        echo '</select>';
+        echo '<p class="description">' . esc_html__( 'Forcer une langue spécifique pour le plugin, indépendamment de la locale WordPress. Nécessite un fichier .mo dans le dossier /languages/.', 'clielo' ) . '</p>';
     }
 
     public static function render_settings_page(): void {
@@ -200,5 +246,9 @@ class Clielo_Admin {
 
     public static function get_position(): string {
         return get_option( 'clielo_position', 'bottom-right' );
+    }
+
+    public static function get_locale(): string {
+        return get_option( 'clielo_locale', '' );
     }
 }

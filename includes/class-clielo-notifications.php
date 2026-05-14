@@ -1060,7 +1060,7 @@ class Clielo_Notifications {
                 'type'     => $row->type,
                 'message'  => self::format_notification_text( $row->type, $nd ),
                 'time_ago' => self::time_ago( $row->created_at ),
-                'url'      => get_permalink( (int) $row->post_id ) ?: home_url(),
+                'url'      => add_query_arg( 'clielo_open_chat', '1', get_permalink( (int) $row->post_id ) ?: home_url() ),
                 'is_read'  => (int) $row->is_read,
             ];
         }
@@ -1173,19 +1173,19 @@ class Clielo_Notifications {
 
         ob_start();
         ?>
-        <div id="clielo-notif-wrap-<?php echo absint( $n ); ?>" style="position:relative !important;display:inline-block !important;vertical-align:middle !important">
+        <div id="clielo-notif-wrap-<?php echo absint( $n ); ?>" class="clielo-notif-wrap" style="position:relative !important;display:inline-block !important;vertical-align:middle !important">
             <!-- Bouton cloche -->
             <button id="clielo-notif-btn-<?php echo absint( $n ); ?>" type="button" style="background:none !important;border:none !important;cursor:pointer !important;padding:6px !important;position:relative !important;display:flex !important;align-items:center !important;justify-content:center !important;line-height:1 !important">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $color ); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block !important"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <span id="clielo-notif-badge-<?php echo absint( $n ); ?>" style="position:absolute !important;top:0 !important;right:0 !important;background:#ef4444 !important;color:#fff !important;font-size:10px !important;font-weight:700 !important;min-width:18px !important;height:18px !important;line-height:18px !important;text-align:center !important;border-radius:9px !important;padding:0 4px !important;box-sizing:border-box !important;display:<?php echo $count > 0 ? 'block' : 'none'; ?> !important"><?php echo absint( $count ); ?></span>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $color ); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="clielo-nb-icon" style="display:block !important"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span id="clielo-notif-badge-<?php echo absint( $n ); ?>" class="clielo-nb-badge" style="position:absolute !important;top:0 !important;right:0 !important;background:#ef4444;color:#fff;font-size:10px !important;font-weight:700 !important;min-width:18px !important;height:18px !important;line-height:18px !important;text-align:center !important;border-radius:9px !important;padding:0 4px !important;box-sizing:border-box !important;display:<?php echo $count > 0 ? 'block' : 'none'; ?> !important"><?php echo absint( $count ); ?></span>
             </button>
 
             <!-- Dropdown -->
-            <div id="clielo-notif-drop-<?php echo absint( $n ); ?>" style="display:none !important;position:absolute !important;top:calc(100% + 6px) !important;right:0 !important;width:360px !important;max-width:calc(100vw - 32px) !important;background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;box-shadow:0 8px 30px rgba(0,0,0,0.12) !important;z-index:999999 !important;overflow:hidden !important">
+            <div id="clielo-notif-drop-<?php echo absint( $n ); ?>" class="clielo-nb-drop" style="display:none !important;position:absolute !important;top:calc(100% + 6px) !important;right:0 !important;width:360px !important;max-width:calc(100vw - 32px) !important;background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;box-shadow:0 8px 30px rgba(0,0,0,0.12) !important;z-index:999999 !important;overflow:hidden !important">
                 <!-- Header -->
                 <div style="padding:14px 16px !important;border-bottom:1px solid #eee !important;display:flex !important;align-items:center !important;justify-content:space-between !important">
                     <span style="font-size:15px !important;font-weight:700 !important;color:#222 !important"><?php esc_html_e( 'Notifications', 'clielo' ); ?></span>
-                    <button id="clielo-notif-readall-<?php echo absint( $n ); ?>" type="button" style="background:none !important;border:none !important;color:<?php echo esc_attr( $color ); ?> !important;font-size:12px !important;font-weight:600 !important;cursor:pointer !important;padding:0 !important"><?php esc_html_e( 'Tout marquer comme lu', 'clielo' ); ?></button>
+                    <button id="clielo-notif-readall-<?php echo absint( $n ); ?>" class="clielo-nb-readall" type="button" style="background:none !important;border:none !important;color:<?php echo esc_attr( $color ); ?>;font-size:12px !important;font-weight:600 !important;cursor:pointer !important;padding:0 !important"><?php esc_html_e( 'Tout marquer comme lu', 'clielo' ); ?></button>
                 </div>
                 <!-- Liste -->
                 <div id="clielo-notif-list-<?php echo absint( $n ); ?>" style="max-height:360px !important;overflow-y:auto !important">

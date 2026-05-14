@@ -125,7 +125,7 @@ class Clielo_Options {
 
         <?php if ( clielo_is_premium() ) :
             $adv_opts_raw = get_post_meta( $post->ID, '_clielo_advanced_options', true );
-            $adv_opts     = $adv_opts_raw ? json_decode( $adv_opts_raw, true ) : [];
+            $adv_opts     = is_array( $adv_opts_raw ) ? $adv_opts_raw : ( ( $adv_opts_raw && is_string( $adv_opts_raw ) ) ? ( json_decode( $adv_opts_raw, true ) ?: [] ) : [] );
             if ( ! is_array( $adv_opts ) ) {
                 $adv_opts = [];
             }

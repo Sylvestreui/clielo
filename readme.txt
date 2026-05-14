@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,12 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.2.0 =
+* Elementor widget: add "Clielo — Cloche" widget for notification bell — style controls for icon color/size, badge color, panel background/radius/width and "Mark all read" link color
+* Elementor widget: add "Clielo — Compte" widget for login/avatar button — style controls for avatar size/border, dropdown background/radius/width, login & register button colors/typography/radius
+* Notifications shortcode: add CSS classes (clielo-nb-icon, clielo-nb-badge, clielo-nb-drop, clielo-nb-readall) to enable Elementor override
+* Account shortcode: add CSS classes (clielo-acct-login, clielo-acct-register, clielo-acct-wrap, clielo-acct-toggle, clielo-acct-drop) to enable Elementor override
 
 = 1.1.0 =
 * Elementor widget: add "En-tête" style section — background color, text color and Typography group for the "Options de service" header bar

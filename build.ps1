@@ -47,11 +47,8 @@ $exclude = @(
     "lib\composer.json"
 )
 
-# Version free WP.org : exclure lib/ (Stripe PHP SDK — premium uniquement)
-# Version premium : lib/ est inclus (Stripe requis)
-if (-not $Premium) {
-    $exclude += "lib"
-}
+# lib/ (Stripe PHP SDK) inclus dans les deux builds.
+# La protection premium est gérée au runtime par clielo_is_premium() — pas par l'absence du fichier.
 
 # Nettoyer (dossier de build temporaire uniquement, pas les autres zips)
 if (Test-Path $buildDir) { Remove-Item $buildDir -Recurse -Force }

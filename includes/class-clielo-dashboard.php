@@ -118,6 +118,15 @@ class Clielo_Dashboard {
             'clielo-shortcodes',
             [ __CLASS__, 'render_shortcodes' ]
         );
+
+        add_submenu_page(
+            'clielo',
+            __( 'Clients WP', 'clielo' ),
+            __( 'Clients WP', 'clielo' ),
+            'manage_options',
+            'clielo-wp-clients',
+            [ __CLASS__, 'render_wp_clients' ]
+        );
     }
 
     /**
@@ -564,6 +573,113 @@ class Clielo_Dashboard {
                 </div>
                 <?php endforeach; ?>
             </div>
+        </div>
+        <?php
+    }
+
+    /* ================================================================
+     *  Page Clients WP
+     * ================================================================ */
+
+    public static function render_wp_clients(): void {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Accès refusé.', 'clielo' ) );
+        }
+
+        global $wpdb;
+        $order_table = Clielo_Orders::table_name();
+
+        // Statuts labels + couleurs
+        $status_labels = [
+            'pending'   => __( 'En attente', 'clielo' ),
+            'paid'      => __( 'Payée', 'clielo' ),
+            'started'   => __( 'En cours', 'clielo' ),
+            'completed' => __( 'Terminée', 'clielo' ),
+            'revision'  => __( 'Retouche en cours', 'clielo' ),
+            'accepted'  => __( 'Acceptée', 'clielo' ),
+        ];
+        $status_colors = [
+            'pending'   => '#f59e0b',
+            'paid'      => '#8b5cf6',
+            'started'   => '#3b82f6',
+            'completed' => '#10b981',
+            'revision'  => '#ef4444',
+            'accepted'  => '#6b7280',
+        ];
+
+        // Requête : clients ayant au moins une commande
+        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        $rows = $wpdb->get_results(
+            "SELECT client_id,
+                    COUNT(id)          AS order_count,
+                    MAX(created_at)    AS last_order_date,
+                    SUM(total_price)   AS total_spent,
+                    (SELECT status FROM {$order_table} o2 WHERE o2.client_id = o.client_id ORDER BY o2.created_at DESC LIMIT 1) AS last_status
+             FROM {$order_table} o
+             WHERE client_id > 0
+             GROUP BY client_id
+             ORDER BY last_order_date DESC"
+        );
+        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+        $color = Clielo_Admin::get_color();
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Clients WP', 'clielo' ); ?></h1>
+            <p style="color:#666;margin-bottom:16px"><?php esc_html_e( 'Utilisateurs WordPress ayant passé au moins une commande via Clielo.', 'clielo' ); ?></p>
+
+            <?php if ( empty( $rows ) ) : ?>
+                <p><?php esc_html_e( 'Aucun client pour le moment.', 'clielo' ); ?></p>
+            <?php else : ?>
+            <table class="wp-list-table widefat fixed striped" style="border-radius:8px;overflow:hidden">
+                <thead>
+                    <tr>
+                        <th style="width:44px"></th>
+                        <th><?php esc_html_e( 'Client', 'clielo' ); ?></th>
+                        <th><?php esc_html_e( 'Email', 'clielo' ); ?></th>
+                        <th style="width:100px;text-align:center"><?php esc_html_e( 'Commandes', 'clielo' ); ?></th>
+                        <th style="width:130px;text-align:right"><?php esc_html_e( 'Total dépensé', 'clielo' ); ?></th>
+                        <th style="width:130px"><?php esc_html_e( 'Dernier statut', 'clielo' ); ?></th>
+                        <th style="width:130px"><?php esc_html_e( 'Dernière commande', 'clielo' ); ?></th>
+                        <th style="width:80px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ( $rows as $row ) :
+                    $user = get_userdata( (int) $row->client_id );
+                    if ( ! $user ) {
+                        continue;
+                    }
+                    $avatar     = get_avatar_url( (int) $row->client_id, [ 'size' => 36 ] );
+                    $status     = $row->last_status ?? '';
+                    $sLabel     = $status_labels[ $status ] ?? $status;
+                    $sColor     = $status_colors[ $status ] ?? '#888';
+                    $spent      = number_format( (float) $row->total_spent, 2, ',', ' ' );
+                    $last_date  = $row->last_order_date ? wp_date( get_option( 'date_format' ), strtotime( $row->last_order_date ) ) : '—';
+                    $edit_url   = get_edit_user_link( (int) $row->client_id );
+                ?>
+                    <tr>
+                        <td><img src="<?php echo esc_url( $avatar ); ?>" style="width:36px;height:36px;border-radius:50%;vertical-align:middle" /></td>
+                        <td><strong><?php echo esc_html( $user->display_name ); ?></strong></td>
+                        <td style="color:#555"><?php echo esc_html( $user->user_email ); ?></td>
+                        <td style="text-align:center;font-weight:600;color:<?php echo esc_attr( $color ); ?>"><?php echo absint( $row->order_count ); ?></td>
+                        <td style="text-align:right;font-weight:600"><?php echo esc_html( $spent ); ?> €</td>
+                        <td>
+                            <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:<?php echo esc_attr( $sColor ); ?>">
+                                <?php echo esc_html( $sLabel ); ?>
+                            </span>
+                        </td>
+                        <td style="color:#888;font-size:12px"><?php echo esc_html( $last_date ); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url( $edit_url ); ?>" style="color:<?php echo esc_attr( $color ); ?>;font-size:12px;font-weight:500;text-decoration:none">
+                                <?php esc_html_e( 'Profil', 'clielo' ); ?>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php endif; ?>
         </div>
         <?php
     }

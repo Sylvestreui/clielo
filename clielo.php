@@ -3,7 +3,7 @@
  * Plugin Name: Clielo
  * Plugin URI:  https://github.com/SylvestreUi/clielo
  * Description: Service management plugin with integrated chat, order tracking, invoicing, Stripe payments and client notifications for any Custom Post Type.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      SylvestreUi
  * Author URI:  https://github.com/SylvestreUi
  * License:     GPL-2.0-or-later
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'CLIELO_VERSION', '1.1.0' );
+define( 'CLIELO_VERSION', '1.2.0' );
 define( 'CLIELO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CLIELO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
@@ -175,8 +175,21 @@ add_action( 'after_setup_theme', function () {
     }
 } );
 
+// Locale override : doit être déclaré avant load_plugin_textdomain
+add_filter( 'plugin_locale', function ( $locale, $domain ) {
+    if ( $domain === 'clielo' ) {
+        $override = get_option( 'clielo_locale', '' );
+        if ( $override !== '' ) {
+            return sanitize_text_field( $override );
+        }
+    }
+    return $locale;
+}, 10, 2 );
+
 // Initialisation
 add_action( 'init', function () {
+    load_plugin_textdomain( 'clielo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
     Clielo_Dashboard::init();
     Clielo_Admin::init();
     Clielo_Ajax::init();

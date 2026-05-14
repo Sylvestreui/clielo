@@ -135,6 +135,8 @@ class Clielo_Invoices {
             'siret_ifu'       => '',
             'siret_label'     => 'SIRET/IFU',
             'invoice_prefix'  => 'FACT-',
+            'invoice_start'   => 1,
+            'invoice_padding' => 3,
             'tax_rate'        => 20,
             'tax_notice'      => '',
             'payment_terms'   => __( 'Paiement à réception de facture.', 'clielo' ),
@@ -176,6 +178,8 @@ class Clielo_Invoices {
 
         $settings = self::get_settings();
         $prefix   = $settings['invoice_prefix'] ?: 'FACT-';
+        $start    = absint( $settings['invoice_start'] ?? 1 );
+        $padding  = max( 1, absint( $settings['invoice_padding'] ?? 3 ) );
         $table    = self::invoices_table_name();
 
         // Chercher uniquement les factures qui commencent par le préfixe actuel
@@ -186,17 +190,17 @@ class Clielo_Invoices {
         ) );
         // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-        $seq = 1;
+        $seq = max( 1, $start );
         if ( $last ) {
             // Extraire la partie numérique après le préfixe exact
             $num_part = substr( $last, strlen( $prefix ) );
             $num      = absint( $num_part );
             if ( $num > 0 ) {
-                $seq = $num + 1;
+                $seq = max( $seq, $num + 1 );
             }
         }
 
-        return $prefix . str_pad( $seq, 3, '0', STR_PAD_LEFT );
+        return $prefix . str_pad( $seq, $padding, '0', STR_PAD_LEFT );
     }
 
     public static function get_client_info( ?int $client_id, ?int $ext_client_id ): ?object {
@@ -1213,6 +1217,8 @@ class Clielo_Invoices {
             'siret_ifu'       => sanitize_text_field( wp_unslash( $_POST['siret_ifu'] ?? '' ) ),
             'siret_label'     => sanitize_text_field( wp_unslash( $_POST['siret_label'] ?? 'SIRET/IFU' ) ),
             'invoice_prefix'  => sanitize_text_field( wp_unslash( $_POST['invoice_prefix'] ?? 'FACT-' ) ),
+            'invoice_start'   => max( 1, absint( $_POST['invoice_start'] ?? 1 ) ),
+            'invoice_padding' => max( 1, min( 8, absint( $_POST['invoice_padding'] ?? 3 ) ) ),
             'tax_rate'        => floatval( $_POST['tax_rate'] ?? 20 ),
             'tax_notice'      => sanitize_textarea_field( wp_unslash( $_POST['tax_notice'] ?? '' ) ),
             'payment_terms'   => sanitize_textarea_field( wp_unslash( $_POST['payment_terms'] ?? '' ) ),
@@ -1380,6 +1386,16 @@ class Clielo_Invoices {
                             <input type="text" id="clielo-inv-prefix" value="<?php echo esc_attr( $s['invoice_prefix'] ); ?>" placeholder="FACT-" />
                         </div>
                         <div class="clielo-inv-field">
+                            <label><?php esc_html_e( 'Premier numéro de facture', 'clielo' ); ?></label>
+                            <input type="number" id="clielo-inv-start" value="<?php echo absint( $s['invoice_start'] ?? 1 ); ?>" min="1" step="1" style="max-width:120px" />
+                            <p class="description" style="margin:4px 0 0;font-size:12px;color:#777"><?php esc_html_e( 'Utile si vous migrez depuis un autre système de facturation.', 'clielo' ); ?></p>
+                        </div>
+                        <div class="clielo-inv-field">
+                            <label><?php esc_html_e( 'Zéros de remplissage (digits)', 'clielo' ); ?></label>
+                            <input type="number" id="clielo-inv-padding" value="<?php echo absint( $s['invoice_padding'] ?? 3 ); ?>" min="1" max="8" step="1" style="max-width:80px" />
+                            <p class="description" style="margin:4px 0 0;font-size:12px;color:#777"><?php esc_html_e( '3 → FACT-001, 4 → FACT-0001', 'clielo' ); ?></p>
+                        </div>
+                        <div class="clielo-inv-field">
                             <label><?php esc_html_e( 'Taux de TVA (%)', 'clielo' ); ?></label>
                             <input type="number" id="clielo-inv-taxrate" value="<?php echo esc_attr( $s['tax_rate'] ); ?>" min="0" max="100" step="0.01" />
                         </div>
@@ -1478,6 +1494,8 @@ class Clielo_Invoices {
                     fd.append('siret_ifu', document.getElementById('clielo-inv-siret').value);
                     fd.append('siret_label', document.getElementById('clielo-inv-siret-label').value);
                     fd.append('invoice_prefix', document.getElementById('clielo-inv-prefix').value);
+                    fd.append('invoice_start', document.getElementById('clielo-inv-start').value);
+                    fd.append('invoice_padding', document.getElementById('clielo-inv-padding').value);
                     fd.append('tax_rate', document.getElementById('clielo-inv-taxrate').value);
                     fd.append('tax_notice', document.getElementById('clielo-inv-taxnotice').value);
                     fd.append('payment_terms', document.getElementById('clielo-inv-terms').value);

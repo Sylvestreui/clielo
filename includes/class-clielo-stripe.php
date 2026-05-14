@@ -657,7 +657,7 @@ class Clielo_Stripe {
         }
     }
 
-    private static function build_order_summary_message( array $base_offer, array $selected, float $total_price, int $total_delay, int $extra_pages = 0, float $extra_page_price = 0, float $maintenance_price = 0, int $express_days = 0, float $express_price = 0, string $payment_mode = 'single', float $upfront_paid = 0.0, int $post_id = 0 ): string {
+    private static function build_order_summary_message( array $base_offer, array $selected, float $total_price, int $total_delay, int $extra_pages = 0, float $extra_page_price = 0, float $maintenance_price = 0, int $express_days = 0, float $express_price = 0, string $payment_mode = 'single', float $upfront_paid = 0.0, int $post_id = 0, int $installments_count = 0, string $invoice_number = '' ): string {
         $lines   = [];
         $lines[] = "\xF0\x9F\x93\x8B " . __( 'Ma sélection :', 'clielo' );
 
@@ -708,9 +708,18 @@ class Clielo_Stripe {
             );
         }
 
-        // Total + ligne paiement selon le mode
+        // Mode de paiement
+        $mode_labels = [
+            'single'       => __( 'Paiement unique', 'clielo' ),
+            'deposit'      => __( 'Acompte 50% + solde à la livraison', 'clielo' ),
+            'installments' => __( 'Mensualités', 'clielo' ),
+            'monthly'      => __( 'Abonnement mensuel', 'clielo' ),
+        ];
+        $lines[] = "\xF0\x9F\x92\xB3 " . ( $mode_labels[ $payment_mode ] ?? __( 'Paiement unique', 'clielo' ) );
+
+        // Ventilation selon le mode
         if ( $payment_mode === 'single' || $upfront_paid <= 0 ) {
-            $lines[] = "\xF0\x9F\x92\xB0 Total : " . number_format( $total_price, 2, ',', ' ' ) . " \xE2\x82\xAC";
+            $lines[] = "\xF0\x9F\x92\xB0 " . __( 'Total :', 'clielo' ) . ' ' . number_format( $total_price, 2, ',', ' ' ) . " \xE2\x82\xAC";
             $lines[] = "\xE2\x9C\x85 " . __( 'Payé par Stripe', 'clielo' );
         } elseif ( $payment_mode === 'monthly' ) {
             $n_months = $upfront_paid > 0 ? (int) round( $total_price / $upfront_paid ) : 1;
@@ -719,16 +728,32 @@ class Clielo_Stripe {
             /* translators: %1$d: number of months, %2$s: total price */
             $lines[] = "\xF0\x9F\x93\x85 " . sprintf( __( 'Durée : %1$d mois (total : %2$s)', 'clielo' ), $n_months, number_format( $total_price, 2, ',', ' ' ) . " \xE2\x82\xAC" );
             $lines[] = "\xE2\x9C\x85 " . __( 'Mois 1 payé via Stripe', 'clielo' );
-        } else {
+        } elseif ( $payment_mode === 'deposit' ) {
+            $balance = round( $total_price - $upfront_paid, 2 );
             $lines[] = "\xF0\x9F\x92\xB0 " . __( 'Total contrat :', 'clielo' ) . ' ' . number_format( $total_price, 2, ',', ' ' ) . " \xE2\x82\xAC";
-            $acompte_label = $payment_mode === 'deposit'
-                ? __( 'Acompte versé (50%) :', 'clielo' )
-                : __( 'Premier versement (40%) :', 'clielo' );
-            $lines[] = "\xE2\x9C\x85 " . $acompte_label . ' ' . number_format( $upfront_paid, 2, ',', ' ' ) . " \xE2\x82\xAC";
+            /* translators: %s: deposit amount paid */
+            $lines[] = "\xE2\x9C\x85 " . sprintf( __( 'Acompte versé (50%) : %s', 'clielo' ), number_format( $upfront_paid, 2, ',', ' ' ) . " \xE2\x82\xAC" );
+            /* translators: %s: balance amount due at delivery */
+            $lines[] = "\xF0\x9F\x94\x9C " . sprintf( __( 'Solde à la livraison (50%) : %s', 'clielo' ), number_format( $balance, 2, ',', ' ' ) . " \xE2\x82\xAC" );
+        } else {
+            // installments (40% upfront + N mensualités)
+            $n        = max( 1, $installments_count );
+            $balance  = round( $total_price - $upfront_paid, 2 );
+            $monthly  = $n > 0 ? round( $balance / $n, 2 ) : $balance;
+            $lines[] = "\xF0\x9F\x92\xB0 " . __( 'Total contrat :', 'clielo' ) . ' ' . number_format( $total_price, 2, ',', ' ' ) . " \xE2\x82\xAC";
+            /* translators: %s: first installment amount paid */
+            $lines[] = "\xE2\x9C\x85 " . sprintf( __( 'Premier versement (40%) : %s', 'clielo' ), number_format( $upfront_paid, 2, ',', ' ' ) . " \xE2\x82\xAC" );
+            /* translators: %1$d: number of installments, %2$s: monthly amount */
+            $lines[] = "\xF0\x9F\x94\x9C " . sprintf( __( 'Puis %1$d × %2$s / mois', 'clielo' ), $n, number_format( $monthly, 2, ',', ' ' ) . " \xE2\x82\xAC" );
         }
 
         if ( $total_delay > 0 ) {
             $lines[] = "\xE2\x8F\xB0 " . __( 'Délai total', 'clielo' ) . ' : ' . $total_delay . ' ' . __( 'jour(s)', 'clielo' );
+        }
+
+        if ( $invoice_number !== '' ) {
+            /* translators: %s: invoice reference number */
+            $lines[] = "\xF0\x9F\xA7\xBE " . sprintf( __( 'Facture : %s', 'clielo' ), $invoice_number );
         }
 
         return implode( "\n", $lines );
@@ -823,7 +848,8 @@ class Clielo_Stripe {
         if ( ! empty( $advanced_options_data ) ) {
             $adv_compact = json_decode( $advanced_options_data, true ) ?: [];
             if ( ! empty( $adv_compact ) && array_key_exists( 'i', (array) ( $adv_compact[0] ?? [] ) ) ) {
-                $post_adv_opts = json_decode( get_post_meta( $post_id, '_clielo_advanced_options', true ) ?: '[]', true ) ?: [];
+                $adv_meta_raw  = get_post_meta( $post_id, '_clielo_advanced_options', true );
+                $post_adv_opts = is_array( $adv_meta_raw ) ? $adv_meta_raw : ( json_decode( (string) ( $adv_meta_raw ?: '[]' ), true ) ?: [] );
                 $adv_full = [];
                 foreach ( $adv_compact as $item ) {
                     $idx        = absint( $item['i'] ?? 0 );
@@ -891,16 +917,11 @@ class Clielo_Stripe {
                 Clielo_DB::insert_message( $post_id, 0, $message, $client_id );
             }
 
-            $upfront_paid = $payment_mode === 'monthly'
-                ? Clielo_Payments::get_monthly_fee( $total_price, $installments_count )
-                : Clielo_Payments::get_upfront_amount( $total_price, $payment_mode );
-            $summary = self::build_order_summary_message( $base_offer, $selected, $total_price, $total_delay, $extra_pages, $extra_page_price, $maintenance_price, $express_days, $express_price, $payment_mode, $upfront_paid, $post_id );
-            Clielo_DB::insert_message( $post_id, $client_id, $summary, $client_id );
-
             do_action( 'clielo_order_created', $order_id, $post_id, $client_id );
             do_action( 'clielo_order_status_changed', $order_id, 'started', '', 0 );
 
-            // Créer l'échéancier + facture du premier paiement si nécessaire
+            // Créer échéancier + facture AVANT le message récap pour inclure la référence.
+            $invoice_number = '';
             if ( $payment_mode !== 'single' ) {
                 Clielo_Payments::create_schedule_for_order( $order_id );
 
@@ -909,19 +930,41 @@ class Clielo_Stripe {
                     foreach ( $schedule as $row ) {
                         // deposit/installments : ligne 'upfront' | monthly : installment_no=1 paid
                         if ( $row->type === 'upfront' || ( $payment_mode === 'monthly' && (int) $row->installment_no === 1 ) ) {
-                            $inv_type = $payment_mode === 'monthly' ? 'mensualite' : 'acompte';
-                            Clielo_Invoices::create_partial_invoice(
+                            $inv_type  = $payment_mode === 'monthly' ? 'mensualite' : 'acompte';
+                            $inv_id    = Clielo_Invoices::create_partial_invoice(
                                 $order_id,
                                 floatval( $row->amount_ttc ),
                                 $inv_type,
                                 (int) $row->id,
                                 (int) $row->installment_no
                             );
+                            if ( $inv_id ) {
+                                $inv = Clielo_Invoices::get_invoice( $inv_id );
+                                if ( $inv ) {
+                                    $invoice_number = $inv->invoice_number;
+                                }
+                            }
                             break;
                         }
                     }
                 }
+            } elseif ( class_exists( 'Clielo_Invoices' ) ) {
+                // Paiement unique : générer la facture complète immédiatement (déjà payée).
+                Clielo_Invoices::on_order_accepted( $order_id, Clielo_Orders::STATUS_ACCEPTED, Clielo_Orders::STATUS_STARTED, $client_id );
+                global $wpdb;
+                $inv_table = Clielo_Invoices::invoices_table_name();
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                $inv = $wpdb->get_row( $wpdb->prepare( "SELECT invoice_number FROM {$inv_table} WHERE order_id = %d AND status != 'cancelled' ORDER BY id DESC LIMIT 1", $order_id ) );
+                if ( $inv ) {
+                    $invoice_number = $inv->invoice_number;
+                }
             }
+
+            $upfront_paid = $payment_mode === 'monthly'
+                ? Clielo_Payments::get_monthly_fee( $total_price, $installments_count )
+                : Clielo_Payments::get_upfront_amount( $total_price, $payment_mode );
+            $summary = self::build_order_summary_message( $base_offer, $selected, $total_price, $total_delay, $extra_pages, $extra_page_price, $maintenance_price, $express_days, $express_price, $payment_mode, $upfront_paid, $post_id, $installments_count, $invoice_number );
+            Clielo_DB::insert_message( $post_id, $client_id, $summary, $client_id );
         }
     }
 }

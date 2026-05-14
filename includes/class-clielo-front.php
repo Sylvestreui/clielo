@@ -130,7 +130,7 @@ class Clielo_Front {
         .<?php echo esc_html( $uid ); ?> .clielo-sc-pack[data-selected]{border-color:var(--clielo-pack-selected-border);background:var(--clielo-pack-selected-bg)}
         .<?php echo esc_html( $uid ); ?> .clielo-pack-dot{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;border:2px solid var(--clielo-pack-dot-border);background:transparent;display:flex;align-items:center;justify-content:center}
         .<?php echo esc_html( $uid ); ?> .clielo-sc-pack[data-selected] .clielo-pack-dot{background:var(--clielo-c);border-color:var(--clielo-c)}
-        @media(max-width:768px){.<?php echo esc_html( $uid ); ?> #clielo-sc-footer{position:sticky !important;bottom:0 !important;z-index:10 !important}}
+        .<?php echo esc_html( $uid ); ?> #clielo-sc-footer{position:sticky !important;bottom:0 !important;z-index:10 !important}
         .clielo-sc-label{font-size:var(--clielo-label-size);font-weight:600;color:var(--clielo-label-color);text-transform:uppercase;letter-spacing:.5px}
         .clielo-pack-name{font-size:var(--clielo-pack-name-size);font-weight:var(--clielo-pack-name-weight);color:var(--clielo-pack-name-color)}
         .clielo-pack-price{font-size:var(--clielo-pack-price-size);font-weight:var(--clielo-pack-price-weight);color:var(--clielo-pack-price-color)}
@@ -226,7 +226,7 @@ class Clielo_Front {
             $advanced_options = [];
             if ( clielo_is_premium() ) {
                 $adv_raw = get_post_meta( $post_id, '_clielo_advanced_options', true );
-                $advanced_options = $adv_raw ? ( json_decode( $adv_raw, true ) ?: [] ) : [];
+                $advanced_options = is_array( $adv_raw ) ? $adv_raw : ( ( $adv_raw && is_string( $adv_raw ) ) ? ( json_decode( $adv_raw, true ) ?: [] ) : [] );
             }
             ?>
 
@@ -325,6 +325,10 @@ class Clielo_Front {
                 <button type="button" id="clielo-sc-order" style="display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;width:100% !important;padding:12px !important;border:none !important;border-radius:var(--clielo-btn-radius) !important;background:var(--clielo-btn-bg) !important;color:var(--clielo-btn-color) !important;font-size:var(--clielo-btn-size) !important;font-weight:var(--clielo-btn-weight) !important;cursor:pointer !important;font-family:inherit !important;margin:0 !important;line-height:1.4 !important">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     <?php echo ( clielo_is_premium() && Clielo_Stripe::is_enabled() ) ? esc_html__( 'Payer et commander', 'clielo' ) : esc_html__( 'Commander via le chat', 'clielo' ); ?>
+                </button>
+                <button type="button" id="clielo-sc-quote" style="display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;width:100% !important;padding:10px !important;border:1px solid var(--clielo-btn-bg) !important;border-radius:var(--clielo-btn-radius) !important;background:transparent !important;color:var(--clielo-btn-bg) !important;font-size:13px !important;font-weight:600 !important;cursor:pointer !important;font-family:inherit !important;margin:6px 0 0 !important;line-height:1.4 !important">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <?php esc_html_e( 'Demander un devis', 'clielo' ); ?>
                 </button>
             </div>
             <?php endif; ?>
@@ -472,7 +476,7 @@ class Clielo_Front {
         $advanced_options = [];
         if ( clielo_is_premium() ) {
             $adv_raw = get_post_meta( $post_id, '_clielo_advanced_options', true );
-            $advanced_options = $adv_raw ? ( json_decode( $adv_raw, true ) ?: [] ) : [];
+            $advanced_options = is_array( $adv_raw ) ? $adv_raw : ( ( $adv_raw && is_string( $adv_raw ) ) ? ( json_decode( $adv_raw, true ) ?: [] ) : [] );
         }
         $tax_rate           = clielo_is_premium() ? floatval( Clielo_Invoices::get_settings()['tax_rate'] ?? 0 ) : 0;
         $payment_mode       = Clielo_Options::get_payment_mode( $post_id );
@@ -517,11 +521,21 @@ class Clielo_Front {
                 'validate_order'    => __( 'Valider', 'clielo' ),
                 'validate_revision' => __( 'Valider la retouche', 'clielo' ),
                 'revision_delay_placeholder' => __( 'Délai (jours)', 'clielo' ),
+                'confirm_complete'       => __( 'Terminer la commande', 'clielo' ),
+                /* translators: %d: todo completion percentage */
+                'todos_incomplete'       => __( 'Les tâches ne sont complétées qu\'à %d%% — impossible de terminer.', 'clielo' ),
+                'confirm_complete_text'  => __( 'Confirmez-vous que tous les livrables ont été fournis au client ?', 'clielo' ),
+                'confirm_complete_check' => __( 'Je confirme que tous les livrables ont été fournis.', 'clielo' ),
+                'cancel'                 => __( 'Annuler', 'clielo' ),
+                'confirm'                => __( 'Confirmer', 'clielo' ),
+                'confirm_revision'            => __( 'Demande de retouche', 'clielo' ),
+                'revision_note_placeholder'   => __( 'Décrivez les modifications souhaitées...', 'clielo' ),
+                'included_from'               => __( 'Inclus', 'clielo' ),
                 'status_pending'    => __( 'En attente', 'clielo' ),
                 'status_paid'       => __( 'Payée', 'clielo' ),
                 'status_started'    => __( 'En cours', 'clielo' ),
                 'status_completed'  => __( 'Terminée', 'clielo' ),
-                'status_revision'   => __( 'Retouche demandée', 'clielo' ),
+                'status_revision'   => __( 'Retouche en cours', 'clielo' ),
                 'status_accepted'   => __( 'Acceptée', 'clielo' ),
                 'client'            => __( 'Client', 'clielo' ),
                 'service'           => __( 'Service', 'clielo' ),
@@ -541,11 +555,23 @@ class Clielo_Front {
                 'progress'          => __( 'Progression', 'clielo' ),
                 'add_note'          => __( 'Ajouter une note (optionnel)', 'clielo' ),
                 'todo_note'         => __( 'Note', 'clielo' ),
+                'orders_label'      => __( 'Commande', 'clielo' ),
+                'todos_label'       => __( 'Tâches', 'clielo' ),
+                'quote_btn'         => __( 'Demander un devis', 'clielo' ),
+                'quote_submitted'   => __( 'Devis soumis ✓', 'clielo' ),
+                'status_quote'      => __( 'Devis en attente', 'clielo' ),
+                'approve_quote'     => __( 'Approuver', 'clielo' ),
+                'reject_quote'      => __( 'Refuser', 'clielo' ),
+                'confirm_quote_reject' => __( 'Refuser ce devis ? Cette action est irréversible.', 'clielo' ),
             ],
         ] );
         ?>
         <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- default chat CSS vars; overridable by Elementor selectors on :root. ?>
-        <style>#clielo-toggle{--clielo-chat-btn-bg:<?php echo esc_attr( $color ); ?>;--clielo-chat-btn-size:60px;--clielo-chat-btn-radius:50%;--clielo-chat-header-bg:<?php echo esc_attr( $color ); ?>}#clielo-chatbox{--clielo-chat-popup-bg:#fff;--clielo-chat-popup-radius:16px;--clielo-chat-popup-width:380px;--clielo-chat-popup-height:520px}</style>
+        <style>
+        #clielo-toggle{--clielo-chat-btn-bg:<?php echo esc_attr( $color ); ?>;--clielo-chat-btn-size:60px;--clielo-chat-btn-radius:50%}
+        #clielo-container{--clielo-chat-btn-bg:<?php echo esc_attr( $color ); ?>;--clielo-chat-header-bg:<?php echo esc_attr( $color ); ?>;--clielo-chat-popup-bg:#fff;--clielo-chat-popup-radius:16px;--clielo-chat-popup-width:380px;--clielo-chat-popup-height:520px}
+        #clielo-chatbox{--clielo-chat-popup-bg:#fff;--clielo-chat-popup-radius:16px;--clielo-chat-popup-width:380px;--clielo-chat-popup-height:520px}
+        </style>
 
         <!-- Clielo : Bouton flottant -->
         <button id="clielo-toggle" style="<?php echo esc_attr( $btn_style ); ?>" aria-label="Chat">
@@ -700,7 +726,7 @@ class Clielo_Front {
                     }
                     var html = '';
                     res.data.forEach(function(cl){
-                        var dotColors = {pending:'#f59e0b',paid:'#8b5cf6',started:'#3b82f6',completed:'#10b981',revision:'#ef4444',accepted:'#6b7280'};
+                        var dotColors = {pending:'#f59e0b',paid:'#8b5cf6',started:'#3b82f6',completed:'#10b981',revision:'#ef4444',accepted:'#6b7280',quote:'#6366f1'};
                         var statusDot = '';
                         if(cl.has_order && cl.order_status){
                             var dc = dotColors[cl.order_status]||'#ccc';
@@ -752,6 +778,7 @@ class Clielo_Front {
 
             /* ── Shortcode elements ──────────────────── */
             var scOrder   = document.getElementById('clielo-sc-order');
+            var scQuote   = document.getElementById('clielo-sc-quote');
             var scChecks  = document.querySelectorAll('.clielo-sc-check');
             var scPacks   = document.querySelectorAll('.clielo-sc-pack');
             var scTotal     = document.getElementById('clielo-sc-total-val');
@@ -855,16 +882,40 @@ class Clielo_Front {
                 calcScTotal();
             }
 
+            function enableQuoteBtn(){
+                if(!scQuote) return;
+                scQuote.disabled = false;
+                scQuote.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> ' + esc(C.i18n.quote_btn);
+                scQuote.style.setProperty('opacity','1','important');
+                scQuote.style.setProperty('cursor','pointer','important');
+            }
+            function disableQuoteBtn(label){
+                if(!scQuote) return;
+                scQuote.disabled = true;
+                if(label) scQuote.textContent = label;
+                scQuote.style.setProperty('opacity','0.5','important');
+                scQuote.style.setProperty('cursor','not-allowed','important');
+            }
+
             function syncCardState(){
                 if(C.is_admin) return;
                 var o = C.active_order;
-                if(!o || !o.id) return;
+                if(!o || !o.id){
+                    enableQuoteBtn();
+                    return;
+                }
                 if(o.status === 'accepted'){
                     resetCard();
+                    enableQuoteBtn();
                 } else if(o.status === 'pending'){
                     lockCard();
+                    disableQuoteBtn(null);
+                } else if(o.status === 'quote'){
+                    freezeCard();
+                    disableQuoteBtn(C.i18n.quote_submitted);
                 } else {
                     freezeCard();
+                    disableQuoteBtn(null);
                 }
             }
             syncCardState();
@@ -998,6 +1049,44 @@ class Clielo_Front {
                             }
                         });
                     }
+                });
+            }
+
+            if(scQuote){
+                scQuote.addEventListener('click', function(e){
+                    e.preventDefault(); e.stopPropagation();
+                    if(!C.is_logged){
+                        window.location.href = C.login_url;
+                        return;
+                    }
+                    if(C.is_admin || scQuote.disabled) return;
+
+                    scQuote.disabled = true;
+                    scQuote.textContent = C.i18n.quote_submitted;
+
+                    var fd = new FormData();
+                    fd.append('action', 'clielo_create_quote');
+                    fd.append('post_id', C.post_id);
+                    fd.append('nonce', C.nonce);
+                    fd.append('selected_pack', selectedPackIdx);
+                    fd.append('selected_indices', JSON.stringify(getSelectedIndices()));
+
+                    fetch(C.ajax_url, {method:'POST', body:fd})
+                    .then(function(r){ return r.json(); })
+                    .then(function(res){
+                        if(res.success && res.data){
+                            C.active_order = res.data.active_order;
+                            renderOrderBar();
+                            syncCardState();
+                            openChat();
+                        } else {
+                            enableQuoteBtn();
+                            showToast(res.data && res.data.message ? res.data.message : C.i18n.order_error, 'error');
+                        }
+                    })
+                    .catch(function(){
+                        enableQuoteBtn();
+                    });
                 });
             }
 
@@ -1343,16 +1432,52 @@ class Clielo_Front {
                         b.addEventListener('click', function(){
                             var action = b.dataset.orderAction;
                             var orderId = parseInt(b.dataset.orderId);
-                            if(action === 'revision_accept'){
+                            if(action === 'quote_approve'){
+                                doOrderTransition(orderId, 'pending');
+                            } else if(action === 'quote_reject'){
+                                if(confirm(C.i18n.confirm_quote_reject)){
+                                    doOrderTransition(orderId, 'quote_reject');
+                                }
+                            } else if(action === 'revision_accept'){
                                 var inp = orderBar.querySelector('[data-revision-delay-for="'+orderId+'"]');
                                 var delay = inp ? (parseInt(inp.value) || 0) : 0;
                                 doRevisionTransition(orderId, delay);
+                            } else if(action === 'completed'){
+                                var targetOrder = null;
+                                if(C.is_admin && Array.isArray(C.active_order)){
+                                    C.active_order.forEach(function(ord){ if(ord.id === orderId) targetOrder = ord; });
+                                } else if(C.active_order && C.active_order.id === orderId){
+                                    targetOrder = C.active_order;
+                                }
+                                var todosTotal = (targetOrder && targetOrder.todos && targetOrder.todos.progress) ? targetOrder.todos.progress.total : 0;
+                                var todosPct2  = todosTotal > 0 ? targetOrder.todos.progress.percent : -1;
+                                if(todosPct2 >= 0 && todosPct2 < 100){
+                                    showToast(C.i18n.todos_incomplete.replace('%d', todosPct2), 'error');
+                                } else {
+                                    showConfirmModal(C.i18n.confirm_complete, C.i18n.confirm_complete_text, C.i18n.confirm_complete_check, function(){
+                                        doOrderTransition(orderId, action);
+                                    });
+                                }
+                            } else if(action === 'revision'){
+                                showRevisionModal(orderId);
                             } else {
                                 doOrderTransition(orderId, action);
                             }
                         });
                     });
                 }
+
+                // Toggles collapse pack detail
+                orderBar.querySelectorAll('.clielo-detail-toggle').forEach(function(btn){
+                    btn.addEventListener('click', function(){
+                        var content = btn.nextElementSibling;
+                        if(!content) return;
+                        var open = content.style.display !== 'none';
+                        content.style.display = open ? 'none' : 'block';
+                        var arrow = btn.querySelector('.clielo-toggle-arrow');
+                        if(arrow) arrow.style.transform = open ? '' : 'rotate(-90deg)';
+                    });
+                });
 
                 renderTodoList();
             }
@@ -1501,8 +1626,8 @@ class Clielo_Front {
             }
 
             function renderSingleOrder(order, isAdmin){
-                var sLabels = {'pending':C.i18n.status_pending,'paid':C.i18n.status_paid,'started':C.i18n.status_started,'completed':C.i18n.status_completed,'revision':C.i18n.status_revision,'accepted':C.i18n.status_accepted};
-                var sColors = {'pending':'#f59e0b','paid':'#8b5cf6','started':'#3b82f6','completed':'#10b981','revision':'#ef4444','accepted':'#6b7280'};
+                var sLabels = {'pending':C.i18n.status_pending,'paid':C.i18n.status_paid,'started':C.i18n.status_started,'completed':C.i18n.status_completed,'revision':C.i18n.status_revision,'accepted':C.i18n.status_accepted,'quote':C.i18n.status_quote};
+                var sColors = {'pending':'#f59e0b','paid':'#8b5cf6','started':'#3b82f6','completed':'#10b981','revision':'#ef4444','accepted':'#6b7280','quote':'#6366f1'};
                 var sL = sLabels[order.status] || order.status;
                 var sC = sColors[order.status] || '#888';
                 var orderNum = order.order_number || ('#CMD-'+order.id);
@@ -1525,13 +1650,19 @@ class Clielo_Front {
                 html += '</div><div style="display:flex;gap:4px">';
 
                 if(isAdmin){
-                    if(order.status==='pending'||order.status==='paid'){
+                    if(order.status==='quote'){
+                        html += makeBtn(order.id,'quote_approve',C.i18n.approve_quote,'#10b981');
+                        html += makeBtn(order.id,'quote_reject',C.i18n.reject_quote,'#ef4444');
+                    } else if(order.status==='pending'||order.status==='paid'){
                         html += makeBtn(order.id,'started',C.i18n.start_order,'#3b82f6');
                     } else if(order.status==='revision'){
                         html += '<input type="number" data-revision-delay-for="'+order.id+'" min="1" max="365" placeholder="'+esc(C.i18n.revision_delay_placeholder)+'" style="width:90px;padding:3px 6px;border:1px solid #d1d5db;border-radius:6px;font-size:11px;font-family:inherit" />';
                         html += '<button data-order-id="'+order.id+'" data-order-action="revision_accept" style="padding:4px 10px;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;background:#3b82f6;cursor:pointer">'+esc(C.i18n.validate_revision)+'</button>';
                     } else if(order.status==='started'){
-                        html += makeBtn(order.id,'completed',C.i18n.complete_order,'#10b981');
+                        var todosPct = (order.todos && order.todos.progress && order.todos.progress.total > 0) ? order.todos.progress.percent : -1;
+                        var completeLabel = C.i18n.complete_order + (todosPct >= 0 ? ' (' + todosPct + '%)' : '');
+                        var completeColor = (todosPct >= 0 && todosPct < 100) ? '#f59e0b' : '#10b981';
+                        html += makeBtn(order.id,'completed',completeLabel,completeColor);
                     }
                 } else {
                     if(order.status==='completed'){
@@ -1540,6 +1671,60 @@ class Clielo_Front {
                     }
                 }
                 html += '</div></div>';
+
+                // Section collapsible : pack + features héritées
+                var bo = order.base_offer || {};
+                if(bo.name){
+                    var totalFmt = (order.total_price||0).toFixed(2).replace('.',',') + ' €';
+                    html += '<div style="margin-top:6px;border-top:1px solid #e5e7eb;padding-top:6px">';
+                    html += '<button type="button" class="clielo-detail-toggle" data-order-detail="'+order.id+'" style="background:none;border:none;padding:0;cursor:pointer;font-size:12px;color:#555;font-family:inherit;display:flex;align-items:center;gap:4px;width:100%;text-align:left">';
+                    html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="clielo-toggle-arrow" style="transition:transform .2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+                    html += '<span>'+esc(bo.name)+'</span><span style="margin-left:auto;font-weight:600;color:#333">'+totalFmt+'</span></button>';
+                    html += '<div class="clielo-detail-content" style="display:none;margin-top:6px;padding-left:4px">';
+
+                    // Features du pack sélectionné (exclusives)
+                    var packIdx = -1;
+                    if(C.packs) C.packs.forEach(function(p,i){ if(p.name===bo.name) packIdx=i; });
+                    var inheritedFeatures = [];
+                    if(packIdx > 0 && C.packs){
+                        for(var pi=0;pi<packIdx;pi++){
+                            (C.packs[pi].features||[]).forEach(function(f){ inheritedFeatures.push(f); });
+                        }
+                    }
+                    var exclusiveFeatures = (bo.features||[]).filter(function(f){ return inheritedFeatures.indexOf(f)===-1; });
+                    exclusiveFeatures.forEach(function(f){
+                        html += '<div style="font-size:11px;color:#444;display:flex;gap:5px;padding:1px 0"><span style="color:#10b981;flex-shrink:0">✓</span>'+esc(f)+'</div>';
+                    });
+
+                    // Features héritées des packs inférieurs (collapsées)
+                    if(packIdx > 0 && C.packs){
+                        var inherited = C.packs.slice(0,packIdx);
+                        html += '<button type="button" class="clielo-detail-toggle" data-order-detail="'+order.id+'-inh" style="background:none;border:none;padding:0;cursor:pointer;font-size:11px;color:#999;font-family:inherit;display:flex;align-items:center;gap:4px;margin-top:4px">';
+                        html += '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="clielo-toggle-arrow" style="transition:transform .2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+                        html += esc(C.i18n.included_from||'Inclus')+'</button>';
+                        html += '<div class="clielo-detail-content" style="display:none;padding-left:8px">';
+                        inherited.forEach(function(ip){
+                            if(!(ip.features&&ip.features.length)) return;
+                            html += '<div style="font-size:10px;color:#aaa;margin-top:3px;font-style:italic">'+esc(ip.name)+'</div>';
+                            ip.features.forEach(function(f){
+                                html += '<div style="font-size:11px;color:#bbb;display:flex;gap:5px;padding:1px 0"><span style="flex-shrink:0">✓</span>'+esc(f)+'</div>';
+                            });
+                        });
+                        html += '</div>';
+                    }
+
+                    // Options sélectionnées
+                    var selOpts = order.selected_options||[];
+                    if(selOpts.length){
+                        html += '<div style="margin-top:4px;font-size:11px;color:#777;font-weight:600">+&nbsp;Options</div>';
+                        selOpts.forEach(function(opt){
+                            html += '<div style="font-size:11px;color:#555;padding:1px 0">+ '+esc(opt.name)+'</div>';
+                        });
+                    }
+
+                    html += '</div></div>';
+                }
+
                 return html;
             }
 
@@ -1564,6 +1749,9 @@ class Clielo_Front {
                         renderOrderBar();
                         syncCardState();
                         loadMsgs();
+                    } else if(!res.success){
+                        var errMsg = (res.data && res.data.message) ? res.data.message : (C.i18n.order_error || 'Une erreur est survenue.');
+                        showToast(errMsg, 'error');
                     }
                 });
             }
@@ -1590,9 +1778,89 @@ class Clielo_Front {
                 var d=new Date(s.replace(' ','T'));
                 return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
             }
+            /* ── Toast ───────────────────────────────── */
+            function showToast(msg, type){
+                var t = document.createElement('div');
+                t.textContent = msg;
+                t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:'+(type==='error'?'#ef4444':'#10b981')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:2147483647;box-shadow:0 4px 12px rgba(0,0,0,0.2);max-width:340px;text-align:center;transition:opacity .3s';
+                document.body.appendChild(t);
+                setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 300); }, 4000);
+            }
+
+            /* ── Modal confirmation ───────────────── */
+            function showConfirmModal(title, text, checkLabel, onConfirm){
+                var overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2147483648;display:flex;align-items:center;justify-content:center';
+                var box = document.createElement('div');
+                box.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);font-family:inherit';
+                box.innerHTML = '<h3 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#222">'+esc(title)+'</h3>'
+                    +'<p style="margin:0 0 16px;font-size:13px;color:#555;line-height:1.5">'+esc(text)+'</p>'
+                    +'<label style="display:flex;align-items:flex-start;gap:8px;margin-bottom:20px;cursor:pointer;font-size:13px;color:#333">'
+                    +'<input type="checkbox" id="clielo-confirm-chk" style="margin-top:2px;cursor:pointer;accent-color:'+C.color+';flex-shrink:0">'
+                    +'<span>'+esc(checkLabel)+'</span></label>'
+                    +'<div style="display:flex;gap:10px;justify-content:flex-end">'
+                    +'<button id="clielo-modal-cancel" style="padding:8px 14px;border:1px solid #d1d5db;background:#fff;border-radius:8px;font-size:13px;cursor:pointer">'+esc(C.i18n.cancel)+'</button>'
+                    +'<button id="clielo-modal-ok" disabled style="padding:8px 14px;border:none;background:#d1d5db;color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:not-allowed">'+esc(C.i18n.confirm)+'</button>'
+                    +'</div>';
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+                var chk = box.querySelector('#clielo-confirm-chk');
+                var okBtn = box.querySelector('#clielo-modal-ok');
+                chk.addEventListener('change', function(){
+                    okBtn.disabled = !chk.checked;
+                    okBtn.style.background = chk.checked ? C.color : '#d1d5db';
+                    okBtn.style.cursor = chk.checked ? 'pointer' : 'not-allowed';
+                });
+                okBtn.addEventListener('click', function(){ if(!chk.checked) return; document.body.removeChild(overlay); onConfirm(); });
+                box.querySelector('#clielo-modal-cancel').addEventListener('click', function(){ document.body.removeChild(overlay); });
+            }
+
+            /* ── Modal retouche ──────────────────── */
+            function showRevisionModal(orderId){
+                var overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2147483648;display:flex;align-items:center;justify-content:center';
+                var mbox = document.createElement('div');
+                mbox.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);font-family:inherit';
+                mbox.innerHTML = '<h3 style="margin:0 0 12px;font-size:15px;font-weight:700;color:#222">'+esc(C.i18n.confirm_revision)+'</h3>'
+                    +'<textarea id="clielo-rev-note" placeholder="'+esc(C.i18n.revision_note_placeholder)+'" style="width:100%;box-sizing:border-box;height:100px;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:16px;outline:none;display:block"></textarea>'
+                    +'<div style="display:flex;gap:10px;justify-content:flex-end">'
+                    +'<button id="clielo-rev-cancel" style="padding:8px 14px;border:1px solid #d1d5db;background:#fff;border-radius:8px;font-size:13px;cursor:pointer">'+esc(C.i18n.cancel)+'</button>'
+                    +'<button id="clielo-rev-ok" disabled style="padding:8px 14px;border:none;background:#d1d5db;color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:not-allowed">'+esc(C.i18n.confirm)+'</button>'
+                    +'</div>';
+                overlay.appendChild(mbox);
+                document.body.appendChild(overlay);
+                var ta = mbox.querySelector('#clielo-rev-note');
+                var okBtn = mbox.querySelector('#clielo-rev-ok');
+                ta.addEventListener('input', function(){
+                    var filled = ta.value.trim().length > 0;
+                    okBtn.disabled = !filled;
+                    okBtn.style.background = filled ? '#ef4444' : '#d1d5db';
+                    okBtn.style.cursor = filled ? 'pointer' : 'not-allowed';
+                });
+                okBtn.addEventListener('click', function(){
+                    if(!ta.value.trim()) return;
+                    var note = ta.value.trim();
+                    document.body.removeChild(overlay);
+                    doOrderTransition(orderId, 'revision', {revision_note: note});
+                });
+                mbox.querySelector('#clielo-rev-cancel').addEventListener('click', function(){ document.body.removeChild(overlay); });
+                setTimeout(function(){ ta.focus(); }, 50);
+            }
+
             function esc(s){
                 if(!s)return'';
                 var d=document.createElement('div'); d.textContent=s; return d.innerHTML;
+            }
+
+            /* ── Auto-open depuis notification ─────── */
+            if(window.location.search.indexOf('clielo_open_chat=1') !== -1){
+                openChat();
+                try{
+                    var cleanUrl = window.location.href
+                        .replace(/([?&])clielo_open_chat=1(&|$)/, function(m,pre,post){ return post === '&' ? pre : ''; })
+                        .replace(/[?&]$/, '');
+                    window.history.replaceState(null, '', cleanUrl);
+                }catch(e){}
             }
         })();
         <?php

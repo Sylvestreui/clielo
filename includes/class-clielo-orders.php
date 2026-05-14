@@ -12,6 +12,7 @@ class Clielo_Orders {
     const STATUS_COMPLETED = 'completed';
     const STATUS_REVISION  = 'revision';
     const STATUS_ACCEPTED  = 'accepted';
+    const STATUS_QUOTE     = 'quote';
 
     private static array $transitions = [
         'pending'   => [ 'started' ],
@@ -19,10 +20,12 @@ class Clielo_Orders {
         'started'   => [ 'completed' ],
         'completed' => [ 'revision', 'accepted' ],
         'revision'  => [ 'started' ],
+        'quote'     => [ 'pending' ],
     ];
 
     public static function init(): void {
         add_action( 'wp_ajax_clielo_create_order',     [ __CLASS__, 'ajax_create_order' ] );
+        add_action( 'wp_ajax_clielo_create_quote',     [ __CLASS__, 'ajax_create_quote' ] );
         add_action( 'wp_ajax_clielo_order_transition',  [ __CLASS__, 'ajax_order_transition' ] );
         add_action( 'wp_ajax_clielo_get_clients',       [ __CLASS__, 'ajax_get_clients' ] );
     }
@@ -151,6 +154,38 @@ class Clielo_Orders {
     }
 
     /**
+     * Crée ou met à jour un devis (statut « quote »).
+     * Écrase un devis existant ; refuse si une commande active est en cours.
+     */
+    public static function create_quote( int $post_id, int $client_id, array $base_offer, array $selected_options, float $total_price, int $total_delay ): int|false {
+        global $wpdb;
+
+        $table    = self::table_name();
+        $existing = self::get_order_for_client( $post_id, $client_id );
+
+        $data = [
+            'post_id'          => $post_id,
+            'client_id'        => $client_id,
+            'status'           => self::STATUS_QUOTE,
+            'base_offer'       => wp_json_encode( $base_offer ),
+            'selected_options' => wp_json_encode( $selected_options ),
+            'total_price'      => $total_price,
+            'total_delay'      => $total_delay,
+            'updated_at'       => current_time( 'mysql' ),
+        ];
+
+        if ( $existing && $existing->status === self::STATUS_QUOTE ) {
+            $wpdb->update( $table, $data, [ 'id' => $existing->id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            return (int) $existing->id;
+        }
+
+        $data['created_at'] = current_time( 'mysql' );
+        $inserted = $wpdb->insert( $table, $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+
+        return $inserted ? (int) $wpdb->insert_id : false;
+    }
+
+    /**
      * Récupère une commande par ID.
      */
     public static function get_order( int $order_id ): ?object {
@@ -251,7 +286,7 @@ class Clielo_Orders {
         );
         // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-        $valid = [ 'pending', 'paid', 'started', 'completed', 'revision', 'accepted' ];
+        $valid = [ 'pending', 'paid', 'started', 'completed', 'revision', 'accepted', 'quote' ];
         if ( $status !== '' && in_array( $status, $valid, true ) ) {
             $sql .= $wpdb->prepare( ' AND o.status = %s', $status );
         }
@@ -398,6 +433,33 @@ class Clielo_Orders {
         $order_num = '#CMD-' . (int) $order->id;
 
         switch ( $new_status ) {
+            case self::STATUS_QUOTE:
+                return sprintf(
+                    "--- %s %s ---\n%s",
+                    $order_num,
+                    __( 'Devis demandé', 'clielo' ),
+                    sprintf(
+                        /* translators: %s: actor display name */
+                        __( '%s a soumis une demande de devis.', 'clielo' ),
+                        $actor_name
+                    )
+                );
+
+            case self::STATUS_PENDING:
+                if ( $old_status === self::STATUS_QUOTE ) {
+                    return sprintf(
+                        "--- %s %s ---\n%s",
+                        $order_num,
+                        __( 'Devis approuvé', 'clielo' ),
+                        sprintf(
+                            /* translators: %s: actor display name */
+                            __( '%s a approuvé votre devis. Vous pouvez maintenant procéder au paiement.', 'clielo' ),
+                            $actor_name
+                        )
+                    );
+                }
+                return '';
+
             case self::STATUS_PAID:
                 return sprintf(
                     "--- %s %s ---\n%s",
@@ -620,7 +682,7 @@ class Clielo_Orders {
 
         // Options avancées dynamiques
         $adv_opts_raw  = get_post_meta( $post_id, '_clielo_advanced_options', true );
-        $adv_opts_cfg  = $adv_opts_raw ? json_decode( $adv_opts_raw, true ) : [];
+        $adv_opts_cfg  = is_array( $adv_opts_raw ) ? $adv_opts_raw : ( ( $adv_opts_raw && is_string( $adv_opts_raw ) ) ? ( json_decode( $adv_opts_raw, true ) ?: [] ) : [] );
         $adv_sels_raw  = isset( $_POST['advanced_options_data'] ) ? sanitize_text_field( wp_unslash( $_POST['advanced_options_data'] ) ) : '[]';
         $adv_sels      = json_decode( $adv_sels_raw, true );
         $adv_sels      = is_array( $adv_sels ) ? $adv_sels : [];
@@ -697,6 +759,30 @@ class Clielo_Orders {
 
         $user_id        = get_current_user_id();
         $revision_delay = absint( $_POST['revision_delay'] ?? 0 );
+        $revision_note  = isset( $_POST['revision_note'] ) ? sanitize_textarea_field( wp_unslash( $_POST['revision_note'] ) ) : '';
+
+        // Refus de devis : message système + suppression de la ligne
+        if ( $new_status === 'quote_reject' ) {
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_send_json_error( [ 'message' => __( 'Action non autorisée.', 'clielo' ) ], 403 );
+            }
+            $order = self::get_order( $order_id );
+            if ( ! $order || $order->status !== self::STATUS_QUOTE ) {
+                wp_send_json_error( [ 'message' => __( 'Devis introuvable.', 'clielo' ) ], 404 );
+            }
+            $reject_msg = sprintf(
+                "--- #CMD-%d %s ---\n%s",
+                $order_id,
+                __( 'Devis refusé', 'clielo' ),
+                __( 'Votre demande de devis a été refusée. N\'hésitez pas à nous contacter pour plus d\'informations.', 'clielo' )
+            );
+            Clielo_DB::insert_message( (int) $order->post_id, 0, $reject_msg, (int) $order->client_id );
+            global $wpdb;
+            $table = self::table_name();
+            $wpdb->delete( $table, [ 'id' => $order_id ], [ '%d' ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $active_order = self::build_order_response( $post_id );
+            wp_send_json_success( [ 'active_order' => $active_order ] );
+        }
 
         // Vérification préalable : tâches incomplètes bloquent le passage à "terminé"
         if ( $new_status === self::STATUS_COMPLETED && class_exists( 'Clielo_Todos' ) ) {
@@ -716,6 +802,24 @@ class Clielo_Orders {
 
         if ( ! $result ) {
             wp_send_json_error( [ 'message' => __( 'Transition non autorisée.', 'clielo' ) ], 403 );
+        }
+
+        // Note de retouche : on la poste automatiquement comme message chat.
+        if ( $new_status === self::STATUS_REVISION && $revision_note !== '' ) {
+            global $wpdb;
+            $msg_table = $wpdb->prefix . 'clielo_messages';
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $wpdb->insert(
+                $msg_table,
+                [
+                    'post_id'    => $post_id,
+                    'client_id'  => $user_id,
+                    'user_id'    => $user_id,
+                    'message'    => $revision_note,
+                    'created_at' => current_time( 'mysql' ),
+                ],
+                [ '%d', '%d', '%d', '%s', '%s' ]
+            );
         }
 
         $active_order = self::build_order_response( $post_id );
@@ -755,6 +859,96 @@ class Clielo_Orders {
     }
 
     /**
+     * AJAX : Créer un devis.
+     */
+    public static function ajax_create_quote(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( [ 'message' => __( 'Non connecté.', 'clielo' ) ], 403 );
+        }
+
+        if ( current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Les administrateurs ne peuvent pas demander un devis.', 'clielo' ) ], 403 );
+        }
+
+        $post_id           = absint( $_POST['post_id'] ?? 0 );
+        $selected_pack_idx = absint( $_POST['selected_pack'] ?? 0 );
+        $selected_indices  = array_map( 'absint', (array) json_decode( sanitize_text_field( wp_unslash( $_POST['selected_indices'] ?? '[]' ) ), true ) );
+
+        if ( ! $post_id || ! is_array( $selected_indices ) ) {
+            wp_send_json_error( [ 'message' => __( 'Données manquantes.', 'clielo' ) ], 400 );
+        }
+
+        $post = get_post( $post_id );
+        if ( ! $post || $post->post_type !== Clielo_Admin::get_post_type() ) {
+            wp_send_json_error( [ 'message' => __( 'Post invalide.', 'clielo' ) ], 400 );
+        }
+
+        $client_id = get_current_user_id();
+
+        // Bloquer si une commande active (non-quote, non-accepted) est déjà en cours
+        $existing        = self::get_order_for_client( $post_id, $client_id );
+        $blocked_statuses = [ self::STATUS_PENDING, self::STATUS_PAID, self::STATUS_STARTED, self::STATUS_COMPLETED, self::STATUS_REVISION ];
+        if ( $existing && in_array( $existing->status, $blocked_statuses, true ) ) {
+            wp_send_json_error( [ 'message' => __( 'Une commande est déjà en cours pour ce service.', 'clielo' ) ], 403 );
+        }
+
+        $packs    = Clielo_Options::get_packs( $post_id );
+        $all_opts = Clielo_Options::get_options( $post_id );
+
+        if ( empty( $packs ) || ! isset( $packs[ $selected_pack_idx ] ) ) {
+            wp_send_json_error( [ 'message' => __( 'Pack invalide.', 'clielo' ) ], 400 );
+        }
+
+        $base_offer = $packs[ $selected_pack_idx ];
+
+        $selected = [];
+        foreach ( $selected_indices as $idx ) {
+            if ( isset( $all_opts[ $idx ] ) ) {
+                $selected[] = $all_opts[ $idx ];
+            }
+        }
+
+        $total_price = floatval( $base_offer['price'] ?? 0 );
+        $total_delay = absint( $base_offer['delay'] ?? 0 );
+        foreach ( $selected as $opt ) {
+            $total_price += floatval( $opt['price'] ?? 0 );
+            $total_delay += absint( $opt['delay'] ?? 0 );
+        }
+
+        $tax_rate    = clielo_is_premium() ? floatval( Clielo_Invoices::get_settings()['tax_rate'] ?? 0 ) : 0;
+        $total_price = round( $total_price * ( 1 + $tax_rate / 100 ), 2 );
+
+        $order_id = self::create_quote( $post_id, $client_id, $base_offer, $selected, $total_price, $total_delay );
+
+        if ( ! $order_id ) {
+            wp_send_json_error( [ 'message' => __( 'Erreur lors de la création du devis.', 'clielo' ) ], 500 );
+        }
+
+        // Message système dans le chat
+        $pack_name = sanitize_text_field( $base_offer['name'] ?? '' );
+        $quote_msg = sprintf(
+            "--- #CMD-%d %s ---\n%s",
+            $order_id,
+            __( 'Devis demandé', 'clielo' ),
+            $pack_name !== ''
+                ? sprintf(
+                    /* translators: %s: pack name */
+                    __( 'Demande de devis pour le pack « %s ».', 'clielo' ),
+                    $pack_name
+                )
+                : __( 'Demande de devis soumise.', 'clielo' )
+        );
+        Clielo_DB::insert_message( $post_id, 0, $quote_msg, $client_id );
+
+        do_action( 'clielo_quote_created', $order_id, $post_id, $client_id );
+
+        $active_order = self::build_order_response( $post_id );
+        wp_send_json_success( [ 'order_id' => $order_id, 'active_order' => $active_order ] );
+    }
+
+    /**
      * Construit la réponse order pour le JS (selon le rôle de l'utilisateur courant).
      */
     public static function build_order_response( int $post_id ): mixed {
@@ -767,16 +961,18 @@ class Clielo_Orders {
             }
             return array_values( array_map( function ( $o ) use ( $is_premium ) {
                 return [
-                    'id'             => (int) $o->id,
-                    'order_number'   => '#CMD-' . (int) $o->id,
-                    'client_id'      => (int) $o->client_id,
-                    'client_name'    => $o->client_name ?? '',
-                    'status'         => $o->status,
-                    'total_price'    => (float) $o->total_price,
-                    'total_delay'    => (int) $o->total_delay,
-                    'estimated_date' => $o->estimated_date,
-                    'created_at'     => $o->created_at,
-                    'todos'          => $is_premium ? Clielo_Todos::build_todos_response( (int) $o->id ) : null,
+                    'id'               => (int) $o->id,
+                    'order_number'     => '#CMD-' . (int) $o->id,
+                    'client_id'        => (int) $o->client_id,
+                    'client_name'      => $o->client_name ?? '',
+                    'status'           => $o->status,
+                    'total_price'      => (float) $o->total_price,
+                    'total_delay'      => (int) $o->total_delay,
+                    'estimated_date'   => $o->estimated_date,
+                    'created_at'       => $o->created_at,
+                    'base_offer'       => json_decode( $o->base_offer ?? '{}', true ) ?: [],
+                    'selected_options' => json_decode( $o->selected_options ?? '[]', true ) ?: [],
+                    'todos'            => $is_premium ? Clielo_Todos::build_todos_response( (int) $o->id ) : null,
                 ];
             }, $orders ) );
         }
@@ -786,15 +982,17 @@ class Clielo_Orders {
             return null;
         }
         return [
-            'id'             => (int) $order->id,
-            'order_number'   => '#CMD-' . (int) $order->id,
-            'client_id'      => (int) $order->client_id,
-            'status'         => $order->status,
-            'total_price'    => (float) $order->total_price,
-            'total_delay'    => (int) $order->total_delay,
-            'estimated_date' => $order->estimated_date,
-            'created_at'     => $order->created_at,
-            'todos'          => $is_premium ? Clielo_Todos::build_todos_response( (int) $order->id ) : null,
+            'id'               => (int) $order->id,
+            'order_number'     => '#CMD-' . (int) $order->id,
+            'client_id'        => (int) $order->client_id,
+            'status'           => $order->status,
+            'total_price'      => (float) $order->total_price,
+            'total_delay'      => (int) $order->total_delay,
+            'estimated_date'   => $order->estimated_date,
+            'created_at'       => $order->created_at,
+            'base_offer'       => json_decode( $order->base_offer ?? '{}', true ) ?: [],
+            'selected_options' => json_decode( $order->selected_options ?? '[]', true ) ?: [],
+            'todos'            => $is_premium ? Clielo_Todos::build_todos_response( (int) $order->id ) : null,
         ];
     }
 }

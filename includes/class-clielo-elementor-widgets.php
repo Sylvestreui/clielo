@@ -23,6 +23,8 @@ class Clielo_Elementor_Widgets {
         $widgets_manager->register( new Clielo_Widget_Option() );
         $widgets_manager->register( new Clielo_Widget_Advanced_Price() );
         $widgets_manager->register( new Clielo_Widget_Service_Options() );
+        $widgets_manager->register( new Clielo_Widget_Notifications() );
+        $widgets_manager->register( new Clielo_Widget_Account() );
     }
 }
 
@@ -1097,5 +1099,286 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
         }
 
         echo Clielo_Front::render_options_card( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML already escaped in render_options_card().
+    }
+}
+
+/* ================================================================
+ *  WIDGET: Cloche notifications [clielo_notifications]
+ * ================================================================ */
+
+class Clielo_Widget_Notifications extends Clielo_Widget_Base {
+
+    public function get_name(): string {
+        return 'clielo_notifications';
+    }
+
+    public function get_title(): string {
+        return __( 'Clielo — Cloche', 'clielo' );
+    }
+
+    public function get_icon(): string {
+        return 'eicon-bell';
+    }
+
+    protected function register_controls(): void {
+        $this->start_controls_section( 'section_bell', [
+            'label' => __( 'Cloche', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'bell_color', [
+            'label'     => __( 'Couleur icône', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-notif-wrap button svg.clielo-nb-icon' => 'stroke: {{VALUE}};',
+            ],
+        ] );
+
+        $this->add_responsive_control( 'bell_size', [
+            'label'      => __( 'Taille icône (px)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 14, 'max' => 64 ] ],
+            'selectors'  => [
+                '{{WRAPPER}} .clielo-notif-wrap button svg.clielo-nb-icon' => 'width: {{SIZE}}px !important; height: {{SIZE}}px !important;',
+            ],
+        ] );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section( 'section_badge', [
+            'label' => __( 'Badge', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'badge_bg', [
+            'label'     => __( 'Couleur fond', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-nb-badge' => 'background: {{VALUE}} !important;',
+            ],
+        ] );
+
+        $this->add_control( 'badge_text_color', [
+            'label'     => __( 'Couleur texte', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-nb-badge' => 'color: {{VALUE}} !important;',
+            ],
+        ] );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section( 'section_panel', [
+            'label' => __( 'Panneau', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'panel_bg', [
+            'label'     => __( 'Fond du panneau', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-nb-drop' => 'background: {{VALUE}} !important;',
+            ],
+        ] );
+
+        $this->add_responsive_control( 'panel_radius', [
+            'label'      => __( 'Rayon des coins (px)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 30 ] ],
+            'selectors'  => [
+                '{{WRAPPER}} .clielo-nb-drop' => 'border-radius: {{SIZE}}px !important;',
+            ],
+        ] );
+
+        $this->add_responsive_control( 'panel_width', [
+            'label'      => __( 'Largeur panneau (px)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 240, 'max' => 600 ] ],
+            'selectors'  => [
+                '{{WRAPPER}} .clielo-nb-drop' => 'width: {{SIZE}}px !important;',
+            ],
+        ] );
+
+        $this->add_control( 'readall_color', [
+            'label'     => __( 'Couleur "Tout marquer lu"', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-nb-readall' => 'color: {{VALUE}} !important;',
+            ],
+        ] );
+
+        $this->end_controls_section();
+    }
+
+    protected function render(): void {
+        if ( ! is_user_logged_in() ) {
+            if ( class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
+                echo '<div style="padding:12px;color:#999;font-size:13px;border:1px dashed #ccc;border-radius:6px;text-align:center">'
+                    . esc_html__( 'Cloche notifications (visible pour les utilisateurs connectés)', 'clielo' )
+                    . '</div>';
+            }
+            return;
+        }
+        if ( class_exists( 'Clielo_Notifications' ) ) {
+            echo Clielo_Notifications::shortcode_bell(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML from shortcode_bell() is already escaped internally.
+        }
+    }
+}
+
+/* ================================================================
+ *  WIDGET: Compte / Avatar [clielo_account]
+ * ================================================================ */
+
+class Clielo_Widget_Account extends Clielo_Widget_Base {
+
+    public function get_name(): string {
+        return 'clielo_account';
+    }
+
+    public function get_title(): string {
+        return __( 'Clielo — Compte', 'clielo' );
+    }
+
+    public function get_icon(): string {
+        return 'eicon-person';
+    }
+
+    protected function register_controls(): void {
+        $this->start_controls_section( 'section_avatar', [
+            'label' => __( 'Avatar', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_responsive_control( 'avatar_size', [
+            'label'      => __( 'Taille (px)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 24, 'max' => 120 ] ],
+            'selectors'  => [
+                '{{WRAPPER}} .clielo-acct-toggle' => 'width: {{SIZE}}px !important; height: {{SIZE}}px !important;',
+            ],
+        ] );
+
+        $this->add_control( 'avatar_border_color', [
+            'label'     => __( 'Couleur bordure', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-acct-toggle' => 'border-color: {{VALUE}};',
+            ],
+        ] );
+
+        $this->add_responsive_control( 'avatar_border_width', [
+            'label'      => __( 'Épaisseur bordure (px)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 8 ] ],
+            'selectors'  => [
+                '{{WRAPPER}} .clielo-acct-toggle' => 'border-width: {{SIZE}}px;',
+            ],
+        ] );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section( 'section_dropdown', [
+            'label' => __( 'Menu déroulant', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'dropdown_bg', [
+            'label'     => __( 'Fond', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-acct-drop' => 'background: {{VALUE}} !important;',
+            ],
+        ] );
+
+        $this->add_responsive_control( 'dropdown_radius', [
+            'label'      => __( 'Rayon des coins (px)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 30 ] ],
+            'selectors'  => [
+                '{{WRAPPER}} .clielo-acct-drop' => 'border-radius: {{SIZE}}px !important;',
+            ],
+        ] );
+
+        $this->add_responsive_control( 'dropdown_min_width', [
+            'label'      => __( 'Largeur min (px)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 160, 'max' => 400 ] ],
+            'selectors'  => [
+                '{{WRAPPER}} .clielo-acct-drop' => 'min-width: {{SIZE}}px !important;',
+            ],
+        ] );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section( 'section_login_btns', [
+            'label' => __( 'Boutons (non connecté)', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_control( 'login_bg', [
+            'label'     => __( 'Fond bouton connexion', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-acct-login' => 'background: {{VALUE}};',
+            ],
+        ] );
+
+        $this->add_control( 'login_text_color', [
+            'label'     => __( 'Texte bouton connexion', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-acct-login' => 'color: {{VALUE}};',
+            ],
+        ] );
+
+        $this->add_control( 'register_border_color', [
+            'label'     => __( 'Bordure bouton inscription', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-acct-register' => 'border-color: {{VALUE}};',
+            ],
+        ] );
+
+        $this->add_control( 'register_text_color', [
+            'label'     => __( 'Texte bouton inscription', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'selectors' => [
+                '{{WRAPPER}} .clielo-acct-register' => 'color: {{VALUE}};',
+            ],
+        ] );
+
+        $this->add_responsive_control( 'btns_radius', [
+            'label'      => __( 'Rayon des coins (px)', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 50 ] ],
+            'selectors'  => [
+                '{{WRAPPER}} .clielo-acct-login'    => 'border-radius: {{SIZE}}px;',
+                '{{WRAPPER}} .clielo-acct-register' => 'border-radius: {{SIZE}}px;',
+            ],
+        ] );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name'     => 'btn_typography',
+                'selector' => '{{WRAPPER}} .clielo-acct-login, {{WRAPPER}} .clielo-acct-register',
+            ]
+        );
+
+        $this->end_controls_section();
+    }
+
+    protected function render(): void {
+        if ( class_exists( 'Clielo_Account' ) ) {
+            echo Clielo_Account::shortcode_account(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML from shortcode_account() is already escaped internally.
+        }
     }
 }
