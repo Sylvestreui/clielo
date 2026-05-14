@@ -412,6 +412,11 @@ class Clielo_Orders {
             return (int) $order->client_id === $acting_user_id;
         }
 
+        // Client accepte son devis : quote → pending autorisé pour le client propriétaire
+        if ( $new_status === self::STATUS_PENDING && $current === self::STATUS_QUOTE ) {
+            return (int) $order->client_id === $acting_user_id;
+        }
+
         // started, completed : admin uniquement
         if ( ! current_user_can( 'manage_options' ) ) {
             return false;
@@ -449,18 +454,7 @@ class Clielo_Orders {
                 );
 
             case self::STATUS_PENDING:
-                if ( $old_status === self::STATUS_QUOTE ) {
-                    return sprintf(
-                        "--- %s %s ---\n%s",
-                        $order_num,
-                        __( 'Devis approuvé', 'clielo' ),
-                        sprintf(
-                            /* translators: %s: actor display name */
-                            __( '%s a approuvé votre devis. Vous pouvez maintenant procéder au paiement.', 'clielo' ),
-                            $actor_name
-                        )
-                    );
-                }
+                // Les AJAX approve_quote / client_accept_quote gèrent leur propre message contextuel.
                 return '';
 
             case self::STATUS_PAID:
@@ -769,6 +763,7 @@ class Clielo_Orders {
             wp_send_json_error( [ 'message' => __( 'Erreur lors de l\'acceptation du devis.', 'clielo' ) ], 500 );
         }
 
+        // transition_status() gère le message système et le do_action ; on ajoute seulement le message client spécifique.
         $accept_msg = sprintf(
             "--- #CMD-%d %s ---\n%s",
             $order_id,
@@ -778,8 +773,6 @@ class Clielo_Orders {
                 : __( 'Vous avez accepté le devis. Votre commande est maintenant en attente de validation.', 'clielo' )
         );
         Clielo_DB::insert_message( (int) $order->post_id, 0, $accept_msg, (int) $order->client_id );
-
-        do_action( 'clielo_order_status_changed', $order_id, self::STATUS_PENDING, self::STATUS_QUOTE, get_current_user_id() );
 
         $active_order = self::build_order_response( $post_id );
         wp_send_json_success( [ 'active_order' => $active_order ] );
@@ -861,11 +854,7 @@ class Clielo_Orders {
         );
         Clielo_DB::insert_message( (int) $order->post_id, 0, $approve_msg, (int) $order->client_id );
 
-        // Notif in-app pour le client
-        if ( class_exists( 'Clielo_Notifications' ) ) {
-            $service = get_the_title( (int) $order->post_id );
-            do_action( 'clielo_order_status_changed', $order_id, self::STATUS_PENDING, self::STATUS_QUOTE, get_current_user_id() );
-        }
+        // transition_status() a déjà déclenché clielo_order_status_changed + le message système.
 
         $active_order = self::build_order_response( $post_id );
         wp_send_json_success( [ 'active_order' => $active_order ] );
