@@ -20,7 +20,8 @@ class Clielo_Stripe {
         add_action( 'admin_init', [ __CLASS__, 'register_settings' ] );
 
         if ( self::is_enabled() ) {
-            add_action( 'wp_ajax_clielo_stripe_checkout', [ __CLASS__, 'ajax_create_checkout_session' ] );
+            add_action( 'wp_ajax_clielo_stripe_checkout',         [ __CLASS__, 'ajax_create_checkout_session' ] );
+            add_action( 'wp_ajax_clielo_stripe_checkout_pending', [ __CLASS__, 'ajax_create_checkout_pending' ] );
             add_action( 'template_redirect', [ __CLASS__, 'handle_return_redirect' ] );
         }
     }
@@ -411,6 +412,115 @@ class Clielo_Stripe {
 
             wp_send_json_success( [ 'checkout_url' => $session->url ] );
 
+        } catch ( \Exception $e ) {
+            wp_send_json_error( [ 'message' => $e->getMessage() ], 500 );
+        }
+    }
+
+    /**
+     * AJAX : Créer une session Stripe pour une commande pending (devis accepté, paiement différé).
+     * Prend une commande existante en status pending et génère la session Stripe pour l'upfront.
+     */
+    public static function ajax_create_checkout_pending(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+
+        if ( ! is_user_logged_in() || current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Action non autorisée.', 'clielo' ) ], 403 );
+        }
+
+        $order_id = absint( $_POST['order_id'] ?? 0 );
+        if ( ! $order_id ) {
+            wp_send_json_error( [ 'message' => __( 'Données manquantes.', 'clielo' ) ], 400 );
+        }
+
+        $order = Clielo_Orders::get_order( $order_id );
+        if ( ! $order || $order->status !== Clielo_Orders::STATUS_PENDING || (int) $order->client_id !== get_current_user_id() ) {
+            wp_send_json_error( [ 'message' => __( 'Commande introuvable.', 'clielo' ) ], 404 );
+        }
+
+        $post_id            = (int) $order->post_id;
+        $base_offer         = json_decode( $order->base_offer ?? '{}', true ) ?: [];
+        $payment_mode       = $order->payment_mode ?? 'single';
+        $installments_count = (int) ( $order->installments_count ?? 0 );
+        $full_total_ttc     = (float) $order->total_price;
+        $tax_rate           = floatval( Clielo_Invoices::get_settings()['tax_rate'] ?? 0 );
+        $settings           = self::get_settings();
+        $currency           = $settings['currency'];
+
+        // Calculer le montant upfront
+        if ( $payment_mode === 'monthly' ) {
+            $upfront_amount = Clielo_Payments::get_monthly_fee( $full_total_ttc, $installments_count );
+        } else {
+            $upfront_amount = Clielo_Payments::get_upfront_amount( $full_total_ttc, $payment_mode );
+        }
+
+        $pack_suffix = match ( $payment_mode ) {
+            /* translators: deposit label on Stripe checkout */
+            'deposit'      => __( 'Acompte 50%', 'clielo' ),
+            /* translators: first installment label on Stripe checkout */
+            'installments' => __( 'Premier versement 40%', 'clielo' ),
+            /* translators: %d: number of installments */
+            'monthly'      => sprintf( __( 'Mois 1 / %d', 'clielo' ), $installments_count ),
+            default        => '',
+        };
+
+        $pack_name = ( $base_offer['name'] ?? get_the_title( $post_id ) ) . ' (#CMD-' . $order_id . ')';
+        if ( $pack_suffix ) {
+            $pack_name .= ' — ' . $pack_suffix;
+        }
+
+        // Décomposer TTC en HT + TVA pour Stripe
+        $upfront_ht  = $tax_rate > 0 ? round( $upfront_amount / ( 1 + $tax_rate / 100 ), 2 ) : $upfront_amount;
+        $upfront_tva = round( $upfront_amount - $upfront_ht, 2 );
+
+        $line_items = [
+            [
+                'price_data' => [
+                    'currency'     => $currency,
+                    'unit_amount'  => (int) round( $upfront_ht * 100 ),
+                    'product_data' => [ 'name' => $pack_name ],
+                ],
+                'quantity' => 1,
+            ],
+        ];
+
+        if ( $tax_rate > 0 && $upfront_tva > 0.005 ) {
+            $line_items[] = [
+                'price_data' => [
+                    'currency'     => $currency,
+                    'unit_amount'  => (int) round( $upfront_tva * 100 ),
+                    /* translators: %s: TVA percentage */
+                    'product_data' => [ 'name' => sprintf( __( 'TVA %s%%', 'clielo' ), number_format( $tax_rate, 1 ) ) ],
+                ],
+                'quantity' => 1,
+            ];
+        }
+
+        $service_page = get_permalink( $post_id );
+        $user         = wp_get_current_user();
+
+        try {
+            $session = self::stripe()->checkout->sessions->create( [
+                'mode'                => 'payment',
+                'customer_email'      => $user->user_email,
+                'client_reference_id' => $post_id . '_' . get_current_user_id(),
+                'line_items'          => $line_items,
+                'metadata'            => [
+                    'existing_order_id'  => $order_id,
+                    'post_id'            => $post_id,
+                    'client_id'          => get_current_user_id(),
+                    'payment_mode'       => $payment_mode,
+                    'installments_count' => $installments_count,
+                    'full_total_ttc'     => $full_total_ttc,
+                ],
+                'success_url' => add_query_arg( [
+                    'stripe_success' => '1',
+                    'session_id'     => '{CHECKOUT_SESSION_ID}',
+                ], $service_page ),
+                'cancel_url' => add_query_arg( 'stripe_cancel', '1', $service_page ),
+            ] );
+
+            wp_send_json_success( [ 'checkout_url' => $session->url ] );
         } catch ( \Exception $e ) {
             wp_send_json_error( [ 'message' => $e->getMessage() ], 500 );
         }
@@ -813,6 +923,12 @@ class Clielo_Stripe {
             return;
         }
 
+        // Paiement d'une commande pending issue d'un devis (quote → pending → paid)
+        if ( isset( $meta->existing_order_id ) && (int) $meta->existing_order_id > 0 ) {
+            self::process_pending_order_payment( $session );
+            return;
+        }
+
         global $wpdb;
         $table  = Clielo_Orders::table_name();
 
@@ -965,5 +1081,122 @@ class Clielo_Stripe {
             $summary = self::build_order_summary_message( $base_offer, $selected, $total_price, $total_delay, $extra_pages, $extra_page_price, $maintenance_price, $express_days, $express_price, $payment_mode, $upfront_paid, $post_id, $installments_count, $invoice_number );
             Clielo_DB::insert_message( $post_id, $client_id, $summary, $client_id );
         }
+    }
+
+    /**
+     * Traite le paiement Stripe d'une commande pending issue d'un devis accepté.
+     * Identique au flux principal mais mise à jour de la commande existante au lieu d'en créer une.
+     */
+    private static function process_pending_order_payment( $session ): void {
+        $meta     = $session->metadata;
+        $order_id = (int) ( $meta->existing_order_id ?? 0 );
+        if ( ! $order_id ) {
+            return;
+        }
+
+        $order = Clielo_Orders::get_order( $order_id );
+        if ( ! $order || $order->status !== Clielo_Orders::STATUS_PENDING ) {
+            return;
+        }
+
+        // Idempotence
+        if ( $order->stripe_session_id === $session->id ) {
+            return;
+        }
+
+        $post_id            = (int) $order->post_id;
+        $client_id          = (int) $order->client_id;
+        $base_offer         = json_decode( $order->base_offer ?? '{}', true ) ?: [];
+        $selected           = json_decode( $order->selected_options ?? '[]', true ) ?: [];
+        $payment_mode       = (string) ( $meta->payment_mode ?? $order->payment_mode ?? 'single' );
+        $installments_count = (int) ( $meta->installments_count ?? $order->installments_count ?? 0 );
+        $full_total_ttc     = floatval( $meta->full_total_ttc ?? $order->total_price );
+        $total_delay        = (int) $order->total_delay;
+
+        $payment_context = [
+            'payment_mode'       => $payment_mode,
+            'deposit_percent'    => $payment_mode === 'deposit' ? 50 : ( $payment_mode === 'installments' ? 40 : 100 ),
+            'installments_count' => $installments_count,
+        ];
+
+        // create_order_paid() détecte l'ordre pending existant et le met à jour → started
+        $result_id = Clielo_Orders::create_order_paid(
+            $post_id,
+            $client_id,
+            $base_offer,
+            $selected,
+            $full_total_ttc,
+            $total_delay,
+            $session->id,
+            $session->payment_intent ?? '',
+            $payment_context,
+            (int) ( $order->extra_pages ?? 0 ),
+            (float) ( $order->extra_page_price ?? 0 ),
+            (float) ( $order->maintenance_price ?? 0 ),
+            (int) ( $order->express_days ?? 0 ),
+            (float) ( $order->express_price ?? 0 ),
+            (string) ( $order->advanced_options_data ?? '' )
+        );
+
+        if ( ! $result_id ) {
+            return;
+        }
+
+        $order = Clielo_Orders::get_order( $result_id );
+
+        do_action( 'clielo_order_status_changed', $result_id, 'started', 'pending', 0 );
+
+        // Échéancier + facture partielle pour les modes non-single
+        $invoice_number = '';
+        if ( $payment_mode !== 'single' ) {
+            Clielo_Payments::create_schedule_for_order( $result_id );
+            if ( class_exists( 'Clielo_Invoices' ) ) {
+                $schedule = Clielo_Payments::get_schedule_for_order( $result_id );
+                foreach ( $schedule as $row ) {
+                    if ( $row->type === 'upfront' || ( $payment_mode === 'monthly' && (int) $row->installment_no === 1 ) ) {
+                        $inv_type = $payment_mode === 'monthly' ? 'mensualite' : 'acompte';
+                        $inv_id   = Clielo_Invoices::create_partial_invoice(
+                            $result_id,
+                            floatval( $row->amount_ttc ),
+                            $inv_type,
+                            (int) $row->id,
+                            (int) $row->installment_no
+                        );
+                        if ( $inv_id ) {
+                            $inv = Clielo_Invoices::get_invoice( $inv_id );
+                            if ( $inv ) {
+                                $invoice_number = $inv->invoice_number;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        } elseif ( class_exists( 'Clielo_Invoices' ) ) {
+            Clielo_Invoices::on_order_accepted( $result_id, Clielo_Orders::STATUS_ACCEPTED, Clielo_Orders::STATUS_STARTED, $client_id );
+            global $wpdb;
+            $inv_table = Clielo_Invoices::invoices_table_name();
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $inv = $wpdb->get_row( $wpdb->prepare( "SELECT invoice_number FROM {$inv_table} WHERE order_id = %d AND status != 'cancelled' ORDER BY id DESC LIMIT 1", $result_id ) );
+            if ( $inv ) {
+                $invoice_number = $inv->invoice_number;
+            }
+        }
+
+        // Message récap dans le chat
+        $upfront_paid = $payment_mode === 'monthly'
+            ? Clielo_Payments::get_monthly_fee( $full_total_ttc, $installments_count )
+            : Clielo_Payments::get_upfront_amount( $full_total_ttc, $payment_mode );
+
+        $summary = self::build_order_summary_message(
+            $base_offer, $selected, $full_total_ttc, $total_delay,
+            (int) ( $order->extra_pages ?? 0 ),
+            (float) ( $order->extra_page_price ?? 0 ),
+            (float) ( $order->maintenance_price ?? 0 ),
+            (int) ( $order->express_days ?? 0 ),
+            (float) ( $order->express_price ?? 0 ),
+            $payment_mode, $upfront_paid, $post_id, $installments_count, $invoice_number
+        );
+        Clielo_DB::insert_message( $post_id, $client_id, $summary, $client_id );
     }
 }

@@ -574,6 +574,8 @@ class Clielo_Front {
                 'reject_quote'          => __( 'Refuser', 'clielo' ),
                 'confirm_quote_reject'  => __( 'Refuser ce devis ? Cette action est irréversible.', 'clielo' ),
                 'approve_quote'         => __( 'Approuver', 'clielo' ),
+                'pay_now_btn'           => __( 'Payer maintenant', 'clielo' ),
+                'status_pending_manual' => __( 'En attente de validation', 'clielo' ),
             ],
         ] );
         ?>
@@ -801,9 +803,11 @@ class Clielo_Front {
             var scOrigBg  = C.color;
 
             var selectedPackIdx = 0;
-            var orderSent   = false;
-            var isEditing   = false;
-            var orderFrozen = false;
+            var orderSent      = false;
+            var isEditing      = false;
+            var orderFrozen    = false;
+            var pendingPayMode  = false;
+            var pendingPayOrderId = 0;
             var lastOrderStateKey = null;
 
             /* Options avancées dynamiques : getAdvOptSelections() collecte depuis les inputs du shortcode */
@@ -919,8 +923,31 @@ class Clielo_Front {
                     resetCard();
                     enableQuoteBtn();
                 } else if(o.status === 'pending'){
-                    lockCard();
-                    setOrderBtnText(C.i18n.status_pending_card, null);
+                    pendingPayMode    = false;
+                    pendingPayOrderId = 0;
+                    if(C.stripe_enabled){
+                        /* Stripe actif : geler les contrôles mais laisser le bouton cliquable pour payer */
+                        orderSent   = true;
+                        isEditing   = false;
+                        orderFrozen = false;
+                        scChecks.forEach(function(cb){ cb.disabled = true; cb.style.opacity = '0.5'; cb.style.cursor = 'default'; });
+                        document.querySelectorAll('.clielo-sc-opt-wrap').forEach(function(w){ w.style.cursor = 'default'; w.style.opacity = '0.7'; });
+                        scPacks.forEach(function(p){ p.style.setProperty('opacity','0.7','important'); p.style.setProperty('cursor','default','important'); });
+                        if(packBox) packBox.setAttribute('data-frozen','true');
+                        if(scOrder){
+                            scOrder.style.setProperty('background', scOrigBg, 'important');
+                            scOrder.style.setProperty('opacity', '1', 'important');
+                            scOrder.style.setProperty('cursor', 'pointer', 'important');
+                            scOrder.disabled = false;
+                        }
+                        setOrderBtnText(C.i18n.pay_now_btn, svgChat);
+                        pendingPayMode    = true;
+                        pendingPayOrderId = o.id;
+                    } else {
+                        /* Paiement manuel : geler complètement, attendre validation admin */
+                        freezeCard();
+                        setOrderBtnText(C.i18n.status_pending_manual, null);
+                    }
                     disableQuoteBtn(null);
                 } else if(o.status === 'quote'){
                     freezeCard();
@@ -1008,6 +1035,34 @@ class Clielo_Front {
                         return;
                     }
                     if(C.is_admin) return;
+
+                    /* Paiement d'une commande pending issue d'un devis accepté */
+                    if(pendingPayMode && pendingPayOrderId){
+                        scOrder.disabled = true;
+                        setOrderBtnText(C.i18n.payment_redirect, svgChat);
+                        var fpd = new FormData();
+                        fpd.append('action', 'clielo_stripe_checkout_pending');
+                        fpd.append('order_id', pendingPayOrderId);
+                        fpd.append('nonce', C.nonce);
+                        fetch(C.ajax_url, {method:'POST', body:fpd})
+                        .then(function(r){ return r.json(); })
+                        .then(function(res){
+                            if(res.success && res.data && res.data.checkout_url){
+                                window.location.href = res.data.checkout_url;
+                            } else {
+                                alert(res.data && res.data.message ? res.data.message : C.i18n.payment_error);
+                                scOrder.disabled = false;
+                                setOrderBtnText(C.i18n.pay_now_btn, svgChat);
+                            }
+                        })
+                        .catch(function(){
+                            alert(C.i18n.payment_error);
+                            scOrder.disabled = false;
+                            setOrderBtnText(C.i18n.pay_now_btn, svgChat);
+                        });
+                        return;
+                    }
+
                     if(orderFrozen) return;
 
                     if(orderSent && !isEditing){
