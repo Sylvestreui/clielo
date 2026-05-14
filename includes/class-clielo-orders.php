@@ -26,6 +26,7 @@ class Clielo_Orders {
     public static function init(): void {
         add_action( 'wp_ajax_clielo_create_order',     [ __CLASS__, 'ajax_create_order' ] );
         add_action( 'wp_ajax_clielo_create_quote',     [ __CLASS__, 'ajax_create_quote' ] );
+        add_action( 'wp_ajax_clielo_approve_quote',    [ __CLASS__, 'ajax_approve_quote' ] );
         add_action( 'wp_ajax_clielo_order_transition',  [ __CLASS__, 'ajax_order_transition' ] );
         add_action( 'wp_ajax_clielo_get_clients',       [ __CLASS__, 'ajax_get_clients' ] );
     }
@@ -737,6 +738,54 @@ class Clielo_Orders {
 
         $active_order = self::build_order_response( $post_id );
         wp_send_json_success( [ 'order_id' => $order_id, 'active_order' => $active_order ] );
+    }
+
+    /**
+     * AJAX : Approuver un devis (admin) → quote → pending + message chat + notif client.
+     */
+    public static function ajax_approve_quote(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Action non autorisée.', 'clielo' ) ], 403 );
+        }
+
+        $order_id = absint( $_POST['order_id'] ?? 0 );
+        $post_id  = absint( $_POST['post_id'] ?? 0 );
+
+        if ( ! $order_id || ! $post_id ) {
+            wp_send_json_error( [ 'message' => __( 'Données manquantes.', 'clielo' ) ], 400 );
+        }
+
+        $order = self::get_order( $order_id );
+        if ( ! $order || $order->status !== self::STATUS_QUOTE ) {
+            wp_send_json_error( [ 'message' => __( 'Devis introuvable.', 'clielo' ) ], 404 );
+        }
+
+        $result = self::transition_status( $order_id, self::STATUS_PENDING, get_current_user_id() );
+        if ( ! $result ) {
+            wp_send_json_error( [ 'message' => __( 'Erreur lors de l\'approbation du devis.', 'clielo' ) ], 500 );
+        }
+
+        // Message système dans le chat
+        $approve_msg = sprintf(
+            "--- #CMD-%d %s ---\n%s",
+            $order_id,
+            __( 'Devis accepté', 'clielo' ),
+            Clielo_Stripe::is_enabled()
+                ? __( 'Votre devis a été accepté. Cliquez sur « Payer et commander » pour finaliser votre commande.', 'clielo' )
+                : __( 'Votre devis a été accepté. Vous pouvez maintenant passer votre commande via le chat.', 'clielo' )
+        );
+        Clielo_DB::insert_message( (int) $order->post_id, 0, $approve_msg, (int) $order->client_id );
+
+        // Notif in-app pour le client
+        if ( class_exists( 'Clielo_Notifications' ) ) {
+            $service = get_the_title( (int) $order->post_id );
+            do_action( 'clielo_order_status_changed', $order_id, self::STATUS_PENDING, self::STATUS_QUOTE, get_current_user_id() );
+        }
+
+        $active_order = self::build_order_response( $post_id );
+        wp_send_json_success( [ 'active_order' => $active_order ] );
     }
 
     /**

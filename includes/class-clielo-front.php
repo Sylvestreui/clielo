@@ -557,12 +557,15 @@ class Clielo_Front {
                 'todo_note'         => __( 'Note', 'clielo' ),
                 'orders_label'      => __( 'Commande', 'clielo' ),
                 'todos_label'       => __( 'Tâches', 'clielo' ),
-                'quote_btn'         => __( 'Demander un devis', 'clielo' ),
-                'quote_submitted'   => __( 'Devis soumis ✓', 'clielo' ),
-                'status_quote'      => __( 'Devis en attente', 'clielo' ),
-                'approve_quote'     => __( 'Approuver', 'clielo' ),
-                'reject_quote'      => __( 'Refuser', 'clielo' ),
+                'quote_btn'           => __( 'Demander un devis', 'clielo' ),
+                'quote_submitted'     => __( 'Devis soumis ✓', 'clielo' ),
+                'quote_success_toast' => __( 'Votre demande de devis a été soumise.', 'clielo' ),
+                'status_quote'        => __( 'Devis en attente', 'clielo' ),
+                'quote_doc_generate'  => __( 'Générer le devis', 'clielo' ),
+                'quote_accepted'      => __( 'Devis accepté', 'clielo' ),
+                'reject_quote'        => __( 'Refuser', 'clielo' ),
                 'confirm_quote_reject' => __( 'Refuser ce devis ? Cette action est irréversible.', 'clielo' ),
+                'approve_quote'       => __( 'Approuver', 'clielo' ),
             ],
         ] );
         ?>
@@ -1079,6 +1082,7 @@ class Clielo_Front {
                             renderOrderBar();
                             syncCardState();
                             openChat();
+                            showToast(C.i18n.quote_success_toast, 'success');
                         } else {
                             enableQuoteBtn();
                             showToast(res.data && res.data.message ? res.data.message : C.i18n.order_error, 'error');
@@ -1432,7 +1436,43 @@ class Clielo_Front {
                         b.addEventListener('click', function(){
                             var action = b.dataset.orderAction;
                             var orderId = parseInt(b.dataset.orderId);
-                            if(action === 'quote_approve'){
+                            if(action === 'clielo_generate_quote_doc'){
+                                b.disabled = true;
+                                var fd2 = new FormData();
+                                fd2.append('action','clielo_generate_quote_doc');
+                                fd2.append('nonce',C.nonce);
+                                fd2.append('order_id',orderId);
+                                fd2.append('post_id',C.post_id);
+                                fetch(C.ajax_url,{method:'POST',body:fd2})
+                                .then(function(r){return r.json();})
+                                .then(function(res){
+                                    b.disabled = false;
+                                    if(res.success && res.data){
+                                        loadMsgs();
+                                        showToast(res.data.quote_number ? (res.data.quote_number + ' généré') : 'Devis généré', 'success');
+                                    } else {
+                                        showToast((res.data&&res.data.message)||C.i18n.order_error,'error');
+                                    }
+                                }).catch(function(){b.disabled=false;});
+                            } else if(action === 'quote_accepted'){
+                                var fd3 = new FormData();
+                                fd3.append('action','clielo_approve_quote');
+                                fd3.append('nonce',C.nonce);
+                                fd3.append('order_id',orderId);
+                                fd3.append('post_id',C.post_id);
+                                fetch(C.ajax_url,{method:'POST',body:fd3})
+                                .then(function(r){return r.json();})
+                                .then(function(res){
+                                    if(res.success && res.data){
+                                        C.active_order = res.data.active_order;
+                                        renderOrderBar();
+                                        syncCardState();
+                                        loadMsgs();
+                                    } else {
+                                        showToast((res.data&&res.data.message)||C.i18n.order_error,'error');
+                                    }
+                                });
+                            } else if(action === 'quote_approve'){
                                 doOrderTransition(orderId, 'pending');
                             } else if(action === 'quote_reject'){
                                 if(confirm(C.i18n.confirm_quote_reject)){
@@ -1651,7 +1691,8 @@ class Clielo_Front {
 
                 if(isAdmin){
                     if(order.status==='quote'){
-                        html += makeBtn(order.id,'quote_approve',C.i18n.approve_quote,'#10b981');
+                        if(C.is_premium) html += makeBtn(order.id,'clielo_generate_quote_doc',C.i18n.quote_doc_generate,'#6366f1');
+                        html += makeBtn(order.id,'quote_accepted',C.i18n.quote_accepted,'#10b981');
                         html += makeBtn(order.id,'quote_reject',C.i18n.reject_quote,'#ef4444');
                     } else if(order.status==='pending'||order.status==='paid'){
                         html += makeBtn(order.id,'started',C.i18n.start_order,'#3b82f6');

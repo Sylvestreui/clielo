@@ -17,8 +17,8 @@ class Clielo_Invoices {
             return;
         }
 
-        add_action( 'admin_menu', [ __CLASS__, 'add_menu' ] );
         add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_admin_scripts' ] );
+        add_action( 'wp_ajax_clielo_generate_quote_doc', [ __CLASS__, 'ajax_generate_quote_doc' ] );
 
         // Auto-génération de facture quand commande acceptée
         add_action( 'clielo_order_status_changed', [ __CLASS__, 'on_order_accepted' ], 10, 4 );
@@ -171,6 +171,137 @@ class Clielo_Invoices {
             self::STATUS_PAID      => '#10b981',
             self::STATUS_CANCELLED => '#ef4444',
         ];
+    }
+
+    private static function generate_quote_number(): string {
+        global $wpdb;
+
+        $table  = self::invoices_table_name();
+        $prefix = 'DEVIS-';
+
+        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $last = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            "SELECT invoice_number FROM {$table} WHERE invoice_number LIKE %s ORDER BY id DESC LIMIT 1",
+            $wpdb->esc_like( $prefix ) . '%'
+        ) );
+        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+        $seq = 1;
+        if ( $last ) {
+            $num = absint( substr( $last, strlen( $prefix ) ) );
+            if ( $num > 0 ) {
+                $seq = $num + 1;
+            }
+        }
+
+        return $prefix . str_pad( $seq, 3, '0', STR_PAD_LEFT );
+    }
+
+    public static function ajax_generate_quote_doc(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Action non autorisée.', 'clielo' ) ], 403 );
+        }
+
+        $order_id = absint( $_POST['order_id'] ?? 0 );
+        $post_id  = absint( $_POST['post_id'] ?? 0 );
+
+        if ( ! $order_id || ! $post_id ) {
+            wp_send_json_error( [ 'message' => __( 'Données manquantes.', 'clielo' ) ], 400 );
+        }
+
+        $order = Clielo_Orders::get_order( $order_id );
+        if ( ! $order || $order->status !== Clielo_Orders::STATUS_QUOTE ) {
+            wp_send_json_error( [ 'message' => __( 'Devis introuvable.', 'clielo' ) ], 404 );
+        }
+
+        global $wpdb;
+        $table = self::invoices_table_name();
+
+        // Vérifier qu'un document DEVIS n'existe pas déjà pour cette commande
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $existing = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE order_id = %d AND invoice_type = 'quote' LIMIT 1", $order_id ) );
+        if ( $existing ) {
+            $view_url = admin_url( 'admin.php?page=clielo-invoice-view&invoice_id=' . (int) $existing );
+            wp_send_json_success( [ 'invoice_id' => (int) $existing, 'view_url' => $view_url ] );
+            return;
+        }
+
+        $settings  = self::get_settings();
+        $tax_rate  = floatval( $settings['tax_rate'] ?? 20 );
+        $base      = json_decode( $order->base_offer ?? '{}', true ) ?: [];
+        $options   = json_decode( $order->selected_options ?? '[]', true ) ?: [];
+
+        $service_name = get_the_title( (int) $order->post_id );
+        $pack_name    = $base['name'] ?? '';
+
+        $items = [];
+        if ( $pack_name !== '' ) {
+            $items[] = [
+                'service_name' => $service_name,
+                'description'  => $pack_name,
+                'quantity'     => 1,
+                'unit_price'   => floatval( $base['price'] ?? 0 ),
+                'total'        => floatval( $base['price'] ?? 0 ),
+            ];
+        }
+        foreach ( $options as $opt ) {
+            $items[] = [
+                'description' => $opt['name'] ?? '',
+                'quantity'    => 1,
+                'unit_price'  => floatval( $opt['price'] ?? 0 ),
+                'total'       => floatval( $opt['price'] ?? 0 ),
+            ];
+        }
+
+        $subtotal   = array_sum( array_column( $items, 'total' ) );
+        $tax_amount = round( $subtotal * $tax_rate / 100, 2 );
+        $total      = round( $subtotal + $tax_amount, 2 );
+
+        $quote_number = self::generate_quote_number();
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+        $inserted = $wpdb->insert(
+            $table,
+            [
+                'invoice_number' => $quote_number,
+                'order_id'       => $order_id,
+                'client_id'      => (int) $order->client_id,
+                'status'         => self::STATUS_DRAFT,
+                'items'          => wp_json_encode( $items ),
+                'subtotal'       => $subtotal,
+                'tax_rate'       => $tax_rate,
+                'tax_amount'     => $tax_amount,
+                'total'          => $total,
+                'invoice_type'   => 'quote',
+                'created_at'     => current_time( 'mysql' ),
+                'updated_at'     => current_time( 'mysql' ),
+            ],
+            [ '%s', '%d', '%d', '%s', '%s', '%f', '%f', '%f', '%f', '%s', '%s', '%s' ]
+        );
+
+        if ( ! $inserted ) {
+            wp_send_json_error( [ 'message' => __( 'Erreur lors de la génération du devis.', 'clielo' ) ], 500 );
+        }
+
+        $invoice_id = (int) $wpdb->insert_id;
+        $view_url   = admin_url( 'admin.php?page=clielo-invoice-view&invoice_id=' . $invoice_id );
+
+        // Message système dans le chat
+        $doc_msg = sprintf(
+            "--- %s %s ---\n%s",
+            $quote_number,
+            __( 'Devis généré', 'clielo' ),
+            sprintf(
+                /* translators: %s: quote document number */
+                __( 'Un document devis (%s) a été généré pour cette demande.', 'clielo' ),
+                $quote_number
+            )
+        );
+        Clielo_DB::insert_message( (int) $order->post_id, 0, $doc_msg, (int) $order->client_id );
+
+        wp_send_json_success( [ 'invoice_id' => $invoice_id, 'view_url' => $view_url, 'quote_number' => $quote_number ] );
     }
 
     private static function generate_invoice_number(): string {

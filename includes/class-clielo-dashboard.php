@@ -9,6 +9,7 @@ class Clielo_Dashboard {
     public static function init(): void {
         add_action( 'admin_menu', [ __CLASS__, 'add_menu' ], 9 );
         add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_admin_assets' ] );
+        add_action( 'admin_head', [ __CLASS__, 'inject_menu_css' ] );
     }
 
     public static function enqueue_admin_assets( string $hook ): void {
@@ -101,32 +102,62 @@ class Clielo_Dashboard {
             30
         );
 
-        add_submenu_page(
-            'clielo',
-            __( 'Tableau de bord', 'clielo' ),
-            __( 'Tableau de bord', 'clielo' ),
-            'manage_options',
-            'clielo',
-            [ __CLASS__, 'render_dashboard' ]
-        );
+        add_submenu_page( 'clielo', __( 'Tableau de bord', 'clielo' ), __( 'Tableau de bord', 'clielo' ), 'manage_options', 'clielo', [ __CLASS__, 'render_dashboard' ] );
 
-        add_submenu_page(
-            'clielo',
-            __( 'Shortcodes', 'clielo' ),
-            __( 'Shortcodes', 'clielo' ),
-            'manage_options',
-            'clielo-shortcodes',
-            [ __CLASS__, 'render_shortcodes' ]
-        );
+        /* ── Séparateur GESTION ── */
+        add_submenu_page( 'clielo', __( 'Gestion', 'clielo' ), '<span class="clielo-menu-sep">&#x2500;&#x2500; ' . esc_html__( 'Gestion', 'clielo' ) . ' &#x2500;&#x2500;</span>', 'manage_options', 'clielo-sep-gestion', [ __CLASS__, 'render_sep_redirect' ] );
 
-        add_submenu_page(
-            'clielo',
-            __( 'Clients WP', 'clielo' ),
-            __( 'Clients WP', 'clielo' ),
-            'manage_options',
-            'clielo-wp-clients',
-            [ __CLASS__, 'render_wp_clients' ]
-        );
+        add_submenu_page( 'clielo', __( 'Clients', 'clielo' ), __( 'Clients', 'clielo' ), 'manage_options', 'clielo-clients', [ 'Clielo_Invoices', 'render_clients_page' ] );
+        add_submenu_page( 'clielo', __( 'Devis', 'clielo' ), __( 'Devis', 'clielo' ), 'manage_options', 'clielo-quotes', [ __CLASS__, 'render_quotes' ] );
+
+        if ( clielo_is_premium() ) {
+            add_submenu_page( 'clielo', __( 'Factures', 'clielo' ), __( 'Factures', 'clielo' ), 'manage_options', 'clielo-invoices', [ 'Clielo_Invoices', 'render_invoices_list' ] );
+            add_submenu_page( 'clielo', __( 'Nouvelle facture', 'clielo' ), __( 'Nouvelle facture', 'clielo' ), 'manage_options', 'clielo-invoice-new', [ 'Clielo_Invoices', 'render_invoice_new' ] );
+        }
+
+        /* ── Séparateur PARAMÈTRES ── */
+        add_submenu_page( 'clielo', __( 'Paramètres', 'clielo' ), '<span class="clielo-menu-sep">&#x2500;&#x2500; ' . esc_html__( 'Paramètres', 'clielo' ) . ' &#x2500;&#x2500;</span>', 'manage_options', 'clielo-sep-params', [ __CLASS__, 'render_sep_redirect' ] );
+
+        add_submenu_page( 'clielo', __( 'Clielo - Settings', 'clielo' ), __( 'Réglages', 'clielo' ), 'manage_options', 'clielo-settings', [ 'Clielo_Admin', 'render_settings_page' ] );
+
+        if ( clielo_is_premium() ) {
+            add_submenu_page( 'clielo', __( 'Notifications', 'clielo' ), __( 'Notifications', 'clielo' ), 'manage_options', 'clielo-notifications', [ 'Clielo_Notifications', 'render_settings_page' ] );
+            add_submenu_page( 'clielo', __( 'Clielo - Paiement', 'clielo' ), __( 'Paiement', 'clielo' ), 'manage_options', 'clielo-stripe', [ 'Clielo_Stripe', 'render_settings_page' ] );
+            add_submenu_page( 'clielo', __( 'Réglages factures', 'clielo' ), __( 'Réglages factures', 'clielo' ), 'manage_options', 'clielo-invoice-settings', [ 'Clielo_Invoices', 'render_settings_page' ] );
+        }
+
+        add_submenu_page( 'clielo', __( 'Shortcodes', 'clielo' ), __( 'Shortcodes', 'clielo' ), 'manage_options', 'clielo-shortcodes', [ __CLASS__, 'render_shortcodes' ] );
+
+        if ( clielo_is_premium() ) {
+            add_submenu_page( null, __( 'Voir facture', 'clielo' ), '', 'manage_options', 'clielo-invoice-view', [ 'Clielo_Invoices', 'render_invoice_view' ] );
+            add_submenu_page( null, __( 'Modifier facture', 'clielo' ), '', 'manage_options', 'clielo-invoice-edit', [ 'Clielo_Invoices', 'render_invoice_edit' ] );
+        }
+    }
+
+    public static function render_sep_redirect(): void {
+        wp_safe_redirect( admin_url( 'admin.php?page=clielo' ) );
+        exit;
+    }
+
+    public static function inject_menu_css(): void {
+        echo '<style>
+            #adminmenu a[href*="page=clielo-sep-"] {
+                pointer-events: none !important;
+                cursor: default !important;
+                color: #a0a5aa !important;
+                font-size: 10px !important;
+                letter-spacing: .07em !important;
+                text-transform: uppercase !important;
+                font-weight: 700 !important;
+                padding: 7px 12px 3px !important;
+                margin-top: 4px !important;
+            }
+            #adminmenu a[href*="page=clielo-sep-"]:hover {
+                color: #a0a5aa !important;
+                background: transparent !important;
+            }
+            .clielo-menu-sep { display: block; }
+        </style>';
     }
 
     /**
@@ -578,7 +609,153 @@ class Clielo_Dashboard {
     }
 
     /* ================================================================
-     *  Page Clients WP
+     *  Page Devis
+     * ================================================================ */
+
+    public static function render_quotes(): void {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Accès refusé.', 'clielo' ) );
+        }
+
+        global $wpdb;
+        $order_table = Clielo_Orders::table_name();
+
+        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        $quote_orders = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT o.*, u.display_name AS client_name, p.post_title AS service_name
+                 FROM {$order_table} o
+                 LEFT JOIN {$wpdb->users} u ON o.client_id = u.ID
+                 LEFT JOIN {$wpdb->posts} p ON o.post_id = p.ID
+                 WHERE o.status = %s
+                 ORDER BY o.created_at DESC",
+                'quote'
+            )
+        );
+        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+        $quote_docs = [];
+        if ( clielo_is_premium() && class_exists( 'Clielo_Invoices' ) ) {
+            $inv_table = Clielo_Invoices::invoices_table_name();
+            // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $quote_docs = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT i.*, u.display_name AS client_name, p.post_title AS service_name
+                     FROM {$inv_table} i
+                     LEFT JOIN {$order_table} o ON i.order_id = o.id
+                     LEFT JOIN {$wpdb->users} u ON o.client_id = u.ID
+                     LEFT JOIN {$wpdb->posts} p ON o.post_id = p.ID
+                     WHERE i.invoice_type = %s
+                     ORDER BY i.created_at DESC",
+                    'quote'
+                )
+            );
+            // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        }
+
+        $color = Clielo_Admin::get_color();
+        ?>
+        <div class="wrap clielo-dashboard">
+            <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+                <span class="dashicons dashicons-media-text" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
+                <?php esc_html_e( 'Clielo — Devis', 'clielo' ); ?>
+            </h1>
+
+            <!-- Demandes de devis en attente -->
+            <div class="clielo-section">
+                <h2 class="clielo-section-title">
+                    <span class="dashicons dashicons-clock" style="color:#6366f1"></span>
+                    <?php esc_html_e( 'Demandes de devis en attente', 'clielo' ); ?>
+                </h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e( 'N°', 'clielo' ); ?></th>
+                            <th><?php esc_html_e( 'Client', 'clielo' ); ?></th>
+                            <th><?php esc_html_e( 'Service', 'clielo' ); ?></th>
+                            <th><?php esc_html_e( 'Pack', 'clielo' ); ?></th>
+                            <th style="text-align:right"><?php esc_html_e( 'Prix estimé', 'clielo' ); ?></th>
+                            <th><?php esc_html_e( 'Date', 'clielo' ); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ( empty( $quote_orders ) ) : ?>
+                            <tr class="clielo-empty-row"><td colspan="6"><?php esc_html_e( 'Aucune demande de devis en attente.', 'clielo' ); ?></td></tr>
+                        <?php else : ?>
+                            <?php foreach ( $quote_orders as $q ) :
+                                $bo        = json_decode( $q->base_offer ?? '{}', true );
+                                $pack_name = $bo['name'] ?? '—';
+                                $permalink = get_permalink( $q->post_id );
+                            ?>
+                            <tr>
+                                <td><strong>#CMD-<?php echo absint( $q->id ); ?></strong></td>
+                                <td><?php echo esc_html( $q->client_name ?: '—' ); ?></td>
+                                <td>
+                                    <?php if ( $permalink ) : ?>
+                                        <a href="<?php echo esc_url( $permalink ); ?>" target="_blank"><?php echo esc_html( mb_strimwidth( $q->service_name ?: '—', 0, 40, '…' ) ); ?></a>
+                                    <?php else : ?>
+                                        <?php echo esc_html( $q->service_name ?: '—' ); ?>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo esc_html( $pack_name ); ?></td>
+                                <td style="text-align:right;font-weight:600"><?php echo esc_html( number_format( (float) $q->total_price, 2, ',', ' ' ) ); ?> €</td>
+                                <td style="color:#888;font-size:12px"><?php echo esc_html( date_i18n( 'd/m/Y H:i', strtotime( $q->created_at ) ) ); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Documents devis générés (premium) -->
+            <?php if ( clielo_is_premium() ) : ?>
+            <div class="clielo-section">
+                <h2 class="clielo-section-title">
+                    <span class="dashicons dashicons-media-text" style="color:<?php echo esc_attr( $color ); ?>"></span>
+                    <?php esc_html_e( 'Documents devis générés', 'clielo' ); ?>
+                </h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e( 'N° devis', 'clielo' ); ?></th>
+                            <th><?php esc_html_e( 'Client', 'clielo' ); ?></th>
+                            <th><?php esc_html_e( 'Service', 'clielo' ); ?></th>
+                            <th style="text-align:right"><?php esc_html_e( 'Montant TTC', 'clielo' ); ?></th>
+                            <th><?php esc_html_e( 'Date', 'clielo' ); ?></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ( empty( $quote_docs ) ) : ?>
+                            <tr class="clielo-empty-row"><td colspan="6"><?php esc_html_e( 'Aucun document devis généré.', 'clielo' ); ?></td></tr>
+                        <?php else : ?>
+                            <?php foreach ( $quote_docs as $d ) :
+                                $view_url = admin_url( 'admin.php?page=clielo-invoice-view&invoice_id=' . absint( $d->id ) );
+                            ?>
+                            <tr>
+                                <td><strong><?php echo esc_html( $d->invoice_number ); ?></strong></td>
+                                <td><?php echo esc_html( $d->client_name ?: '—' ); ?></td>
+                                <td><?php echo esc_html( mb_strimwidth( $d->service_name ?: '—', 0, 40, '…' ) ); ?></td>
+                                <td style="text-align:right;font-weight:600"><?php echo esc_html( number_format( (float) $d->total, 2, ',', ' ' ) ); ?> €</td>
+                                <td style="color:#888;font-size:12px"><?php echo esc_html( date_i18n( 'd/m/Y', strtotime( $d->created_at ) ) ); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url( $view_url ); ?>" target="_blank" style="color:<?php echo esc_attr( $color ); ?>;font-size:12px;font-weight:500;text-decoration:none">
+                                        <?php esc_html_e( 'Voir', 'clielo' ); ?>
+                                    </a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /* ================================================================
+     *  Page Clients WP (kept for backwards compat, no longer in menu)
      * ================================================================ */
 
     public static function render_wp_clients(): void {

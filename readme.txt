@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,15 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.2.2 =
+* Admin menu: reorganize with GESTION / PARAMÈTRES separators — centralize all submenu registrations in Dashboard
+* Admin menu: replace "Clients WP" with "Clients" (external clients from clielo_clients table)
+* Admin menu: add "Devis" page listing pending quote orders and generated DEVIS-XXX documents
+* Quote flow: add toast notification on client quote submission
+* Quote flow: admin bell notification when a client submits a quote
+* Quote flow: add "Générer le devis" button (premium) — creates DEVIS-XXX document in invoices table, posts link in chat
+* Quote flow: rename "Approuver" → "Devis accepté" — transitions quote→pending, posts approval message in chat, sends client in-app notification
 
 = 1.2.0 =
 * Elementor widget: add "Clielo — Cloche" widget for notification bell — style controls for icon color/size, badge color, panel background/radius/width and "Mark all read" link color

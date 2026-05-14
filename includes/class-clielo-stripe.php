@@ -17,7 +17,6 @@ class Clielo_Stripe {
             return;
         }
 
-        add_action( 'admin_menu', [ __CLASS__, 'add_menu' ] );
         add_action( 'admin_init', [ __CLASS__, 'register_settings' ] );
 
         if ( self::is_enabled() ) {

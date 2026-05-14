@@ -5,7 +5,7 @@
 | Propriété | Valeur |
 |---|---|
 | Type | Plugin WordPress premium (freemium via Freemius) |
-| Version | `1.2.1` — bumper à chaque déploiement WP.org (voir règle #1 en bas) |
+| Version | `1.2.2` — bumper à chaque déploiement WP.org (voir règle #1 en bas) |
 | Emplacement | `c:/Users/Ecompresta/Documents/Projets plugins/serviceflow/` |
 | Repo GitHub | https://github.com/SylvestreUi/serviceflow |
 | Statut | En test sur staging, pas encore soumis sur WordPress.org |

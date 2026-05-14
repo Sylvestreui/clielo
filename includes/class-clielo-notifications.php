@@ -23,8 +23,9 @@ class Clielo_Notifications {
         add_action( 'wp_enqueue_scripts',    [ __CLASS__, 'enqueue_frontend_assets' ] );
         add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_admin_assets' ] );
 
+        add_action( 'clielo_quote_created', [ __CLASS__, 'on_quote_created' ], 10, 3 );
+
         if ( clielo_is_premium() ) {
-            add_action( 'admin_menu', [ __CLASS__, 'add_menu' ] );
             add_action( 'admin_init', [ __CLASS__, 'register_settings' ] );
             add_action( 'wp_ajax_clielo_preview_email', [ __CLASS__, 'ajax_preview_email' ] );
         }
@@ -626,6 +627,21 @@ class Clielo_Notifications {
         foreach ( self::get_admin_ids() as $admin_id ) {
             self::create_notification( (int) $admin_id, 'new_order', $order_id, $post_id, $client_id, $data );
             self::maybe_send_email( 'new_order', (int) $admin_id, $data, $post_id );
+        }
+    }
+
+    public static function on_quote_created( int $order_id, int $post_id, int $client_id ): void {
+        $client  = get_userdata( $client_id );
+        $service = get_the_title( $post_id );
+
+        $data = [
+            'client_name'  => $client ? $client->display_name : '',
+            'service_name' => $service,
+            'order_number' => '#CMD-' . $order_id,
+        ];
+
+        foreach ( self::get_admin_ids() as $admin_id ) {
+            self::create_notification( (int) $admin_id, 'new_order', $order_id, $post_id, $client_id, $data );
         }
     }
 

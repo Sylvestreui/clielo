@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Clielo_Admin {
 
     public static function init(): void {
-        add_action( 'admin_menu', [ __CLASS__, 'add_menu' ] );
         add_action( 'admin_init', [ __CLASS__, 'register_settings' ] );
     }
 
