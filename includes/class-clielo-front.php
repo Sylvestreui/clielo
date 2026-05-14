@@ -1548,6 +1548,29 @@ class Clielo_Front {
                             } else if(action === 'view_quote_doc'){
                                 var invId = b.dataset.invoiceId;
                                 window.open(C.ajax_url + '?action=clielo_view_invoice&invoice_id=' + invId, '_blank');
+                            } else if(action === 'pending_pay'){
+                                b.disabled = true;
+                                b.textContent = C.i18n.payment_redirect;
+                                var fpd2 = new FormData();
+                                fpd2.append('action','clielo_stripe_checkout_pending');
+                                fpd2.append('order_id',orderId);
+                                fpd2.append('nonce',C.nonce);
+                                fetch(C.ajax_url,{method:'POST',body:fpd2})
+                                .then(function(r){return r.json();})
+                                .then(function(res){
+                                    if(res.success&&res.data&&res.data.checkout_url){
+                                        window.location.href = res.data.checkout_url;
+                                    } else {
+                                        alert(res.data&&res.data.message?res.data.message:C.i18n.payment_error);
+                                        b.disabled = false;
+                                        b.textContent = C.i18n.pay_now_btn;
+                                    }
+                                })
+                                .catch(function(){
+                                    alert(C.i18n.payment_error);
+                                    b.disabled = false;
+                                    b.textContent = C.i18n.pay_now_btn;
+                                });
                             } else if(action === 'client_accept_quote'){
                                 var fd4 = new FormData();
                                 fd4.append('action','clielo_client_accept_quote');
@@ -1805,9 +1828,7 @@ class Clielo_Front {
 
                 if(isAdmin){
                     if(order.status==='quote'){
-                        if(C.is_premium) html += makeBtn(order.id,'clielo_generate_quote_doc',C.i18n.quote_doc_generate,'#6366f1');
-                        html += makeBtn(order.id,'quote_accepted',C.i18n.quote_accepted,'#10b981');
-                        html += makeBtn(order.id,'quote_reject',C.i18n.reject_quote,'#ef4444');
+                        if(C.is_premium) html += makeBtn(order.id,'clielo_generate_quote_doc',C.i18n.quote_doc_generate,'#7c3aed');
                     } else if(order.status==='pending'||order.status==='paid'){
                         html += makeBtn(order.id,'started',C.i18n.start_order,'#3b82f6');
                     } else if(order.status==='revision'){
@@ -1825,6 +1846,10 @@ class Clielo_Front {
                             html += '<button data-order-id="'+order.id+'" data-order-action="view_quote_doc" data-invoice-id="'+order.quote_invoice_id+'" style="padding:4px 10px;border:1px solid #6366f1;border-radius:6px;font-size:11px;font-weight:600;color:#6366f1;background:#fff;cursor:pointer">'+esc(C.i18n.view_quote_doc)+'</button>';
                             html += makeBtn(order.id,'client_accept_quote',C.i18n.client_accept_quote,'#10b981');
                             html += makeBtn(order.id,'client_refuse_quote',C.i18n.client_refuse_quote,'#ef4444');
+                        }
+                    } else if(order.status==='pending'){
+                        if(C.stripe_enabled){
+                            html += makeBtn(order.id,'pending_pay',C.i18n.pay_now_btn,C.color||'#3b82f6');
                         }
                     } else if(order.status==='completed'){
                         html += makeBtn(order.id,'accepted',C.i18n.accept_delivery,'#10b981');

@@ -919,28 +919,31 @@ class Clielo_Orders {
             }
         }
 
+        // Note de retouche : insérée AVANT la transition pour qu'elle apparaisse avant le message système.
+        if ( $new_status === self::STATUS_REVISION && $revision_note !== '' ) {
+            global $wpdb;
+            $msg_table = $wpdb->prefix . 'clielo_messages';
+            $order_tmp = self::get_order( $order_id );
+            if ( $order_tmp ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+                $wpdb->insert(
+                    $msg_table,
+                    [
+                        'post_id'    => (int) $order_tmp->post_id,
+                        'client_id'  => $user_id,
+                        'user_id'    => $user_id,
+                        'message'    => $revision_note,
+                        'created_at' => current_time( 'mysql' ),
+                    ],
+                    [ '%d', '%d', '%d', '%s', '%s' ]
+                );
+            }
+        }
+
         $result = self::transition_status( $order_id, $new_status, $user_id, $revision_delay );
 
         if ( ! $result ) {
             wp_send_json_error( [ 'message' => __( 'Transition non autorisée.', 'clielo' ) ], 403 );
-        }
-
-        // Note de retouche : on la poste automatiquement comme message chat.
-        if ( $new_status === self::STATUS_REVISION && $revision_note !== '' ) {
-            global $wpdb;
-            $msg_table = $wpdb->prefix . 'clielo_messages';
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-            $wpdb->insert(
-                $msg_table,
-                [
-                    'post_id'    => $post_id,
-                    'client_id'  => $user_id,
-                    'user_id'    => $user_id,
-                    'message'    => $revision_note,
-                    'created_at' => current_time( 'mysql' ),
-                ],
-                [ '%d', '%d', '%d', '%s', '%s' ]
-            );
         }
 
         $active_order = self::build_order_response( $post_id );

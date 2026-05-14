@@ -80,7 +80,7 @@ class Clielo_DB {
                      FROM {$table} m
                      LEFT JOIN {$wpdb->users} u ON m.user_id = u.ID
                      WHERE m.post_id = %d AND m.client_id = %d
-                     ORDER BY m.created_at ASC
+                     ORDER BY m.created_at ASC, m.id ASC
                      LIMIT %d OFFSET %d",
                     $post_id,
                     $client_id,
@@ -98,7 +98,7 @@ class Clielo_DB {
                  FROM {$table} m
                  LEFT JOIN {$wpdb->users} u ON m.user_id = u.ID
                  WHERE m.post_id = %d
-                 ORDER BY m.created_at ASC
+                 ORDER BY m.created_at ASC, m.id ASC
                  LIMIT %d OFFSET %d",
                 $post_id,
                 $limit,
@@ -124,7 +124,7 @@ class Clielo_DB {
                      FROM {$table} m
                      LEFT JOIN {$wpdb->users} u ON m.user_id = u.ID
                      WHERE m.post_id = %d AND m.client_id = %d AND m.id > %d
-                     ORDER BY m.created_at ASC",
+                     ORDER BY m.created_at ASC, m.id ASC",
                     $post_id,
                     $client_id,
                     $last_id
@@ -140,7 +140,7 @@ class Clielo_DB {
                  FROM {$table} m
                  LEFT JOIN {$wpdb->users} u ON m.user_id = u.ID
                  WHERE m.post_id = %d AND m.id > %d
-                 ORDER BY m.created_at ASC",
+                 ORDER BY m.created_at ASC, m.id ASC",
                 $post_id,
                 $last_id
             )
