@@ -259,6 +259,11 @@ class Clielo_Account {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         <?php esc_html_e( 'Mes factures', 'clielo' ); ?>
                     </a>
+                    <a href="<?php echo esc_url( $acct_url . '#devis' ); ?>"
+                       style="display:flex !important;align-items:center !important;gap:10px !important;padding:10px 16px !important;color:#333 !important;text-decoration:none !important;font-size:13px !important;font-weight:500 !important;border-bottom:1px solid #f5f5f5 !important">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        <?php esc_html_e( 'Mes devis', 'clielo' ); ?>
+                    </a>
                     <a href="<?php echo esc_url( $logout_url ); ?>"
                        style="display:flex !important;align-items:center !important;gap:10px !important;padding:10px 16px !important;color:#ef4444 !important;text-decoration:none !important;font-size:13px !important;font-weight:500 !important">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -334,6 +339,7 @@ class Clielo_Account {
         $dashboard_html = self::render_dashboard_section( $user, $orders, $color );
         $orders_html    = self::render_orders_section( $orders, $color );
         $profile_html   = self::render_profile_section( $user, $color );
+        $devis_html     = self::render_devis_section( $color );
         $esc_color      = esc_attr( $color );
         ?>
         <?php $logout_url = wp_logout_url( get_permalink() ); ?>
@@ -353,6 +359,10 @@ class Clielo_Account {
                         <button class="clielo-ma-tab" data-tab="factures">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                             <?php esc_html_e( 'Mes factures', 'clielo' ); ?>
+                        </button>
+                        <button class="clielo-ma-tab" data-tab="devis">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            <?php esc_html_e( 'Mes devis', 'clielo' ); ?>
                         </button>
                         <button class="clielo-ma-tab" data-tab="profil">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -375,6 +385,9 @@ class Clielo_Account {
                     </div>
                     <div id="clielo-ma-panel-factures" class="clielo-ma-panel" style="display:none">
                         <?php echo self::render_invoices_section( $color ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output from internal static method. ?>
+                    </div>
+                    <div id="clielo-ma-panel-devis" class="clielo-ma-panel" style="display:none">
+                        <?php echo $devis_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generated internally by render_devis_section(). ?>
                     </div>
                     <div id="clielo-ma-panel-profil" class="clielo-ma-panel" style="display:none">
                         <?php echo $profile_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generated internally by render_profile_section(). ?>
@@ -406,7 +419,7 @@ class Clielo_Account {
             /* Hash URL */
             function applyHash(){
                 var hash=window.location.hash.replace('#','');
-                if(hash==='profil'||hash==='factures'||hash==='commandes'||hash==='dashboard'){
+                if(hash==='profil'||hash==='factures'||hash==='devis'||hash==='commandes'||hash==='dashboard'){
                     var ht=document.querySelector('.clielo-ma-tab[data-tab="'+hash+'"]');
                     if(ht) ht.click();
                 }
@@ -473,6 +486,7 @@ class Clielo_Account {
         $total_orders   = count( $orders );
         $active_orders  = 0;
         $pending_orders = 0;
+        $quote_orders   = 0;
         $total_revenue  = 0.0;
         foreach ( $orders as $o ) {
             if ( in_array( $o->status, [ 'started', 'revision' ], true ) ) {
@@ -480,6 +494,9 @@ class Clielo_Account {
             }
             if ( in_array( $o->status, [ 'pending', 'paid' ], true ) ) {
                 $pending_orders++;
+            }
+            if ( $o->status === 'quote' ) {
+                $quote_orders++;
             }
             $total_revenue += (float) ( $o->total_price ?? 0 );
         }
@@ -531,7 +548,7 @@ class Clielo_Account {
             ] : [
                 [ 'label' => __( 'Total commandes', 'clielo' ), 'value' => $total_orders, 'color' => '#3b82f6', 'icon' => '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>' ],
                 [ 'label' => __( 'En cours', 'clielo' ), 'value' => $active_orders, 'color' => '#f59e0b', 'icon' => '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' ],
-                [ 'label' => __( 'En attente', 'clielo' ), 'value' => $pending_orders, 'color' => '#8b5cf6', 'icon' => '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>' ],
+                [ 'label' => __( 'Devis en attente', 'clielo' ), 'value' => $quote_orders, 'color' => '#8b5cf6', 'icon' => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>' ],
                 [ 'label' => __( 'Factures', 'clielo' ), 'value' => $total_invoices, 'color' => '#10b981', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>' ],
             ];
             foreach ( $stats as $st ) :
@@ -547,11 +564,16 @@ class Clielo_Account {
         </div>
 
         <!-- Accès rapides -->
-        <div class="clielo-dash-quick" style="display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:12px !important;margin:0 0 20px 0 !important">
+        <div class="clielo-dash-quick" style="display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:12px !important;margin:0 0 20px 0 !important">
             <button type="button" class="clielo-dash-goto" data-goto="commandes"
                     style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;cursor:pointer !important;text-align:center !important;font-family:inherit !important;transition:border-color .15s !important">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $esc_color ); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block !important;margin:0 auto 8px !important"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                 <span style="font-size:13px !important;font-weight:600 !important;color:#333 !important"><?php esc_html_e( 'Mes commandes', 'clielo' ); ?></span>
+            </button>
+            <button type="button" class="clielo-dash-goto" data-goto="devis"
+                    style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;cursor:pointer !important;text-align:center !important;font-family:inherit !important;transition:border-color .15s !important">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( $esc_color ); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block !important;margin:0 auto 8px !important"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <span style="font-size:13px !important;font-weight:600 !important;color:#333 !important"><?php esc_html_e( 'Mes devis', 'clielo' ); ?></span>
             </button>
             <button type="button" class="clielo-dash-goto" data-goto="factures"
                     style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;cursor:pointer !important;text-align:center !important;font-family:inherit !important;transition:border-color .15s !important">
@@ -979,6 +1001,93 @@ class Clielo_Account {
         ?>
         <?php endif; ?>
         <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Section devis (onglet Mon Compte).
+     */
+    private static function render_devis_section( string $color ): string {
+        $user_id   = get_current_user_id();
+        $esc_color = esc_attr( $color );
+
+        global $wpdb;
+        $order_table = Clielo_Orders::table_name();
+
+        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        $quote_orders = $wpdb->get_results( $wpdb->prepare(
+            "SELECT o.*, p.post_title AS service_name
+             FROM {$order_table} o
+             LEFT JOIN {$wpdb->posts} p ON o.post_id = p.ID
+             WHERE o.client_id = %d AND o.status = 'quote'
+             ORDER BY o.created_at DESC",
+            $user_id
+        ) );
+
+        $quote_docs = [];
+        if ( class_exists( 'Clielo_Invoices' ) ) {
+            $inv_table  = Clielo_Invoices::invoices_table_name();
+            $docs_raw   = $wpdb->get_results( $wpdb->prepare(
+                "SELECT i.id, i.invoice_number, i.created_at, i.order_id
+                 FROM {$inv_table} i
+                 WHERE i.client_id = %d AND i.invoice_type = 'quote'
+                 ORDER BY i.created_at DESC",
+                $user_id
+            ) );
+            foreach ( $docs_raw as $d ) {
+                $quote_docs[ (int) $d->order_id ] = $d;
+            }
+        }
+        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+        ob_start();
+
+        if ( empty( $quote_orders ) && empty( $quote_docs ) ) :
+            ?>
+            <div style="text-align:center !important;padding:40px 20px !important;color:#888 !important">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block !important;margin:0 auto 12px !important"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <p style="font-size:14px !important;margin:0 !important"><?php esc_html_e( 'Aucun devis pour le moment.', 'clielo' ); ?></p>
+            </div>
+            <?php
+        else :
+            foreach ( $quote_orders as $qo ) :
+                $bo        = json_decode( $qo->base_offer ?? '{}', true );
+                $pack_name = $bo['name'] ?? '—';
+                $doc       = $quote_docs[ (int) $qo->id ] ?? null;
+                $view_url  = $doc ? admin_url( 'admin-ajax.php?action=clielo_view_invoice&invoice_id=' . (int) $doc->id ) : '';
+                ?>
+                <div style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;margin:0 0 10px 0 !important;box-shadow:0 1px 3px rgba(0,0,0,0.04) !important">
+                    <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;margin:0 0 8px 0 !important">
+                        <strong style="font-size:14px !important;color:#222 !important">
+                            <?php
+                            printf(
+                                /* translators: %1$d: order id, %2$s: service name */
+                                esc_html__( '#CMD-%1$d — %2$s', 'clielo' ),
+                                absint( $qo->id ),
+                                esc_html( $qo->service_name ?: '—' )
+                            );
+                            ?>
+                        </strong>
+                        <span style="display:inline-block !important;padding:3px 10px !important;border-radius:12px !important;font-size:11px !important;font-weight:600 !important;color:#fff !important;background:#8b5cf6 !important"><?php esc_html_e( 'Devis en attente', 'clielo' ); ?></span>
+                    </div>
+                    <div style="font-size:12px !important;color:#888 !important;margin:0 0 10px 0 !important">
+                        <?php esc_html_e( 'Pack :', 'clielo' ); ?> <strong><?php echo esc_html( $pack_name ); ?></strong>
+                        &middot; <?php echo esc_html( date_i18n( 'd/m/Y', strtotime( $qo->created_at ) ) ); ?>
+                    </div>
+                    <?php if ( $doc ) : ?>
+                        <a href="<?php echo esc_url( $view_url ); ?>" target="_blank"
+                           style="display:inline-flex !important;align-items:center !important;gap:4px !important;font-size:12px !important;color:<?php echo esc_attr( $esc_color ); ?> !important;text-decoration:none !important;font-weight:600 !important">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <?php echo esc_html( $doc->invoice_number ); ?> — <?php esc_html_e( 'Voir le devis', 'clielo' ); ?>
+                        </a>
+                    <?php else : ?>
+                        <span style="font-size:12px !important;color:#999 !important;font-style:italic !important"><?php esc_html_e( 'Document devis en cours de préparation…', 'clielo' ); ?></span>
+                    <?php endif; ?>
+                </div>
+                <?php
+            endforeach;
+        endif;
+
         return ob_get_clean();
     }
 

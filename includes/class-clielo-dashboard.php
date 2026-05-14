@@ -186,6 +186,11 @@ class Clielo_Dashboard {
             'pending'
         ) );
 
+        $quote_count = (int) $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$order_table} WHERE status = %s",
+            'quote'
+        ) );
+
         $conversations = (int) $wpdb->get_var(
             "SELECT COUNT(DISTINCT client_id) FROM {$msg_table} WHERE client_id > 0"
         );
@@ -207,6 +212,7 @@ class Clielo_Dashboard {
             'in_progress'      => $in_progress,
             'completed'        => $completed,
             'pending'          => $pending,
+            'quote_count'      => $quote_count,
             'conversations'    => $conversations,
             'total_invoiced'   => $total_invoiced,
             'pending_invoices' => $pending_invoices,
@@ -354,6 +360,15 @@ class Clielo_Dashboard {
                     <div>
                         <div class="clielo-stat-number"><?php echo esc_html( $stats['pending_invoices'] ); ?></div>
                         <div class="clielo-stat-label"><?php esc_html_e( 'Factures à valider', 'clielo' ); ?></div>
+                    </div>
+                </div>
+                <div class="clielo-stat-card">
+                    <div class="clielo-stat-icon" style="background:#8b5cf6">
+                        <span class="dashicons dashicons-clipboard"></span>
+                    </div>
+                    <div>
+                        <div class="clielo-stat-number"><?php echo esc_html( $stats['quote_count'] ); ?></div>
+                        <div class="clielo-stat-label"><?php esc_html_e( 'Devis en attente', 'clielo' ); ?></div>
                     </div>
                 </div>
             </div>

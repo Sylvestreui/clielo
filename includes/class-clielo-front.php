@@ -1768,9 +1768,9 @@ class Clielo_Front {
                     if(order.status==='quote'){
                         if(order.quote_invoice_id){
                             html += '<button data-order-id="'+order.id+'" data-order-action="view_quote_doc" data-invoice-id="'+order.quote_invoice_id+'" style="padding:4px 10px;border:1px solid #6366f1;border-radius:6px;font-size:11px;font-weight:600;color:#6366f1;background:#fff;cursor:pointer">'+esc(C.i18n.view_quote_doc)+'</button>';
+                            html += makeBtn(order.id,'client_accept_quote',C.i18n.client_accept_quote,'#10b981');
+                            html += makeBtn(order.id,'client_refuse_quote',C.i18n.client_refuse_quote,'#ef4444');
                         }
-                        html += makeBtn(order.id,'client_accept_quote',C.i18n.client_accept_quote,'#10b981');
-                        html += makeBtn(order.id,'client_refuse_quote',C.i18n.client_refuse_quote,'#ef4444');
                     } else if(order.status==='completed'){
                         html += makeBtn(order.id,'accepted',C.i18n.accept_delivery,'#10b981');
                         html += makeBtn(order.id,'revision',C.i18n.request_revision,'#ef4444');
