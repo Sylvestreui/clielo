@@ -557,15 +557,23 @@ class Clielo_Front {
                 'todo_note'         => __( 'Note', 'clielo' ),
                 'orders_label'      => __( 'Commande', 'clielo' ),
                 'todos_label'       => __( 'Tâches', 'clielo' ),
-                'quote_btn'           => __( 'Demander un devis', 'clielo' ),
-                'quote_submitted'     => __( 'Devis soumis ✓', 'clielo' ),
-                'quote_success_toast' => __( 'Votre demande de devis a été soumise.', 'clielo' ),
-                'status_quote'        => __( 'Devis en attente', 'clielo' ),
-                'quote_doc_generate'  => __( 'Générer le devis', 'clielo' ),
-                'quote_accepted'      => __( 'Devis accepté', 'clielo' ),
-                'reject_quote'        => __( 'Refuser', 'clielo' ),
-                'confirm_quote_reject' => __( 'Refuser ce devis ? Cette action est irréversible.', 'clielo' ),
-                'approve_quote'       => __( 'Approuver', 'clielo' ),
+                'quote_btn'             => __( 'Demander un devis', 'clielo' ),
+                'quote_submitted'       => __( 'Devis soumis ✓', 'clielo' ),
+                'quote_success_toast'   => __( 'Votre demande de devis a été soumise.', 'clielo' ),
+                'status_quote'          => __( 'Devis en attente', 'clielo' ),
+                'status_quote_card'     => __( 'Devis en attente', 'clielo' ),
+                'status_pending_card'   => __( 'En attente de paiement', 'clielo' ),
+                'status_completed_card' => __( 'Livraison terminée', 'clielo' ),
+                'status_revision_card'  => __( 'Retouche en cours', 'clielo' ),
+                'quote_doc_generate'    => __( 'Générer le devis', 'clielo' ),
+                'quote_accepted'        => __( 'Devis accepté', 'clielo' ),
+                'view_quote_doc'        => __( 'Voir le devis', 'clielo' ),
+                'client_accept_quote'   => __( 'Accepter le devis', 'clielo' ),
+                'client_refuse_quote'   => __( 'Refuser le devis', 'clielo' ),
+                'confirm_refuse_quote'  => __( 'Refuser le devis ? Cette action est irréversible.', 'clielo' ),
+                'reject_quote'          => __( 'Refuser', 'clielo' ),
+                'confirm_quote_reject'  => __( 'Refuser ce devis ? Cette action est irréversible.', 'clielo' ),
+                'approve_quote'         => __( 'Approuver', 'clielo' ),
             ],
         ] );
         ?>
@@ -912,10 +920,20 @@ class Clielo_Front {
                     enableQuoteBtn();
                 } else if(o.status === 'pending'){
                     lockCard();
+                    setOrderBtnText(C.i18n.status_pending_card, null);
                     disableQuoteBtn(null);
                 } else if(o.status === 'quote'){
                     freezeCard();
+                    setOrderBtnText(C.i18n.status_quote_card, null);
                     disableQuoteBtn(C.i18n.quote_submitted);
+                } else if(o.status === 'completed'){
+                    freezeCard();
+                    setOrderBtnText(C.i18n.status_completed_card, null);
+                    disableQuoteBtn(null);
+                } else if(o.status === 'revision'){
+                    freezeCard();
+                    setOrderBtnText(C.i18n.status_revision_card, null);
+                    disableQuoteBtn(null);
                 } else {
                     freezeCard();
                     disableQuoteBtn(null);
@@ -1472,6 +1490,47 @@ class Clielo_Front {
                                         showToast((res.data&&res.data.message)||C.i18n.order_error,'error');
                                     }
                                 });
+                            } else if(action === 'view_quote_doc'){
+                                var invId = b.dataset.invoiceId;
+                                window.open(C.ajax_url + '?action=clielo_view_invoice&invoice_id=' + invId, '_blank');
+                            } else if(action === 'client_accept_quote'){
+                                var fd4 = new FormData();
+                                fd4.append('action','clielo_client_accept_quote');
+                                fd4.append('nonce',C.nonce);
+                                fd4.append('order_id',orderId);
+                                fd4.append('post_id',C.post_id);
+                                fetch(C.ajax_url,{method:'POST',body:fd4})
+                                .then(function(r){return r.json();})
+                                .then(function(res){
+                                    if(res.success && res.data){
+                                        C.active_order = res.data.active_order;
+                                        renderOrderBar();
+                                        syncCardState();
+                                        loadMsgs();
+                                    } else {
+                                        showToast((res.data&&res.data.message)||C.i18n.order_error,'error');
+                                    }
+                                });
+                            } else if(action === 'client_refuse_quote'){
+                                if(confirm(C.i18n.confirm_refuse_quote)){
+                                    var fd5 = new FormData();
+                                    fd5.append('action','clielo_client_refuse_quote');
+                                    fd5.append('nonce',C.nonce);
+                                    fd5.append('order_id',orderId);
+                                    fd5.append('post_id',C.post_id);
+                                    fetch(C.ajax_url,{method:'POST',body:fd5})
+                                    .then(function(r){return r.json();})
+                                    .then(function(res){
+                                        if(res.success && res.data){
+                                            C.active_order = res.data.active_order;
+                                            renderOrderBar();
+                                            syncCardState();
+                                            loadMsgs();
+                                        } else {
+                                            showToast((res.data&&res.data.message)||C.i18n.order_error,'error');
+                                        }
+                                    });
+                                }
                             } else if(action === 'quote_approve'){
                                 doOrderTransition(orderId, 'pending');
                             } else if(action === 'quote_reject'){
@@ -1706,7 +1765,13 @@ class Clielo_Front {
                         html += makeBtn(order.id,'completed',completeLabel,completeColor);
                     }
                 } else {
-                    if(order.status==='completed'){
+                    if(order.status==='quote'){
+                        if(order.quote_invoice_id){
+                            html += '<button data-order-id="'+order.id+'" data-order-action="view_quote_doc" data-invoice-id="'+order.quote_invoice_id+'" style="padding:4px 10px;border:1px solid #6366f1;border-radius:6px;font-size:11px;font-weight:600;color:#6366f1;background:#fff;cursor:pointer">'+esc(C.i18n.view_quote_doc)+'</button>';
+                        }
+                        html += makeBtn(order.id,'client_accept_quote',C.i18n.client_accept_quote,'#10b981');
+                        html += makeBtn(order.id,'client_refuse_quote',C.i18n.client_refuse_quote,'#ef4444');
+                    } else if(order.status==='completed'){
                         html += makeBtn(order.id,'accepted',C.i18n.accept_delivery,'#10b981');
                         html += makeBtn(order.id,'revision',C.i18n.request_revision,'#ef4444');
                     }

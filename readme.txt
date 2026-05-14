@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,12 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.2.3 =
+* Quote flow: client can now view the DEVIS document directly from the chat order bar ("Voir le devis" button)
+* Quote flow: client gets "Accepter le devis" and "Refuser le devis" buttons when a quote is pending
+* Quote flow: fix card order button text — shows "Devis en attente", "En attente de paiement", "Livraison terminée" or "Retouche en cours" instead of generic "Commande en cours..."
+* Quote flow: invoice view endpoint now allows clients to view quote documents (type=quote) regardless of status
 
 = 1.2.2 =
 * Admin menu: reorganize with GESTION / PARAMÈTRES separators — centralize all submenu registrations in Dashboard

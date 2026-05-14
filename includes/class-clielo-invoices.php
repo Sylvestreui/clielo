@@ -1384,8 +1384,9 @@ class Clielo_Invoices {
             wp_die( esc_html__( 'Accès non autorisé.', 'clielo' ) );
         }
 
-        // Seules validated / paid visibles
-        if ( ! in_array( $invoice->status, [ self::STATUS_VALIDATED, self::STATUS_PAID ], true ) ) {
+        // Les devis (type=quote) sont toujours visibles par le client propriétaire
+        $is_quote_doc = ( $invoice->invoice_type ?? '' ) === 'quote';
+        if ( ! $is_quote_doc && ! in_array( $invoice->status, [ self::STATUS_VALIDATED, self::STATUS_PAID ], true ) ) {
             wp_die( esc_html__( 'Cette facture n\'est pas encore disponible.', 'clielo' ) );
         }
 
