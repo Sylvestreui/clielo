@@ -664,7 +664,7 @@ class Clielo_Front {
 
         <?php ob_start(); ?>(function(){
             var C = <?php echo $js_config; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode() ensures safe JSON output ?>;
-            var POLL = 5000;
+            var POLL = 2000;
             var lsKey = 'sf_last_seen_' + C.post_id + '_' + C.user_id;
             var lastId = parseInt(localStorage.getItem(lsKey) || '0', 10);
             var hasLoaded = false, unread = 0;

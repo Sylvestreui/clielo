@@ -65,47 +65,48 @@ class Clielo_DB {
     }
 
     /**
-     * Récupère les messages d'un post, filtrés par client_id si fourni.
+     * Récupère les N derniers messages d'un post, en ordre chronologique.
+     * On charge en DESC pour garantir les plus récents, puis on inverse.
      */
-    public static function get_messages( int $post_id, int $client_id = 0, int $limit = 50, int $offset = 0 ): array {
+    public static function get_messages( int $post_id, int $client_id = 0, int $limit = 100 ): array {
         global $wpdb;
 
         $table = self::table_name();
 
         if ( $client_id > 0 ) {
             // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 $wpdb->prepare(
                     "SELECT m.*, u.display_name, u.user_email
                      FROM {$table} m
                      LEFT JOIN {$wpdb->users} u ON m.user_id = u.ID
                      WHERE m.post_id = %d AND m.client_id = %d
-                     ORDER BY m.created_at ASC, m.id ASC
-                     LIMIT %d OFFSET %d",
+                     ORDER BY m.created_at DESC, m.id DESC
+                     LIMIT %d",
                     $post_id,
                     $client_id,
-                    $limit,
-                    $offset
+                    $limit
                 )
             );
             // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            return array_reverse( $rows );
         }
 
         // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $wpdb->prepare(
                 "SELECT m.*, u.display_name, u.user_email
                  FROM {$table} m
                  LEFT JOIN {$wpdb->users} u ON m.user_id = u.ID
                  WHERE m.post_id = %d
-                 ORDER BY m.created_at ASC, m.id ASC
-                 LIMIT %d OFFSET %d",
+                 ORDER BY m.created_at DESC, m.id DESC
+                 LIMIT %d",
                 $post_id,
-                $limit,
-                $offset
+                $limit
             )
         );
         // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        return array_reverse( $rows );
     }
 
     /**
