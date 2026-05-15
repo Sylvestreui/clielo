@@ -629,11 +629,12 @@ class Clielo_Invoices {
 
         global $wpdb;
 
-        // Vérifier qu'aucune facture non-annulée n'existe déjà
+        // Vérifier qu'aucune facture de paiement non-annulée n'existe déjà
+        // (le document DEVIS invoice_type='quote' ne compte pas comme facture de paiement)
         $table  = self::invoices_table_name();
         // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $exists = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            "SELECT id FROM {$table} WHERE order_id = %d AND status != %s LIMIT 1",
+            "SELECT id FROM {$table} WHERE order_id = %d AND status != %s AND invoice_type != 'quote' LIMIT 1",
             $order_id, self::STATUS_CANCELLED
         ) );
         // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared

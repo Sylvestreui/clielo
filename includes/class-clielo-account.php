@@ -1015,19 +1015,13 @@ class Clielo_Account {
         $order_table = Clielo_Orders::table_name();
 
         // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-        $quote_orders = $wpdb->get_results( $wpdb->prepare(
-            "SELECT o.*, p.post_title AS service_name
-             FROM {$order_table} o
-             LEFT JOIN {$wpdb->posts} p ON o.post_id = p.ID
-             WHERE o.client_id = %d AND o.status = 'quote'
-             ORDER BY o.created_at DESC",
-            $user_id
-        ) );
 
+        // Récupérer les docs DEVIS d'abord pour construire la liste complète des order_ids
         $quote_docs = [];
+        $doc_order_ids = [];
         if ( class_exists( 'Clielo_Invoices' ) ) {
-            $inv_table  = Clielo_Invoices::invoices_table_name();
-            $docs_raw   = $wpdb->get_results( $wpdb->prepare(
+            $inv_table = Clielo_Invoices::invoices_table_name();
+            $docs_raw  = $wpdb->get_results( $wpdb->prepare(
                 "SELECT i.id, i.invoice_number, i.created_at, i.order_id
                  FROM {$inv_table} i
                  WHERE i.client_id = %d AND i.invoice_type = 'quote'
@@ -1036,8 +1030,32 @@ class Clielo_Account {
             ) );
             foreach ( $docs_raw as $d ) {
                 $quote_docs[ (int) $d->order_id ] = $d;
+                $doc_order_ids[] = (int) $d->order_id;
             }
         }
+
+        // Requête : status = 'quote' OU commande ayant un document DEVIS (acceptées/en cours/terminées)
+        if ( ! empty( $doc_order_ids ) ) {
+            $ids_placeholder = implode( ',', array_map( 'absint', $doc_order_ids ) );
+            $quote_orders = $wpdb->get_results( $wpdb->prepare(
+                "SELECT o.*, p.post_title AS service_name
+                 FROM {$order_table} o
+                 LEFT JOIN {$wpdb->posts} p ON o.post_id = p.ID
+                 WHERE o.client_id = %d AND (o.status = 'quote' OR o.id IN ({$ids_placeholder}))
+                 ORDER BY o.created_at DESC",
+                $user_id
+            ) );
+        } else {
+            $quote_orders = $wpdb->get_results( $wpdb->prepare(
+                "SELECT o.*, p.post_title AS service_name
+                 FROM {$order_table} o
+                 LEFT JOIN {$wpdb->posts} p ON o.post_id = p.ID
+                 WHERE o.client_id = %d AND o.status = 'quote'
+                 ORDER BY o.created_at DESC",
+                $user_id
+            ) );
+        }
+
         // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
         ob_start();
@@ -1055,6 +1073,18 @@ class Clielo_Account {
                 $pack_name = $bo['name'] ?? '—';
                 $doc       = $quote_docs[ (int) $qo->id ] ?? null;
                 $view_url  = $doc ? admin_url( 'admin-ajax.php?action=clielo_view_invoice&invoice_id=' . (int) $doc->id ) : '';
+
+                // Badge de statut adapté
+                $status_map = [
+                    'quote'     => [ __( 'Devis en attente', 'clielo' ),       '#8b5cf6' ],
+                    'pending'   => [ __( 'Devis accepté — En attente de paiement', 'clielo' ), '#f59e0b' ],
+                    'paid'      => [ __( 'Payé — En attente de démarrage', 'clielo' ), '#8b5cf6' ],
+                    'started'   => [ __( 'Commande en cours', 'clielo' ),       '#3b82f6' ],
+                    'completed' => [ __( 'Livraison terminée', 'clielo' ),      '#10b981' ],
+                    'revision'  => [ __( 'Retouche en cours', 'clielo' ),       '#ef4444' ],
+                    'accepted'  => [ __( 'Commande acceptée', 'clielo' ),       '#6b7280' ],
+                ];
+                [ $status_label, $status_color ] = $status_map[ $qo->status ] ?? [ esc_html( $qo->status ), '#888' ];
                 ?>
                 <div style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:10px !important;padding:16px !important;margin:0 0 10px 0 !important;box-shadow:0 1px 3px rgba(0,0,0,0.04) !important">
                     <div style="display:flex !important;justify-content:space-between !important;align-items:center !important;margin:0 0 8px 0 !important">
@@ -1068,7 +1098,7 @@ class Clielo_Account {
                             );
                             ?>
                         </strong>
-                        <span style="display:inline-block !important;padding:3px 10px !important;border-radius:12px !important;font-size:11px !important;font-weight:600 !important;color:#fff !important;background:#8b5cf6 !important"><?php esc_html_e( 'Devis en attente', 'clielo' ); ?></span>
+                        <span style="display:inline-block !important;padding:3px 10px !important;border-radius:12px !important;font-size:11px !important;font-weight:600 !important;color:#fff !important;background:<?php echo esc_attr( $status_color ); ?> !important"><?php echo esc_html( $status_label ); ?></span>
                     </div>
                     <div style="font-size:12px !important;color:#888 !important;margin:0 0 10px 0 !important">
                         <?php esc_html_e( 'Pack :', 'clielo' ); ?> <strong><?php echo esc_html( $pack_name ); ?></strong>
