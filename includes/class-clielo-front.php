@@ -1828,7 +1828,13 @@ class Clielo_Front {
 
                 if(isAdmin){
                     if(order.status==='quote'){
-                        if(C.is_premium) html += makeBtn(order.id,'clielo_generate_quote_doc',C.i18n.quote_doc_generate,'#7c3aed');
+                        if(C.is_premium){
+                            if(order.quote_invoice_id){
+                                html += '<button data-order-id="'+order.id+'" data-order-action="view_quote_doc" data-invoice-id="'+order.quote_invoice_id+'" style="padding:4px 10px;border:1px solid #7c3aed;border-radius:6px;font-size:11px;font-weight:600;color:#7c3aed;background:#fff;cursor:pointer">'+esc(C.i18n.view_quote_doc)+'</button>';
+                            } else {
+                                html += makeBtn(order.id,'clielo_generate_quote_doc',C.i18n.quote_doc_generate,'#7c3aed');
+                            }
+                        }
                     } else if(order.status==='pending'||order.status==='paid'){
                         html += makeBtn(order.id,'started',C.i18n.start_order,'#3b82f6');
                     } else if(order.status==='revision'){
