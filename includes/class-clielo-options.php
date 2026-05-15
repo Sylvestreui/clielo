@@ -213,7 +213,7 @@ class Clielo_Options {
 
         <?php endif; ?>
 
-        <?php if ( clielo_is_premium() && Clielo_Stripe::is_enabled() ) :
+        <?php if ( clielo_is_premium() ) :
             $payment_mode       = get_post_meta( $post->ID, '_clielo_payment_mode', true ) ?: ( Clielo_Stripe::get_settings()['default_payment_mode'] ?? 'single' );
             $installments_count = (int) get_post_meta( $post->ID, '_clielo_installments_count', true ) ?: 3;
         ?>
