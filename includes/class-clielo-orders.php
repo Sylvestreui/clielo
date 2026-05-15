@@ -166,15 +166,20 @@ class Clielo_Orders {
         $table    = self::table_name();
         $existing = self::get_order_for_client( $post_id, $client_id );
 
+        $payment_mode       = class_exists( 'Clielo_Options' ) ? Clielo_Options::get_payment_mode( $post_id ) : 'single';
+        $installments_count = class_exists( 'Clielo_Options' ) ? Clielo_Options::get_installments_count( $post_id ) : 3;
+
         $data = [
-            'post_id'          => $post_id,
-            'client_id'        => $client_id,
-            'status'           => self::STATUS_QUOTE,
-            'base_offer'       => wp_json_encode( $base_offer ),
-            'selected_options' => wp_json_encode( $selected_options ),
-            'total_price'      => $total_price,
-            'total_delay'      => $total_delay,
-            'updated_at'       => current_time( 'mysql' ),
+            'post_id'           => $post_id,
+            'client_id'         => $client_id,
+            'status'            => self::STATUS_QUOTE,
+            'base_offer'        => wp_json_encode( $base_offer ),
+            'selected_options'  => wp_json_encode( $selected_options ),
+            'total_price'       => $total_price,
+            'total_delay'       => $total_delay,
+            'payment_mode'      => $payment_mode,
+            'installments_count' => $installments_count,
+            'updated_at'        => current_time( 'mysql' ),
         ];
 
         if ( $existing && $existing->status === self::STATUS_QUOTE ) {
