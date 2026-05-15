@@ -255,6 +255,26 @@ class Clielo_Invoices {
             ];
         }
 
+        // Options avancées dynamiques
+        if ( ! empty( $order->advanced_options_data ) ) {
+            $adv_data = json_decode( $order->advanced_options_data, true ) ?: [];
+            foreach ( $adv_data as $adv ) {
+                $lbl   = sanitize_text_field( $adv['label'] ?? '' );
+                $qty   = absint( $adv['qty'] ?? 1 );
+                $price = floatval( $adv['price'] ?? 0 );
+                $mode  = $adv['mode'] ?? 'unit';
+                if ( ! $lbl || ! $price ) {
+                    continue;
+                }
+                $items[] = [
+                    'description' => $lbl . ( $mode === 'monthly' ? ' (' . __( 'mensuel', 'clielo' ) . ')' : '' ),
+                    'quantity'    => $qty,
+                    'unit_price'  => $price,
+                    'total'       => round( $qty * $price, 2 ),
+                ];
+            }
+        }
+
         $subtotal   = array_sum( array_column( $items, 'total' ) );
         $tax_amount = round( $subtotal * $tax_rate / 100, 2 );
         $total      = round( $subtotal + $tax_amount, 2 );

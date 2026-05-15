@@ -160,7 +160,7 @@ class Clielo_Orders {
      * Crée ou met à jour un devis (statut « quote »).
      * Écrase un devis existant ; refuse si une commande active est en cours.
      */
-    public static function create_quote( int $post_id, int $client_id, array $base_offer, array $selected_options, float $total_price, int $total_delay ): int|false {
+    public static function create_quote( int $post_id, int $client_id, array $base_offer, array $selected_options, float $total_price, int $total_delay, string $advanced_options_data = '' ): int|false {
         global $wpdb;
 
         $table    = self::table_name();
@@ -170,16 +170,17 @@ class Clielo_Orders {
         $installments_count = class_exists( 'Clielo_Options' ) ? Clielo_Options::get_installments_count( $post_id ) : 3;
 
         $data = [
-            'post_id'           => $post_id,
-            'client_id'         => $client_id,
-            'status'            => self::STATUS_QUOTE,
-            'base_offer'        => wp_json_encode( $base_offer ),
-            'selected_options'  => wp_json_encode( $selected_options ),
-            'total_price'       => $total_price,
-            'total_delay'       => $total_delay,
-            'payment_mode'      => $payment_mode,
-            'installments_count' => $installments_count,
-            'updated_at'        => current_time( 'mysql' ),
+            'post_id'               => $post_id,
+            'client_id'             => $client_id,
+            'status'                => self::STATUS_QUOTE,
+            'base_offer'            => wp_json_encode( $base_offer ),
+            'selected_options'      => wp_json_encode( $selected_options ),
+            'total_price'           => $total_price,
+            'total_delay'           => $total_delay,
+            'payment_mode'          => $payment_mode,
+            'installments_count'    => $installments_count,
+            'advanced_options_data' => $advanced_options_data ?: null,
+            'updated_at'            => current_time( 'mysql' ),
         ];
 
         if ( $existing && $existing->status === self::STATUS_QUOTE ) {
@@ -1031,29 +1032,76 @@ class Clielo_Orders {
             $total_delay += absint( $opt['delay'] ?? 0 );
         }
 
+        // Options avancées dynamiques (même logique que ajax_create_order)
+        $adv_opts_raw  = get_post_meta( $post_id, '_clielo_advanced_options', true );
+        $adv_opts_cfg  = is_array( $adv_opts_raw ) ? $adv_opts_raw : ( ( $adv_opts_raw && is_string( $adv_opts_raw ) ) ? ( json_decode( $adv_opts_raw, true ) ?: [] ) : [] );
+        $adv_sels_raw  = isset( $_POST['advanced_options_data'] ) ? sanitize_text_field( wp_unslash( $_POST['advanced_options_data'] ) ) : '[]'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $adv_sels      = json_decode( $adv_sels_raw, true );
+        $adv_sels      = is_array( $adv_sels ) ? $adv_sels : [];
+        $adv_order_data = [];
+
+        foreach ( $adv_sels as $sel ) {
+            $idx   = absint( $sel['index'] ?? -1 );
+            $qty   = absint( $sel['qty'] ?? 0 );
+            if ( $idx < 0 || ! isset( $adv_opts_cfg[ $idx ] ) || $qty <= 0 ) {
+                continue;
+            }
+            $cfg   = $adv_opts_cfg[ $idx ];
+            $mode  = $cfg['mode'] ?? 'unit';
+            $price = floatval( $cfg['price'] ?? 0 );
+            $total = round( $qty * $price, 2 );
+
+            if ( $mode === 'daily' ) {
+                $min_delay    = (int) ceil( $total_delay * 0.45 );
+                $max_days_off = $total_delay - $min_delay;
+                $qty          = min( $qty, $max_days_off );
+                $total        = round( $qty * $price, 2 );
+                $total_delay -= $qty;
+            }
+
+            $total_price += $total;
+            $adv_order_data[] = [
+                'index'      => $idx,
+                'label'      => sanitize_text_field( $cfg['label'] ?? '' ),
+                'price'      => $price,
+                'mode'       => $mode,
+                'unit_label' => sanitize_text_field( $cfg['unit_label'] ?? '' ),
+                'qty'        => $qty,
+                'total'      => $total,
+            ];
+        }
+
+        $adv_order_json = wp_json_encode( $adv_order_data );
+
         $tax_rate    = clielo_is_premium() ? floatval( Clielo_Invoices::get_settings()['tax_rate'] ?? 0 ) : 0;
         $total_price = round( $total_price * ( 1 + $tax_rate / 100 ), 2 );
 
-        $order_id = self::create_quote( $post_id, $client_id, $base_offer, $selected, $total_price, $total_delay );
+        $order_id = self::create_quote( $post_id, $client_id, $base_offer, $selected, $total_price, $total_delay, $adv_order_json );
 
         if ( ! $order_id ) {
             wp_send_json_error( [ 'message' => __( 'Erreur lors de la création du devis.', 'clielo' ) ], 500 );
         }
 
-        // Message système dans le chat
+        // Message système dans le chat — récapitulatif complet de la sélection
         $pack_name = sanitize_text_field( $base_offer['name'] ?? '' );
-        $quote_msg = sprintf(
-            "--- #CMD-%d %s ---\n%s",
-            $order_id,
-            __( 'Devis demandé', 'clielo' ),
-            $pack_name !== ''
-                ? sprintf(
-                    /* translators: %s: pack name */
-                    __( 'Demande de devis pour le pack « %s ».', 'clielo' ),
-                    $pack_name
-                )
-                : __( 'Demande de devis soumise.', 'clielo' )
-        );
+        $p_delay   = absint( $base_offer['delay'] ?? 0 );
+        $p_str     = $p_delay > 0 ? " (\u{23F1} {$p_delay}j)" : '';
+        $lines     = [];
+        $lines[]   = "\u{1F4CB} " . __( 'Ma sélection :', 'clielo' );
+        $lines[]   = "\u{1F4E6} {$pack_name} \u{2014} " . number_format( (float) ( $base_offer['price'] ?? 0 ), 2, ',', ' ' ) . " \u{20AC}" . $p_str;
+        foreach ( $selected as $opt ) {
+            $d       = absint( $opt['delay'] ?? 0 );
+            $ds      = $d > 0 ? " (+{$d}j)" : '';
+            $lines[] = "\u{2705} " . sanitize_text_field( $opt['name'] ?? 'Option' ) . ' \u{2014} ' . number_format( (float) ( $opt['price'] ?? 0 ), 2, ',', ' ' ) . " \u{20AC}" . $ds;
+        }
+        foreach ( $adv_order_data as $adv ) {
+            $lbl     = $adv['label'];
+            $qty_str = $adv['qty'] > 1 ? ' × ' . $adv['qty'] : '';
+            $lines[] = "\u{2728} {$lbl}{$qty_str} \u{2014} " . number_format( (float) $adv['total'], 2, ',', ' ' ) . " \u{20AC}";
+        }
+        $lines[]   = "\u{1F4B0} " . __( 'Total estimé :', 'clielo' ) . ' ' . number_format( $total_price, 2, ',', ' ' ) . " \u{20AC} TTC";
+        $body      = implode( "\n", $lines );
+        $quote_msg = sprintf( "--- #CMD-%d %s ---\n%s", $order_id, __( 'Devis demandé', 'clielo' ), $body );
         Clielo_DB::insert_message( $post_id, 0, $quote_msg, $client_id );
 
         do_action( 'clielo_quote_created', $order_id, $post_id, $client_id );
