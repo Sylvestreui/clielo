@@ -576,6 +576,20 @@ class Clielo_Front {
                 'approve_quote'         => __( 'Approuver', 'clielo' ),
                 'pay_now_btn'           => __( 'Payer maintenant', 'clielo' ),
                 'status_pending_manual' => __( 'En attente de validation', 'clielo' ),
+                'pi_awaiting'           => __( 'En attente de paiement', 'clielo' ),
+                'pi_link'               => __( 'Lien', 'clielo' ),
+                'pi_text'               => __( 'Texte libre', 'clielo' ),
+                'pi_send'               => __( 'Envoyer au client', 'clielo' ),
+                'pi_sending'            => __( 'Envoi...', 'clielo' ),
+                'pi_sent'               => __( 'Envoyé ✓', 'clielo' ),
+                'pi_mark_paid'          => __( '✓ Marquer comme payé', 'clielo' ),
+                'pi_placeholder_link'   => __( 'https://...', 'clielo' ),
+                'pi_placeholder_text'   => __( 'IBAN, PayPal, instructions...', 'clielo' ),
+                'pi_empty'              => __( 'Veuillez renseigner le lien ou le texte.', 'clielo' ),
+                'pm_single'             => __( 'Paiement unique (100 %)', 'clielo' ),
+                'pm_deposit'            => __( 'Acompte (50 %)', 'clielo' ),
+                'pm_installments'       => __( '1er versement (40 %)', 'clielo' ),
+                'pm_monthly'            => __( '1re mensualité', 'clielo' ),
             ],
         ] );
         ?>
@@ -1657,6 +1671,56 @@ class Clielo_Front {
                 });
 
                 renderTodoList();
+
+                // Handler formulaire info paiement (admin, Stripe désactivé, pending)
+                orderBar.querySelectorAll('[data-pi-form]').forEach(function(form){
+                    var oid = form.dataset.piForm;
+                    var inp = form.querySelector('[data-pi-input="'+oid+'"]');
+                    var sendBtn = form.querySelector('[data-pi-send="'+oid+'"]');
+                    var radios  = form.querySelectorAll('input[name="pi_type_'+oid+'"]');
+
+                    // Changer le placeholder selon lien/texte
+                    radios.forEach(function(r){
+                        r.addEventListener('change', function(){
+                            if(!inp) return;
+                            inp.placeholder = r.value === 'link' ? C.i18n.pi_placeholder_link : C.i18n.pi_placeholder_text;
+                        });
+                    });
+
+                    if(sendBtn && inp){
+                        sendBtn.addEventListener('click', function(){
+                            var val = inp.value.trim();
+                            if(!val){ showToast(C.i18n.pi_empty,'error'); return; }
+                            var typeVal = 'link';
+                            radios.forEach(function(r){ if(r.checked) typeVal = r.value; });
+                            sendBtn.disabled = true;
+                            sendBtn.textContent = C.i18n.pi_sending;
+                            var fd = new FormData();
+                            fd.append('action','clielo_send_payment_info');
+                            fd.append('nonce',C.nonce);
+                            fd.append('order_id',oid);
+                            fd.append('type',typeVal);
+                            fd.append('value',val);
+                            fetch(C.ajax_url,{method:'POST',body:fd})
+                            .then(function(r){return r.json();})
+                            .then(function(res){
+                                if(res.success){
+                                    sendBtn.textContent = C.i18n.pi_sent;
+                                    inp.value = '';
+                                    loadMsgs();
+                                } else {
+                                    showToast((res.data&&res.data.message)||C.i18n.order_error,'error');
+                                    sendBtn.disabled = false;
+                                    sendBtn.textContent = C.i18n.pi_send;
+                                }
+                            })
+                            .catch(function(){
+                                sendBtn.disabled = false;
+                                sendBtn.textContent = C.i18n.pi_send;
+                            });
+                        });
+                    }
+                });
             }
 
             /* ── Todo list bar ───────────────────────── */
@@ -1836,7 +1900,32 @@ class Clielo_Front {
                             }
                         }
                     } else if(order.status==='pending'||order.status==='paid'){
-                        html += makeBtn(order.id,'started',C.i18n.start_order,'#3b82f6');
+                        if(!C.stripe_enabled && order.status==='pending'){
+                            var pm = order.payment_mode || 'single';
+                            var tot = parseFloat(order.total_price)||0;
+                            var inst = parseInt(order.installments_count)||3;
+                            var pmAmt = tot;
+                            if(pm==='deposit') pmAmt = Math.round(tot*0.5*100)/100;
+                            else if(pm==='installments') pmAmt = Math.round(tot*0.4*100)/100;
+                            else if(pm==='monthly') pmAmt = inst>0 ? Math.round(tot/inst*100)/100 : tot;
+                            var pmLbls = {single:C.i18n.pm_single,deposit:C.i18n.pm_deposit,installments:C.i18n.pm_installments,monthly:C.i18n.pm_monthly};
+                            var pmLbl = pmLbls[pm]||C.i18n.pm_single;
+                            var amtStr = pmAmt.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+                            html += '<div data-pi-form="'+order.id+'" style="border-top:1px solid #e5e7eb;margin-top:8px;padding-top:8px;width:100%">';
+                            html += '<div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:6px">💳 '+esc(pmLbl)+' — '+amtStr+'</div>';
+                            html += '<div style="display:flex;gap:12px;margin-bottom:6px;font-size:11px">';
+                            html += '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="pi_type_'+order.id+'" value="link" checked style="margin:0"> '+esc(C.i18n.pi_link)+'</label>';
+                            html += '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="pi_type_'+order.id+'" value="text" style="margin:0"> '+esc(C.i18n.pi_text)+'</label>';
+                            html += '</div>';
+                            html += '<div style="display:flex;gap:6px;margin-bottom:6px">';
+                            html += '<input type="text" data-pi-input="'+order.id+'" placeholder="'+esc(C.i18n.pi_placeholder_link)+'" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:11px;font-family:inherit">';
+                            html += '<button data-pi-send="'+order.id+'" style="padding:4px 10px;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;background:#7c3aed;cursor:pointer;white-space:nowrap">'+esc(C.i18n.pi_send)+'</button>';
+                            html += '</div>';
+                            html += '<button data-order-id="'+order.id+'" data-order-action="started" style="width:100%;padding:5px 10px;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;background:#10b981;cursor:pointer">'+esc(C.i18n.pi_mark_paid)+'</button>';
+                            html += '</div>';
+                        } else {
+                            html += makeBtn(order.id,'started',C.i18n.start_order,'#3b82f6');
+                        }
                     } else if(order.status==='revision'){
                         html += '<input type="number" data-revision-delay-for="'+order.id+'" min="1" max="365" placeholder="'+esc(C.i18n.revision_delay_placeholder)+'" style="width:90px;padding:3px 6px;border:1px solid #d1d5db;border-radius:6px;font-size:11px;font-family:inherit" />';
                         html += '<button data-order-id="'+order.id+'" data-order-action="revision_accept" style="padding:4px 10px;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;background:#3b82f6;cursor:pointer">'+esc(C.i18n.validate_revision)+'</button>';

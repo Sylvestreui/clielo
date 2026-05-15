@@ -30,7 +30,8 @@ class Clielo_Orders {
         add_action( 'wp_ajax_clielo_client_accept_quote', [ __CLASS__, 'ajax_client_accept_quote' ] );
         add_action( 'wp_ajax_clielo_client_refuse_quote', [ __CLASS__, 'ajax_client_refuse_quote' ] );
         add_action( 'wp_ajax_clielo_order_transition',    [ __CLASS__, 'ajax_order_transition' ] );
-        add_action( 'wp_ajax_clielo_get_clients',         [ __CLASS__, 'ajax_get_clients' ] );
+        add_action( 'wp_ajax_clielo_get_clients',          [ __CLASS__, 'ajax_get_clients' ] );
+        add_action( 'wp_ajax_clielo_send_payment_info',    [ __CLASS__, 'ajax_send_payment_info' ] );
     }
 
     public static function table_name(): string {
@@ -1110,6 +1111,52 @@ class Clielo_Orders {
         wp_send_json_success( [ 'order_id' => $order_id, 'active_order' => $active_order ] );
     }
 
+    /**
+     * AJAX admin : envoie les informations de paiement au client via le chat.
+     */
+    public static function ajax_send_payment_info(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Action non autorisée.', 'clielo' ) ], 403 );
+        }
+
+        $order_id = absint( $_POST['order_id'] ?? 0 );
+        $type     = sanitize_text_field( wp_unslash( $_POST['type'] ?? '' ) );
+        $value    = sanitize_textarea_field( wp_unslash( $_POST['value'] ?? '' ) );
+
+        if ( ! $order_id || ! $value ) {
+            wp_send_json_error( [ 'message' => __( 'Informations manquantes.', 'clielo' ) ], 400 );
+        }
+
+        $order = self::get_order( $order_id );
+        if ( ! $order || $order->status !== self::STATUS_PENDING ) {
+            wp_send_json_error( [ 'message' => __( 'Commande introuvable ou statut invalide.', 'clielo' ) ], 404 );
+        }
+
+        if ( $type === 'link' ) {
+            $msg = sprintf(
+                "--- #CMD-%d %s ---\n%s\n%s",
+                $order_id,
+                __( 'Informations de paiement', 'clielo' ),
+                __( 'Cliquez sur le lien ci-dessous pour effectuer votre paiement :', 'clielo' ),
+                esc_url_raw( $value )
+            );
+        } else {
+            $msg = sprintf(
+                "--- #CMD-%d %s ---\n%s\n%s",
+                $order_id,
+                __( 'Informations de paiement', 'clielo' ),
+                __( 'Voici les informations pour effectuer votre paiement :', 'clielo' ),
+                wp_strip_all_tags( $value )
+            );
+        }
+
+        Clielo_DB::insert_message( (int) $order->post_id, 0, $msg, (int) $order->client_id );
+
+        wp_send_json_success();
+    }
+
     private static function get_quote_invoice_id( int $order_id ): int {
         if ( ! $order_id || ! clielo_is_premium() || ! class_exists( 'Clielo_Invoices' ) ) {
             return 0;
@@ -1134,19 +1181,21 @@ class Clielo_Orders {
             }
             return array_values( array_map( function ( $o ) use ( $is_premium ) {
                 return [
-                    'id'               => (int) $o->id,
-                    'order_number'     => '#CMD-' . (int) $o->id,
-                    'client_id'        => (int) $o->client_id,
-                    'client_name'      => $o->client_name ?? '',
-                    'status'           => $o->status,
-                    'total_price'      => (float) $o->total_price,
-                    'total_delay'      => (int) $o->total_delay,
-                    'estimated_date'   => $o->estimated_date,
-                    'created_at'       => $o->created_at,
-                    'base_offer'       => json_decode( $o->base_offer ?? '{}', true ) ?: [],
-                    'selected_options' => json_decode( $o->selected_options ?? '[]', true ) ?: [],
-                    'todos'            => $is_premium ? Clielo_Todos::build_todos_response( (int) $o->id ) : null,
-                    'quote_invoice_id' => $o->status === self::STATUS_QUOTE ? self::get_quote_invoice_id( (int) $o->id ) : 0,
+                    'id'                 => (int) $o->id,
+                    'order_number'       => '#CMD-' . (int) $o->id,
+                    'client_id'          => (int) $o->client_id,
+                    'client_name'        => $o->client_name ?? '',
+                    'status'             => $o->status,
+                    'total_price'        => (float) $o->total_price,
+                    'total_delay'        => (int) $o->total_delay,
+                    'estimated_date'     => $o->estimated_date,
+                    'created_at'         => $o->created_at,
+                    'payment_mode'       => $o->payment_mode ?? 'single',
+                    'installments_count' => (int) ( $o->installments_count ?? 3 ),
+                    'base_offer'         => json_decode( $o->base_offer ?? '{}', true ) ?: [],
+                    'selected_options'   => json_decode( $o->selected_options ?? '[]', true ) ?: [],
+                    'todos'              => $is_premium ? Clielo_Todos::build_todos_response( (int) $o->id ) : null,
+                    'quote_invoice_id'   => $o->status === self::STATUS_QUOTE ? self::get_quote_invoice_id( (int) $o->id ) : 0,
                 ];
             }, $orders ) );
         }
@@ -1156,18 +1205,20 @@ class Clielo_Orders {
             return null;
         }
         return [
-            'id'               => (int) $order->id,
-            'order_number'     => '#CMD-' . (int) $order->id,
-            'client_id'        => (int) $order->client_id,
-            'status'           => $order->status,
-            'total_price'      => (float) $order->total_price,
-            'total_delay'      => (int) $order->total_delay,
-            'estimated_date'   => $order->estimated_date,
-            'created_at'       => $order->created_at,
-            'base_offer'       => json_decode( $order->base_offer ?? '{}', true ) ?: [],
-            'selected_options' => json_decode( $order->selected_options ?? '[]', true ) ?: [],
-            'todos'            => $is_premium ? Clielo_Todos::build_todos_response( (int) $order->id ) : null,
-            'quote_invoice_id' => $order->status === self::STATUS_QUOTE ? self::get_quote_invoice_id( (int) $order->id ) : 0,
+            'id'                 => (int) $order->id,
+            'order_number'       => '#CMD-' . (int) $order->id,
+            'client_id'          => (int) $order->client_id,
+            'status'             => $order->status,
+            'total_price'        => (float) $order->total_price,
+            'total_delay'        => (int) $order->total_delay,
+            'estimated_date'     => $order->estimated_date,
+            'created_at'         => $order->created_at,
+            'payment_mode'       => $order->payment_mode ?? 'single',
+            'installments_count' => (int) ( $order->installments_count ?? 3 ),
+            'base_offer'         => json_decode( $order->base_offer ?? '{}', true ) ?: [],
+            'selected_options'   => json_decode( $order->selected_options ?? '[]', true ) ?: [],
+            'todos'              => $is_premium ? Clielo_Todos::build_todos_response( (int) $order->id ) : null,
+            'quote_invoice_id'   => $order->status === self::STATUS_QUOTE ? self::get_quote_invoice_id( (int) $order->id ) : 0,
         ];
     }
 }

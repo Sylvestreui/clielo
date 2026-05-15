@@ -653,8 +653,13 @@ class Clielo_Notifications {
 
         $service = get_the_title( (int) $order->post_id );
 
+        // Quand le client accepte un devis → label plus explicite pour l'admin
+        $pending_label = ( $old_status === 'quote' )
+            ? __( 'Devis accepté — en attente de paiement', 'clielo' )
+            : __( 'En attente', 'clielo' );
+
         $status_labels = [
-            'pending'   => __( 'En attente', 'clielo' ),
+            'pending'   => $pending_label,
             'paid'      => __( 'Payée', 'clielo' ),
             'started'   => __( 'En cours', 'clielo' ),
             'completed' => __( 'Terminée', 'clielo' ),
