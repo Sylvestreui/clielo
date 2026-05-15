@@ -637,9 +637,13 @@ class Clielo_Front {
                     </div>
                     <div id="clielo-input-wrapper" class="clielo-input-wrapper">
                         <input type="file" id="clielo-file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none">
-                        <button type="button" id="clielo-attach-btn" title="<?php esc_attr_e( 'Envoyer une image', 'clielo' ); ?>" style="background:none;border:none;cursor:pointer;padding:4px 6px;color:#9ca3af;flex-shrink:0;font-size:16px;line-height:1">📎</button>
+                        <button type="button" id="clielo-attach-btn" title="<?php esc_attr_e( 'Envoyer une image', 'clielo' ); ?>" style="background:none;border:none;cursor:pointer;padding:4px 6px;color:#9ca3af;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                        </button>
                         <textarea id="clielo-input" class="clielo-input" placeholder="<?php esc_attr_e( 'Votre message...', 'clielo' ); ?>" rows="1" maxlength="1000"></textarea>
-                        <button type="button" id="clielo-mic-btn" title="<?php esc_attr_e( 'Message vocal', 'clielo' ); ?>" style="background:none;border:none;cursor:pointer;padding:4px 6px;color:#9ca3af;flex-shrink:0;font-size:16px;line-height:1">🎤</button>
+                        <button type="button" id="clielo-mic-btn" title="<?php esc_attr_e( 'Message vocal', 'clielo' ); ?>" style="background:none;border:none;cursor:pointer;padding:4px 6px;color:#9ca3af;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+                        </button>
                         <button type="button" id="clielo-send" class="clielo-send" style="background:var(--clielo-chat-btn-bg)">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2Z"></path></svg>
                         </button>
