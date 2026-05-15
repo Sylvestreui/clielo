@@ -15,6 +15,9 @@ class Clielo_Ajax {
 
         // Chargement initial des messages
         add_action( 'wp_ajax_clielo_load', [ __CLASS__, 'load_messages' ] );
+
+        // Upload média dans le chat (images, audio)
+        add_action( 'wp_ajax_clielo_chat_upload', [ __CLASS__, 'ajax_chat_upload' ] );
     }
 
     /**
@@ -205,5 +208,109 @@ class Clielo_Ajax {
             return [];
         }
         return Clielo_Payments::get_expired_schedule_ids_for_post( $post_id );
+    }
+
+    /**
+     * Upload d'un média (image ou audio) dans le chat.
+     */
+    public static function ajax_chat_upload(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( [ 'message' => __( 'Vous devez être connecté.', 'clielo' ) ], 403 );
+        }
+
+        $post_id = absint( $_POST['post_id'] ?? 0 );
+        $type    = sanitize_text_field( wp_unslash( $_POST['type'] ?? '' ) );
+
+        if ( ! $post_id || ! in_array( $type, [ 'image', 'audio' ], true ) ) {
+            wp_send_json_error( [ 'message' => __( 'Données manquantes.', 'clielo' ) ], 400 );
+        }
+
+        $post = get_post( $post_id );
+        if ( ! $post || $post->post_type !== Clielo_Admin::get_post_type() ) {
+            wp_send_json_error( [ 'message' => __( 'Post invalide.', 'clielo' ) ], 400 );
+        }
+
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- $_FILES handled via move_uploaded_file
+        if ( empty( $_FILES['file'] ) || UPLOAD_ERR_OK !== (int) $_FILES['file']['error'] ) {
+            wp_send_json_error( [ 'message' => __( 'Erreur lors de l\'envoi du fichier.', 'clielo' ) ], 400 );
+        }
+
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $file      = $_FILES['file'];
+        $size      = (int) $file['size'];
+        $tmp_name  = $file['tmp_name'];
+        $orig_name = sanitize_file_name( basename( wp_unslash( $file['name'] ) ) );
+
+        $size_limit = ( 'image' === $type ) ? 5 * MB_IN_BYTES : 15 * MB_IN_BYTES;
+        if ( $size > $size_limit ) {
+            wp_send_json_error( [ 'message' => __( 'Fichier trop volumineux.', 'clielo' ) ], 400 );
+        }
+
+        $allowed = ( 'image' === $type )
+            ? [ 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp' ]
+            : [ 'webm' => 'audio/webm', 'ogg' => 'audio/ogg', 'mp3' => 'audio/mpeg', 'wav' => 'audio/wav' ];
+
+        $check = wp_check_filetype( $orig_name, $allowed );
+        if ( ! $check['type'] ) {
+            wp_send_json_error( [ 'message' => __( 'Format de fichier non supporté.', 'clielo' ) ], 400 );
+        }
+
+        // Préparer le répertoire d'upload
+        $upload   = wp_upload_dir();
+        $sub_dir  = 'clielo-chat/' . gmdate( 'Y/m' );
+        $chat_dir = $upload['basedir'] . '/' . $sub_dir;
+        wp_mkdir_p( $chat_dir );
+
+        $ext      = $check['ext'] ?: ( 'image' === $type ? 'jpg' : 'webm' );
+        $filename = wp_unique_filename( $chat_dir, wp_generate_uuid4() . '.' . $ext );
+        $filepath = $chat_dir . '/' . $filename;
+
+        if ( ! move_uploaded_file( $tmp_name, $filepath ) ) {
+            wp_send_json_error( [ 'message' => __( 'Erreur lors de l\'enregistrement.', 'clielo' ) ], 500 );
+        }
+
+        if ( 'image' === $type ) {
+            $editor = wp_get_image_editor( $filepath );
+            if ( ! is_wp_error( $editor ) ) {
+                $editor->resize( 1200, 1200, false );
+                $editor->set_quality( 82 );
+                $editor->save( $filepath );
+            }
+        }
+
+        $url = $upload['baseurl'] . '/' . $sub_dir . '/' . $filename;
+
+        $user_id   = get_current_user_id();
+        $client_id = absint( $_POST['client_id'] ?? 0 );
+        if ( current_user_can( 'manage_options' ) ) {
+            if ( ! $client_id ) {
+                wp_send_json_error( [ 'message' => __( 'Client non sélectionné.', 'clielo' ) ], 400 );
+            }
+        } else {
+            $client_id = $user_id;
+        }
+
+        $token    = ( 'image' === $type ) ? '[CLIELO_IMG:' . $url . ']' : '[CLIELO_AUDIO:' . $url . ']';
+        $inserted = Clielo_DB::insert_message( $post_id, $user_id, $token, $client_id );
+
+        if ( ! $inserted ) {
+            wp_send_json_error( [ 'message' => __( 'Erreur lors de l\'envoi.', 'clielo' ) ], 500 );
+        }
+
+        do_action( 'clielo_message_sent', $post_id, $user_id, $client_id, $inserted );
+
+        $user = wp_get_current_user();
+        wp_send_json_success( [
+            'id'           => $inserted,
+            'post_id'      => $post_id,
+            'user_id'      => $user_id,
+            'client_id'    => $client_id,
+            'display_name' => $user->display_name,
+            'message'      => $token,
+            'created_at'   => current_time( 'mysql' ),
+            'avatar'       => Clielo_Account::get_user_avatar( $user_id, 40 ),
+        ] );
     }
 }

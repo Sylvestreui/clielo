@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,11 @@ Used to manage plugin licensing, upgrades and trials. Activated on first use of 
 No data is transmitted to external services in the free plan without explicit configuration by the site administrator.
 
 == Changelog ==
+
+= 1.2.4 =
+* Chat: image sharing — clients and admin can send images (auto-resized to 1200px, 5 MB max)
+* Chat: voice messages — record and send audio clips up to 3 minutes (🎤 button)
+* Chat: URLs in messages are now clickable links
 
 = 1.2.3 =
 * Quote flow: client can now view the DEVIS document directly from the chat order bar ("Voir le devis" button)

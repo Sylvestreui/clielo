@@ -629,8 +629,17 @@ class Clielo_Front {
 
             <?php if ( $is_logged ) : ?>
                 <form id="clielo-form" class="clielo-form" onsubmit="return false;">
-                    <div class="clielo-input-wrapper">
+                    <div id="clielo-rec-bar" style="display:none;align-items:center;gap:8px;padding:6px 10px;background:#fee2e2;border-radius:8px;margin:4px 4px 0;font-size:12px;color:#dc2626">
+                        <span id="clielo-rec-timer" style="font-weight:700;min-width:32px">0:00</span>
+                        <span style="flex:1">🔴 <?php esc_html_e( 'Enregistrement...', 'clielo' ); ?></span>
+                        <button type="button" id="clielo-rec-stop" style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px"><?php esc_html_e( 'Envoyer', 'clielo' ); ?></button>
+                        <button type="button" id="clielo-rec-cancel" style="background:#6b7280;color:#fff;border:none;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px"><?php esc_html_e( 'Annuler', 'clielo' ); ?></button>
+                    </div>
+                    <div id="clielo-input-wrapper" class="clielo-input-wrapper">
+                        <input type="file" id="clielo-file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none">
+                        <button type="button" id="clielo-attach-btn" title="<?php esc_attr_e( 'Envoyer une image', 'clielo' ); ?>" style="background:none;border:none;cursor:pointer;padding:4px 6px;color:#9ca3af;flex-shrink:0;font-size:16px;line-height:1">📎</button>
                         <textarea id="clielo-input" class="clielo-input" placeholder="<?php esc_attr_e( 'Votre message...', 'clielo' ); ?>" rows="1" maxlength="1000"></textarea>
+                        <button type="button" id="clielo-mic-btn" title="<?php esc_attr_e( 'Message vocal', 'clielo' ); ?>" style="background:none;border:none;cursor:pointer;padding:4px 6px;color:#9ca3af;flex-shrink:0;font-size:16px;line-height:1">🎤</button>
                         <button type="button" id="clielo-send" class="clielo-send" style="background:var(--clielo-chat-btn-bg)">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2Z"></path></svg>
                         </button>
@@ -668,6 +677,14 @@ class Clielo_Front {
             var backBtn     = document.getElementById('clielo-back');
             var headerTitle = document.getElementById('clielo-header-title');
             var chatForm    = document.getElementById('clielo-form');
+            var fileInput   = document.getElementById('clielo-file-input');
+            var attachBtn   = document.getElementById('clielo-attach-btn');
+            var micBtn      = document.getElementById('clielo-mic-btn');
+            var recBar      = document.getElementById('clielo-rec-bar');
+            var recTimer    = document.getElementById('clielo-rec-timer');
+            var recStop     = document.getElementById('clielo-rec-stop');
+            var recCancel   = document.getElementById('clielo-rec-cancel');
+            var inputWrap   = document.getElementById('clielo-input-wrapper');
 
             if(!btn || !box || !msgs) return;
 
@@ -675,6 +692,14 @@ class Clielo_Front {
             var selectedClientId = 0;
             var sfOrderCollapsed = false;
             var sfTodoCollapsed  = false;
+
+            /* ── Média chat : enregistrement ─────────── */
+            var mediaRecorder = null;
+            var recChunks     = [];
+            var recInterval   = null;
+            var recSecs       = 0;
+            var MAX_REC_SECS  = 180;
+            var willUpload    = false;
 
             /* ── Toggle popup ────────────────────────── */
             function markSeen(){
@@ -1300,6 +1325,100 @@ class Clielo_Front {
                 });
             }
 
+            /* ── Attach image ─────────────────────── */
+            if(attachBtn && fileInput){
+                attachBtn.addEventListener('click', function(){
+                    if(C.is_admin && !selectedClientId) return;
+                    fileInput.click();
+                });
+                fileInput.addEventListener('change', function(){
+                    var file = fileInput.files && fileInput.files[0];
+                    if(!file) return;
+                    fileInput.value = '';
+                    uploadChatMedia(file, 'image', file.name);
+                });
+            }
+
+            /* ── Voice recording ──────────────────── */
+            if(micBtn){
+                micBtn.addEventListener('click', function(){
+                    if(C.is_admin && !selectedClientId) return;
+                    if(mediaRecorder && mediaRecorder.state === 'recording') return;
+                    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+                        showToast('<?php echo esc_js( __( 'Microphone non disponible sur ce navigateur.', 'clielo' ) ); ?>', 'error');
+                        return;
+                    }
+                    navigator.mediaDevices.getUserMedia({audio:true})
+                    .then(function(stream){
+                        recChunks = [];
+                        recSecs   = 0;
+                        if(recTimer) recTimer.textContent = '0:00';
+                        if(recBar)   { recBar.style.display = 'flex'; }
+                        if(inputWrap){ inputWrap.style.visibility = 'hidden'; }
+                        micBtn.disabled = true;
+
+                        var mimeType = (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))
+                            ? 'audio/webm;codecs=opus' : 'audio/webm';
+                        mediaRecorder = new MediaRecorder(stream, {mimeType: mimeType});
+
+                        mediaRecorder.ondataavailable = function(e){
+                            if(e.data && e.data.size > 0) recChunks.push(e.data);
+                        };
+
+                        mediaRecorder.onstop = function(){
+                            stream.getTracks().forEach(function(t){ t.stop(); });
+                            clearInterval(recInterval);
+                            recInterval = null;
+                            if(recBar)   { recBar.style.display = 'none'; }
+                            if(inputWrap){ inputWrap.style.visibility = ''; }
+                            micBtn.disabled = false;
+
+                            if(willUpload && recChunks.length > 0){
+                                var blob = new Blob(recChunks, {type: 'audio/webm'});
+                                uploadChatMedia(blob, 'audio', 'voice-'+Date.now()+'.webm');
+                            }
+                            recChunks  = [];
+                            willUpload = false;
+                            mediaRecorder = null;
+                        };
+
+                        mediaRecorder.start(1000);
+
+                        recInterval = setInterval(function(){
+                            recSecs++;
+                            var m = Math.floor(recSecs / 60);
+                            var s = recSecs % 60;
+                            if(recTimer) recTimer.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+                            if(recSecs >= MAX_REC_SECS && mediaRecorder && mediaRecorder.state === 'recording'){
+                                willUpload = true;
+                                mediaRecorder.stop();
+                            }
+                        }, 1000);
+                    })
+                    .catch(function(){
+                        showToast('<?php echo esc_js( __( 'Microphone non accessible.', 'clielo' ) ); ?>', 'error');
+                    });
+                });
+            }
+
+            if(recStop){
+                recStop.addEventListener('click', function(){
+                    if(mediaRecorder && mediaRecorder.state === 'recording'){
+                        willUpload = true;
+                        mediaRecorder.stop();
+                    }
+                });
+            }
+
+            if(recCancel){
+                recCancel.addEventListener('click', function(){
+                    if(mediaRecorder && mediaRecorder.state === 'recording'){
+                        willUpload = false;
+                        mediaRecorder.stop();
+                    }
+                });
+            }
+
             function doSend(){
                 var msg = input.value.trim();
                 if(!msg) return;
@@ -1325,6 +1444,49 @@ class Clielo_Front {
                     }
                 })
                 .finally(function(){ send.disabled = false; input.focus(); });
+            }
+
+            /* ── Upload média ────────────────────────── */
+            function uploadChatMedia(fileOrBlob, type, filename){
+                var fd = new FormData();
+                fd.append('action','clielo_chat_upload');
+                fd.append('nonce',C.nonce);
+                fd.append('post_id',C.post_id);
+                fd.append('type',type);
+                fd.append('file',fileOrBlob,filename);
+                if(C.is_admin) fd.append('client_id',selectedClientId);
+
+                fetch(C.ajax_url,{method:'POST',body:fd})
+                .then(function(r){return r.json();})
+                .then(function(res){
+                    if(res.success){
+                        rmEmpty();
+                        res.data.is_mine = true;
+                        addMsg(res.data);
+                        scrollEnd();
+                    } else {
+                        showToast((res.data&&res.data.message)||C.i18n.error,'error');
+                    }
+                })
+                .catch(function(){ showToast(C.i18n.error,'error'); });
+            }
+
+            /* ── Render message content ───────────── */
+            function renderMsgContent(raw){
+                if(!raw) return '';
+                var imgM = raw.match(/^\[CLIELO_IMG:(https?:\/\/[^\]]+)\]$/);
+                if(imgM){
+                    return '<a href="'+esc(imgM[1])+'" target="_blank" rel="noopener"><img src="'+esc(imgM[1])+'" style="max-width:200px;max-height:200px;border-radius:8px;display:block;cursor:pointer" loading="lazy"></a>';
+                }
+                var audM = raw.match(/^\[CLIELO_AUDIO:(https?:\/\/[^\]]+)\]$/);
+                if(audM){
+                    return '<audio controls src="'+esc(audM[1])+'" style="max-width:220px;display:block"></audio>';
+                }
+                var parts = raw.split(/(https?:\/\/[^\s<>"']+)/g);
+                return parts.map(function(p,i){
+                    if(i%2===1) return '<a href="'+esc(p)+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">'+esc(p)+'</a>';
+                    return esc(p).replace(/\n/g,'<br>');
+                }).join('');
             }
 
             /* ── Load ────────────────────────────────── */
@@ -1459,7 +1621,7 @@ class Clielo_Front {
                     '<div class="clielo-avatar"><img src="'+esc(m.avatar)+'" alt="'+esc(m.display_name)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover"></div>'+
                     '<div class="clielo-bubble-wrap">'+
                         (!mine?'<div class="clielo-username">'+esc(m.display_name)+'</div>':'')+
-                        '<div class="clielo-bubble" style="'+bubbleStyle+'">'+esc(m.message).replace(/\n/g,'<br>')+'</div>'+
+                        '<div class="clielo-bubble" style="'+bubbleStyle+'">'+renderMsgContent(m.message)+'</div>'+
                         '<div class="clielo-time">'+fmtTime(m.created_at)+'</div>'+
                     '</div>';
                 msgs.appendChild(el);
