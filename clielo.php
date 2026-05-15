@@ -143,6 +143,11 @@ add_action( 'admin_init', function () {
     if ( ! wp_next_scheduled( 'clielo_daily_payments' ) ) {
         wp_schedule_event( strtotime( 'tomorrow 08:00:00' ), 'daily', 'clielo_daily_payments' );
     }
+
+    // Migration ponctuelle : factures manquantes pour commandes passées via devis (avant mai 2026)
+    if ( clielo_is_premium() && class_exists( 'Clielo_Invoices' ) ) {
+        Clielo_Invoices::maybe_fix_missing_quote_invoices();
+    }
 } );
 
 // Avertissement si WP-Cron est désactivé (envoi automatique des paiements ne fonctionnera pas)

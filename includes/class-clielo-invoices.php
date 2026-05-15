@@ -2728,4 +2728,111 @@ class Clielo_Invoices {
         endif; ?>
         <?php
     }
+
+    /* ================================================================
+     *  Migration ponctuelle : factures manquantes pour commandes via devis
+     * ================================================================ */
+
+    /**
+     * Crée rétroactivement les factures manquantes pour les commandes payées
+     * via le flux devis, avant le déploiement du correctif (mai 2026).
+     *
+     * Déclenchée une seule fois via admin_init (option clielo_fix_quote_invoices_v1).
+     */
+    public static function maybe_fix_missing_quote_invoices(): void {
+        if ( get_option( 'clielo_fix_quote_invoices_v1' ) ) {
+            return;
+        }
+
+        if ( ! class_exists( 'Clielo_Payments' ) || ! class_exists( 'Clielo_Orders' ) ) {
+            return;
+        }
+
+        global $wpdb;
+
+        $order_table   = Clielo_Orders::table_name();
+        $invoice_table = self::invoices_table_name();
+
+        // Commandes payées via Stripe (stripe_payment_intent non-vide) avec un DEVIS
+        // mais sans facture de paiement (non-quote, non-cancelled).
+        // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $affected = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            "SELECT o.*
+             FROM {$order_table} o
+             WHERE o.stripe_payment_intent != ''
+               AND o.stripe_payment_intent IS NOT NULL
+               AND o.status IN ('started','completed','revision','accepted')
+               AND EXISTS (
+                   SELECT 1 FROM {$invoice_table} qi
+                   WHERE qi.order_id = o.id AND qi.invoice_type = 'quote'
+               )
+               AND NOT EXISTS (
+                   SELECT 1 FROM {$invoice_table} pi
+                   WHERE pi.order_id = o.id
+                     AND pi.invoice_type != 'quote'
+                     AND pi.status != 'cancelled'
+               )"
+        );
+        // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+        if ( empty( $affected ) ) {
+            update_option( 'clielo_fix_quote_invoices_v1', '1' );
+            return;
+        }
+
+        foreach ( $affected as $order ) {
+            $order_id = (int) $order->id;
+            $post_id  = (int) $order->post_id;
+
+            // Lire le vrai mode de paiement depuis les méta du service (source de vérité)
+            $real_mode         = get_post_meta( $post_id, '_clielo_payment_mode', true ) ?: 'single';
+            $installments_count = (int) ( get_post_meta( $post_id, '_clielo_installments_count', true ) ?: 3 );
+
+            if ( $real_mode !== 'single' && $order->payment_mode !== $real_mode ) {
+                // Corriger le mode de paiement stocké dans la commande
+                $deposit_percent = ( $real_mode === 'deposit' ) ? 50 : ( $real_mode === 'installments' ? 40 : 100 );
+                $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+                    $order_table,
+                    [
+                        'payment_mode'       => $real_mode,
+                        'deposit_percent'    => $deposit_percent,
+                        'installments_count' => $installments_count,
+                    ],
+                    [ 'id' => $order_id ],
+                    [ '%s', '%d', '%d' ],
+                    [ '%d' ]
+                );
+            }
+
+            if ( $real_mode === 'single' ) {
+                // Mode unique : générer la facture complète
+                self::on_order_accepted( $order_id, Clielo_Orders::STATUS_ACCEPTED, (string) $order->status, (int) $order->client_id );
+            } else {
+                // Mode non-single : créer l'échéancier si manquant, puis la facture d'acompte
+                $schedule = Clielo_Payments::get_schedule_for_order( $order_id );
+                if ( empty( $schedule ) ) {
+                    Clielo_Payments::create_schedule_for_order( $order_id );
+                    $schedule = Clielo_Payments::get_schedule_for_order( $order_id );
+                }
+
+                foreach ( $schedule as $row ) {
+                    $is_upfront = ( $row->type === 'upfront' )
+                        || ( $real_mode === 'monthly' && (int) $row->installment_no === 1 );
+                    if ( $is_upfront ) {
+                        $inv_type = ( $real_mode === 'monthly' ) ? 'mensualite' : 'acompte';
+                        self::create_partial_invoice(
+                            $order_id,
+                            floatval( $row->amount_ttc ),
+                            $inv_type,
+                            (int) $row->id,
+                            (int) $row->installment_no
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+
+        update_option( 'clielo_fix_quote_invoices_v1', '1' );
+    }
 }
