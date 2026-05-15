@@ -341,7 +341,7 @@ class Clielo_Orders {
     /**
      * Effectue une transition de statut.
      */
-    public static function transition_status( int $order_id, string $new_status, int $acting_user_id, int $revision_delay = 0 ): bool {
+    public static function transition_status( int $order_id, string $new_status, int $acting_user_id, int $revision_delay = 0, string $revision_note = '' ): bool {
         $order = self::get_order( $order_id );
         if ( ! $order ) {
             return false;
@@ -385,7 +385,7 @@ class Clielo_Orders {
         // Poster un message système dans le chat, scopé au client
         $actor      = get_userdata( $acting_user_id );
         $actor_name = $actor ? $actor->display_name : __( 'Utilisateur', 'clielo' );
-        $message    = self::format_status_message( $new_status, $order, $actor_name, $old_status );
+        $message    = self::format_status_message( $new_status, $order, $actor_name, $old_status, $revision_note );
 
         if ( ! empty( $message ) ) {
             Clielo_DB::insert_message( (int) $order->post_id, 0, $message, (int) $order->client_id );
@@ -442,7 +442,7 @@ class Clielo_Orders {
     /**
      * Génère le message système pour un changement de statut.
      */
-    public static function format_status_message( string $new_status, object $order, string $actor_name, string $old_status = '' ): string {
+    public static function format_status_message( string $new_status, object $order, string $actor_name, string $old_status = '', string $revision_note = '' ): string {
         $order_num = '#CMD-' . (int) $order->id;
 
         switch ( $new_status ) {
@@ -588,7 +588,7 @@ class Clielo_Orders {
                 );
 
             case self::STATUS_REVISION:
-                return sprintf(
+                $rev_msg = sprintf(
                     "--- %s %s ---\n%s",
                     $order_num,
                     __( 'Retouche demandée', 'clielo' ),
@@ -598,6 +598,11 @@ class Clielo_Orders {
                         $actor_name
                     )
                 );
+                if ( $revision_note !== '' ) {
+                    /* translators: %s: revision note text from the client */
+                    $rev_msg .= "\n" . sprintf( __( '💬 Commentaire : %s', 'clielo' ), $revision_note );
+                }
+                return $rev_msg;
 
             case self::STATUS_ACCEPTED:
                 return sprintf(
@@ -924,28 +929,8 @@ class Clielo_Orders {
             }
         }
 
-        // Note de retouche : insérée AVANT la transition pour qu'elle apparaisse avant le message système.
-        if ( $new_status === self::STATUS_REVISION && $revision_note !== '' ) {
-            global $wpdb;
-            $msg_table = $wpdb->prefix . 'clielo_messages';
-            $order_tmp = self::get_order( $order_id );
-            if ( $order_tmp ) {
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-                $wpdb->insert(
-                    $msg_table,
-                    [
-                        'post_id'    => (int) $order_tmp->post_id,
-                        'client_id'  => $user_id,
-                        'user_id'    => $user_id,
-                        'message'    => $revision_note,
-                        'created_at' => current_time( 'mysql' ),
-                    ],
-                    [ '%d', '%d', '%d', '%s', '%s' ]
-                );
-            }
-        }
-
-        $result = self::transition_status( $order_id, $new_status, $user_id, $revision_delay );
+        // La note de retouche est fusionnée dans le message système par transition_status() → format_status_message().
+        $result = self::transition_status( $order_id, $new_status, $user_id, $revision_delay, $revision_note );
 
         if ( ! $result ) {
             wp_send_json_error( [ 'message' => __( 'Transition non autorisée.', 'clielo' ) ], 403 );
