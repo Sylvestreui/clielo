@@ -477,6 +477,10 @@ class Clielo_Payments {
         if ( $new_status !== Clielo_Orders::STATUS_ACCEPTED ) {
             return;
         }
+        // Ne rien faire si Stripe n'est pas configuré : l'admin gère le solde manuellement
+        if ( ! class_exists( 'Clielo_Stripe' ) || ! Clielo_Stripe::is_enabled() ) {
+            return;
+        }
         $order = Clielo_Orders::get_order( $order_id );
         if ( ! $order || $order->payment_mode !== 'deposit' ) {
             return;

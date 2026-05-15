@@ -588,6 +588,7 @@ class Clielo_Front {
                 'pi_empty'              => __( 'Veuillez renseigner le lien ou le texte.', 'clielo' ),
                 'pm_single'             => __( 'Paiement unique (100 %)', 'clielo' ),
                 'pm_deposit'            => __( 'Acompte (50 %)', 'clielo' ),
+                'pm_deposit_balance'    => __( 'Solde à régler (50 %)', 'clielo' ),
                 'pm_installments'       => __( '1er versement (40 %)', 'clielo' ),
                 'pm_monthly'            => __( '1re mensualité', 'clielo' ),
             ],
@@ -1934,6 +1935,27 @@ class Clielo_Front {
                         var completeLabel = C.i18n.complete_order + (todosPct >= 0 ? ' (' + todosPct + '%)' : '');
                         var completeColor = (todosPct >= 0 && todosPct < 100) ? '#f59e0b' : '#10b981';
                         html += makeBtn(order.id,'completed',completeLabel,completeColor);
+                    } else if(order.status==='completed' && !C.stripe_enabled && order.payment_mode && order.payment_mode !== 'single'){
+                        // Mode non-single, Stripe désactivé : formulaire solde manuel
+                        var pm3 = order.payment_mode;
+                        var tot3 = parseFloat(order.total_price)||0;
+                        var inst3 = parseInt(order.installments_count)||3;
+                        var balAmt = pm3==='deposit' ? Math.round(tot3*0.5*100)/100
+                                   : pm3==='installments' ? Math.round(tot3*0.6*100)/100
+                                   : (inst3>0 ? Math.round(tot3/inst3*100)/100 : tot3);
+                        var balLbl = pm3==='deposit' ? C.i18n.pm_deposit_balance : C.i18n.pm_monthly;
+                        var balAmtStr = balAmt.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+                        html += '<div data-pi-form="'+order.id+'" style="border-top:1px solid #e5e7eb;margin-top:8px;padding-top:8px;width:100%">';
+                        html += '<div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:6px">💳 '+esc(balLbl)+' — '+balAmtStr+'</div>';
+                        html += '<div style="display:flex;gap:12px;margin-bottom:6px;font-size:11px">';
+                        html += '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="pi_type_'+order.id+'" value="link" checked style="margin:0"> '+esc(C.i18n.pi_link)+'</label>';
+                        html += '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="pi_type_'+order.id+'" value="text" style="margin:0"> '+esc(C.i18n.pi_text)+'</label>';
+                        html += '</div>';
+                        html += '<div style="display:flex;gap:6px">';
+                        html += '<input type="text" data-pi-input="'+order.id+'" placeholder="'+esc(C.i18n.pi_placeholder_link)+'" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:11px;font-family:inherit">';
+                        html += '<button data-pi-send="'+order.id+'" style="padding:4px 10px;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;background:#7c3aed;cursor:pointer;white-space:nowrap">'+esc(C.i18n.pi_send)+'</button>';
+                        html += '</div>';
+                        html += '</div>';
                     }
                 } else {
                     if(order.status==='quote'){

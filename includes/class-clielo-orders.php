@@ -1130,7 +1130,8 @@ class Clielo_Orders {
         }
 
         $order = self::get_order( $order_id );
-        if ( ! $order || $order->status !== self::STATUS_PENDING ) {
+        $allowed_statuses = [ self::STATUS_PENDING, self::STATUS_STARTED, self::STATUS_COMPLETED, self::STATUS_REVISION ];
+        if ( ! $order || ! in_array( $order->status, $allowed_statuses, true ) ) {
             wp_send_json_error( [ 'message' => __( 'Commande introuvable ou statut invalide.', 'clielo' ) ], 404 );
         }
 
