@@ -661,6 +661,9 @@ class Clielo_Front {
                 </div>
             <?php endif; ?>
         </div>
+        <div id="clielo-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999999;align-items:center;justify-content:center;cursor:zoom-out">
+            <img id="clielo-lightbox-img" src="" alt="" style="max-width:90vw;max-height:90vh;border-radius:8px;object-fit:contain;cursor:default">
+        </div>
 
         <?php ob_start(); ?>(function(){
             var C = <?php echo $js_config; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode() ensures safe JSON output ?>;
@@ -689,8 +692,27 @@ class Clielo_Front {
             var recStop     = document.getElementById('clielo-rec-stop');
             var recCancel   = document.getElementById('clielo-rec-cancel');
             var inputWrap   = document.getElementById('clielo-input-wrapper');
+            var lightbox    = document.getElementById('clielo-lightbox');
+            var lightboxImg = document.getElementById('clielo-lightbox-img');
 
             if(!btn || !box || !msgs) return;
+
+            /* ── Lightbox ────────────────────────────── */
+            if(msgs && lightbox && lightboxImg){
+                msgs.addEventListener('click', function(e){
+                    var src = e.target.getAttribute('data-lightbox-src');
+                    if(src){
+                        e.stopPropagation();
+                        lightboxImg.src = src;
+                        lightbox.style.display = 'flex';
+                    }
+                });
+                lightbox.addEventListener('click', function(e){
+                    e.stopPropagation();
+                    lightbox.style.display = 'none';
+                    lightboxImg.src = '';
+                });
+            }
 
             /* ── Admin : état conversation ────────────── */
             var selectedClientId = 0;
@@ -1480,7 +1502,7 @@ class Clielo_Front {
                 if(!raw) return '';
                 var imgM = raw.match(/^\[CLIELO_IMG:(https?:\/\/[^\]]+)\]$/);
                 if(imgM){
-                    return '<a href="'+esc(imgM[1])+'" target="_blank" rel="noopener"><img src="'+esc(imgM[1])+'" style="max-width:200px;max-height:200px;border-radius:8px;display:block;cursor:pointer" loading="lazy"></a>';
+                    return '<img src="'+esc(imgM[1])+'" data-lightbox-src="'+esc(imgM[1])+'" style="max-width:200px;max-height:200px;border-radius:8px;display:block;cursor:zoom-in" loading="lazy">';
                 }
                 var audM = raw.match(/^\[CLIELO_AUDIO:(https?:\/\/[^\]]+)\]$/);
                 if(audM){
