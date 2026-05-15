@@ -1144,6 +1144,8 @@ class Clielo_Stripe {
 
         $order = Clielo_Orders::get_order( $result_id );
 
+        // Notifier les admins comme pour une nouvelle commande (le devis est maintenant payé)
+        do_action( 'clielo_order_created', $result_id, $post_id, $client_id );
         do_action( 'clielo_order_status_changed', $result_id, 'started', 'pending', 0 );
 
         // Échéancier + facture partielle pour les modes non-single
