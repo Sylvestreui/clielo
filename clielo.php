@@ -3,7 +3,7 @@
  * Plugin Name: Clielo
  * Plugin URI:  https://github.com/SylvestreUi/clielo
  * Description: Service management plugin with integrated chat, order tracking, invoicing, Stripe payments and client notifications for any Custom Post Type.
- * Version:     1.2.4
+ * Version:     1.2.5
  * Author:      SylvestreUi
  * Author URI:  https://github.com/SylvestreUi
  * License:     GPL-2.0-or-later
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'CLIELO_VERSION', '1.2.4' );
+define( 'CLIELO_VERSION', '1.2.5' );
 define( 'CLIELO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CLIELO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
@@ -45,7 +45,7 @@ if ( ! function_exists( 'clielo_fs' ) ) {
                 'has_paid_plans'      => true,
                 'is_org_compliant'    => true,
                 'trial'               => array(
-                    'days'               => 14,
+                    'days'               => 7,
                     'is_require_payment' => false,
                 ),
                 'menu'                => array(

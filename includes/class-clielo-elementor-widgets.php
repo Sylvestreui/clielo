@@ -451,6 +451,15 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
             'default'      => 'yes',
         ] );
 
+        $this->add_control( 'show_quote_button', [
+            'label'        => __( 'Afficher bouton devis', 'clielo' ),
+            'type'         => \Elementor\Controls_Manager::SWITCHER,
+            'label_on'     => __( 'Oui', 'clielo' ),
+            'label_off'    => __( 'Non', 'clielo' ),
+            'return_value' => 'yes',
+            'default'      => 'yes',
+        ] );
+
         $this->add_control( 'show_chat_bubble', [
             'label'        => __( 'Afficher bouton chat flottant', 'clielo' ),
             'type'         => \Elementor\Controls_Manager::SWITCHER,
@@ -872,6 +881,42 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
 
         $this->end_controls_section();
 
+        /* ── Style — Bouton Devis ── */
+        $this->start_controls_section( 'section_style_quote_btn', [
+            'label' => __( 'Bouton Devis', 'clielo' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ] );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [ 'name' => 'quote_btn_typography', 'selector' => '{{WRAPPER}} #clielo-sc-quote' ]
+        );
+
+        $this->add_control( 'quote_btn_border_color', [
+            'label'     => __( 'Couleur bordure / texte', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-quote-btn-border: {{VALUE}}; --clielo-quote-btn-color: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'quote_btn_bg', [
+            'label'     => __( 'Fond du bouton', 'clielo' ),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '',
+            'selectors' => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-quote-btn-bg: {{VALUE}};' ],
+        ] );
+
+        $this->add_control( 'quote_btn_border_radius', [
+            'label'      => __( 'Rayon des coins', 'clielo' ),
+            'type'       => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range'      => [ 'px' => [ 'min' => 0, 'max' => 32 ] ],
+            'default'    => [ 'size' => 8, 'unit' => 'px' ],
+            'selectors'  => [ '{{WRAPPER}} .clielo-sc-wrapper' => '--clielo-quote-btn-radius: {{SIZE}}{{UNIT}};' ],
+        ] );
+
+        $this->end_controls_section();
+
         /* ── Style — Récapitulatif ── */
         $this->start_controls_section( 'section_style_recap', [
             'label' => __( 'Récapitulatif', 'clielo' ),
@@ -1084,6 +1129,7 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
         $post_id           = $this->get_post_id();
         $color             = ! empty( $s['color_override'] ) ? sanitize_hex_color( $s['color_override'] ) : '';
         $show_order_button = 'yes' === ( $s['show_order_button'] ?? 'yes' );
+        $show_quote_button = 'yes' === ( $s['show_quote_button'] ?? 'yes' );
         $show_chat_bubble  = 'yes' === ( $s['show_chat_bubble'] ?? 'yes' );
 
         $args = [
@@ -1092,6 +1138,10 @@ class Clielo_Widget_Service_Options extends Clielo_Widget_Base {
         ];
         if ( $color ) {
             $args['color'] = $color;
+        }
+
+        if ( ! $show_quote_button ) {
+            echo '<style>#clielo-sc-quote{display:none !important}</style>';
         }
 
         if ( ! $show_chat_bubble ) {

@@ -3,7 +3,7 @@ Contributors: sylvestreui
 Tags: chat, orders, invoices, payments, client
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -71,6 +71,10 @@ Yes. You can change the accent colour and chat button position (bottom-left, bot
 
 Four modes per service: single payment, 50% deposit + balance on delivery, installments (40% upfront + N monthly payments), or pure monthly subscription.
 
+= My site already has an account system (WooCommerce, membership plugin…). Will it conflict with Clielo? =
+
+No. The `[clielo_account]` shortcode (login/avatar widget for your header) is entirely optional. If your site already manages user accounts with another plugin, simply skip it and add a menu link pointing to the page that contains the `[clielo_my_account]` shortcode. Your users will access their Clielo dashboard (orders, invoices, chat history) directly from that link, without any conflict with your existing account system.
+
 = Where is the webhook URL for Stripe? =
 
 Go to **Clielo → Stripe** in your admin. The webhook URL is displayed there — copy it into your Stripe Dashboard under Developers → Webhooks. Select the `checkout.session.completed` event.
@@ -94,10 +98,19 @@ No data is transmitted to external services in the free plan without explicit co
 
 == Changelog ==
 
+= 1.2.5 =
+* Trial period reduced from 14 to 7 days (synced with Freemius dashboard)
+
 = 1.2.4 =
 * Chat: image sharing — clients and admin can send images (auto-resized to 1200px, 5 MB max)
-* Chat: voice messages — record and send audio clips up to 3 minutes (🎤 button)
+* Chat: voice messages — record and send audio clips up to 3 minutes (mic button)
 * Chat: URLs in messages are now clickable links
+* Chat: image lightbox — clicking a thumbnail opens a full-screen overlay; click again to close
+* Chat: attach and mic buttons use flat SVG stroke icons, correctly aligned with the input field
+* Fix: recent messages were disappearing after quote generation or order transitions (query now loads latest 100 messages)
+* Fix: chat polling interval reduced from 5 s to 2 s for near-real-time updates
+* Elementor widget "Options de service": add "Show quote button" toggle (Content tab)
+* Elementor widget "Options de service": add "Bouton Devis" style section — typography, border/text color, background, border radius
 
 = 1.2.3 =
 * Quote flow: client can now view the DEVIS document directly from the chat order bar ("Voir le devis" button)
