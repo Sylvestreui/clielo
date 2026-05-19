@@ -1682,11 +1682,25 @@ class Clielo_Front {
                 html += '<span style="font-size:9px;color:#aaa">' + arrow + '</span></div>';
                 if(!sfOrderCollapsed) html += contentHtml;
 
-                // Sauvegarder les valeurs des inputs de délai retouche avant re-render
+                // Sauvegarder l'état avant re-render
                 var savedDelays = {};
                 orderBar.querySelectorAll('[data-revision-delay-for]').forEach(function(inp){
                     var v = inp.value.trim();
                     if(v) savedDelays[inp.dataset.revisionDelayFor] = v;
+                });
+                var savedPiType = {}, savedPiValue = {};
+                orderBar.querySelectorAll('[data-pi-form]').forEach(function(form){
+                    var oid = form.dataset.piForm;
+                    var inp = form.querySelector('[data-pi-input="'+oid+'"]');
+                    if(inp) savedPiValue[oid] = inp.value;
+                    form.querySelectorAll('input[name="pi_type_'+oid+'"]').forEach(function(r){
+                        if(r.checked) savedPiType[oid] = r.value;
+                    });
+                });
+                var savedDetailOpen = {};
+                orderBar.querySelectorAll('[data-order-detail]').forEach(function(btn){
+                    var content = btn.nextElementSibling;
+                    if(content) savedDetailOpen[btn.dataset.orderDetail] = content.style.display !== 'none';
                 });
 
                 orderBar.innerHTML = html;
@@ -1696,6 +1710,25 @@ class Clielo_Front {
                 Object.keys(savedDelays).forEach(function(oid){
                     var inp = orderBar.querySelector('[data-revision-delay-for="'+oid+'"]');
                     if(inp) inp.value = savedDelays[oid];
+                });
+                Object.keys(savedPiType).forEach(function(oid){
+                    var r = orderBar.querySelector('input[name="pi_type_'+oid+'"][value="'+savedPiType[oid]+'"]');
+                    if(r) r.checked = true;
+                });
+                Object.keys(savedPiValue).forEach(function(oid){
+                    var inp = orderBar.querySelector('[data-pi-input="'+oid+'"]');
+                    if(inp && savedPiValue[oid]) inp.value = savedPiValue[oid];
+                });
+                Object.keys(savedDetailOpen).forEach(function(key){
+                    if(!savedDetailOpen[key]) return;
+                    var btn = orderBar.querySelector('[data-order-detail="'+key+'"]');
+                    if(!btn) return;
+                    var content = btn.nextElementSibling;
+                    if(content){
+                        content.style.display = 'block';
+                        var arrow = btn.querySelector('.clielo-toggle-arrow');
+                        if(arrow) arrow.style.transform = 'rotate(-90deg)';
+                    }
                 });
 
                 var orderToggle = orderBar.querySelector('[data-sf-toggle="order"]');

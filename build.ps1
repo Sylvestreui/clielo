@@ -34,6 +34,8 @@ $exclude = @(
     "build.ps1",
     "list-zip.ps1",
     "dist",
+    "svn",
+    "sylvestre-site",
     "composer.json",
     "composer.lock",
     "phpcs.xml",
