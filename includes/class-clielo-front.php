@@ -1663,6 +1663,12 @@ class Clielo_Front {
                 var o = C.active_order;
                 if(!o){ orderBar.style.display = 'none'; return; }
 
+                // Ne pas reconstruire si l'utilisateur est en train de remplir le formulaire de paiement
+                var activeEl = document.activeElement;
+                if(activeEl && orderBar.contains(activeEl) && activeEl.dataset && activeEl.dataset.piInput !== undefined){
+                    return;
+                }
+
                 var contentHtml = '';
                 if(C.is_admin && Array.isArray(o)){
                     // Admin dans une conversation : filtrer par client sélectionné
@@ -1716,7 +1722,12 @@ class Clielo_Front {
                 });
                 Object.keys(savedPiType).forEach(function(oid){
                     var r = orderBar.querySelector('input[name="pi_type_'+oid+'"][value="'+savedPiType[oid]+'"]');
-                    if(r) r.checked = true;
+                    if(r){
+                        r.checked = true;
+                        // Mettre à jour le placeholder manuellement (change event non déclenché)
+                        var inp2 = orderBar.querySelector('[data-pi-input="'+oid+'"]');
+                        if(inp2) inp2.placeholder = savedPiType[oid] === 'link' ? C.i18n.pi_placeholder_link : (C.i18n.pi_placeholder_text || '');
+                    }
                 });
                 Object.keys(savedPiValue).forEach(function(oid){
                     var inp = orderBar.querySelector('[data-pi-input="'+oid+'"]');
