@@ -1349,6 +1349,9 @@ class Clielo_Front {
                     input.style.height = 'auto';
                     input.style.height = Math.min(input.scrollHeight, 120)+'px';
                 });
+                // Hauteur initiale correcte dès le chargement
+                input.style.height = 'auto';
+                input.style.height = Math.min(input.scrollHeight, 120)+'px';
             }
 
             /* ── Attach image ─────────────────────── */

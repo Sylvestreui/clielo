@@ -118,13 +118,16 @@
     font-family: inherit;
     resize: none !important;
     outline: none;
-    max-height: 120px;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 120px !important;
     line-height: 1.4;
     background: #fff !important;
     color: #333 !important;
     overflow: hidden !important;
     overflow-y: auto !important;
     scrollbar-width: none !important;
+    box-sizing: border-box !important;
 }
 
 .clielo-input::-webkit-scrollbar {
