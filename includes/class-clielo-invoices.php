@@ -1688,6 +1688,26 @@ class Clielo_Invoices {
         $color   = esc_attr( Clielo_Admin::get_color() );
         $nonce   = wp_create_nonce( 'clielo_nonce' );
         ?>
+        <style>
+            .clielo-clients-wrap{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+            .clielo-clients-list{flex:1;min-width:400px}
+            .clielo-clients-form{flex:0 0 380px}
+            .clielo-clients-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
+            .clielo-clients-table th{background:#f9f9f9;text-align:left;padding:10px 12px;font-size:12px;font-weight:600;color:#555;border-bottom:1px solid #e0e0e0}
+            .clielo-clients-table td{padding:10px 12px;font-size:13px;color:#333;border-bottom:1px solid #f5f5f5}
+            .clielo-clients-table tr:last-child td{border-bottom:none}
+            .clielo-cl-form-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+            .clielo-cl-form-card h3{margin:0 0 16px;font-size:15px;font-weight:700;color:#222}
+            .clielo-cl-field{margin-bottom:12px}
+            .clielo-cl-field label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:3px}
+            .clielo-cl-field input,.clielo-cl-field textarea{width:100%;box-sizing:border-box}
+            .clielo-cl-field textarea{height:60px}
+            .clielo-cl-row{display:flex;gap:10px}
+            .clielo-cl-row .clielo-cl-field{flex:1}
+            .clielo-cl-actions a{cursor:pointer;font-size:12px;margin-right:8px;text-decoration:none}
+            .clielo-cl-actions .edit{color:#0073aa}
+            .clielo-cl-actions .delete{color:#dc3545}
+        </style>
         <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <span class="dashicons dashicons-groups" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
