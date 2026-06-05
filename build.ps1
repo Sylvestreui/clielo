@@ -8,7 +8,7 @@ param(
 )
 
 $pluginSlug    = "clielo"
-$pluginVersion = "1.0.0"
+$pluginVersion = "1.2.9"
 $rootDir       = $PSScriptRoot
 $distDir       = Join-Path $rootDir "dist"
 
@@ -31,6 +31,8 @@ $exclude = @(
     ".distignore",
     ".claude",
     ".mcp.json",
+    ".agents",
+    "skills-lock.json",
     "build.ps1",
     "list-zip.ps1",
     "dist",
