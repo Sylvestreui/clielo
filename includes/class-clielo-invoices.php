@@ -13,29 +13,34 @@ class Clielo_Invoices {
     const STATUS_CANCELLED = 'cancelled';
 
     public static function init(): void {
-        if ( ! clielo_is_premium() ) {
-            return;
-        }
-
         add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_admin_scripts' ] );
-        add_action( 'wp_ajax_clielo_generate_quote_doc', [ __CLASS__, 'ajax_generate_quote_doc' ] );
 
-        // Auto-génération de facture quand commande acceptée
-        add_action( 'clielo_order_status_changed', [ __CLASS__, 'on_order_accepted' ], 10, 4 );
+        // AJAX clients externes (gratuit)
+        add_action( 'wp_ajax_clielo_save_ext_client',   [ __CLASS__, 'ajax_save_client' ] );
+        add_action( 'wp_ajax_clielo_delete_ext_client', [ __CLASS__, 'ajax_delete_client' ] );
 
-        // AJAX admin
+        // AJAX factures — création/modification (gratuit pour clients externes, premium pour WP users)
+        add_action( 'wp_ajax_clielo_invoice_save',      [ __CLASS__, 'ajax_save_invoice' ] );
+        add_action( 'wp_ajax_clielo_invoice_update',    [ __CLASS__, 'ajax_update_invoice' ] );
         add_action( 'wp_ajax_clielo_invoice_validate',  [ __CLASS__, 'ajax_validate' ] );
         add_action( 'wp_ajax_clielo_invoice_mark_paid', [ __CLASS__, 'ajax_mark_paid' ] );
         add_action( 'wp_ajax_clielo_invoice_cancel',    [ __CLASS__, 'ajax_cancel' ] );
-        add_action( 'wp_ajax_clielo_invoice_save',      [ __CLASS__, 'ajax_save_invoice' ] );
-        add_action( 'wp_ajax_clielo_invoice_update',    [ __CLASS__, 'ajax_update_invoice' ] );
         add_action( 'wp_ajax_clielo_invoice_set_status', [ __CLASS__, 'ajax_set_status' ] );
-        add_action( 'wp_ajax_clielo_save_ext_client',   [ __CLASS__, 'ajax_save_client' ] );
-        add_action( 'wp_ajax_clielo_delete_ext_client', [ __CLASS__, 'ajax_delete_client' ] );
         add_action( 'wp_ajax_clielo_save_invoice_settings', [ __CLASS__, 'ajax_save_settings' ] );
+
+        // AJAX devis manuels (gratuit)
+        add_action( 'wp_ajax_clielo_save_quote',   [ __CLASS__, 'ajax_save_quote' ] );
+        add_action( 'wp_ajax_clielo_update_quote', [ __CLASS__, 'ajax_update_quote' ] );
+        add_action( 'wp_ajax_clielo_delete_quote', [ __CLASS__, 'ajax_delete_quote' ] );
 
         // AJAX frontend (vue client)
         add_action( 'wp_ajax_clielo_view_invoice', [ __CLASS__, 'ajax_client_view_invoice' ] );
+
+        // Premium uniquement : génération document devis depuis commande + auto-facture
+        if ( clielo_is_premium() ) {
+            add_action( 'wp_ajax_clielo_generate_quote_doc', [ __CLASS__, 'ajax_generate_quote_doc' ] );
+            add_action( 'clielo_order_status_changed', [ __CLASS__, 'on_order_accepted' ], 10, 4 );
+        }
     }
 
     /* ================================================================
@@ -137,6 +142,9 @@ class Clielo_Invoices {
             'invoice_prefix'  => 'FACT-',
             'invoice_start'   => 1,
             'invoice_padding' => 3,
+            'quote_prefix'    => 'DEVIS-',
+            'quote_start'     => 1,
+            'quote_padding'   => 3,
             'tax_rate'        => 20,
             'tax_notice'      => '',
             'payment_terms'   => __( 'Paiement à réception de facture.', 'clielo' ),
@@ -176,8 +184,11 @@ class Clielo_Invoices {
     private static function generate_quote_number(): string {
         global $wpdb;
 
-        $table  = self::invoices_table_name();
-        $prefix = 'DEVIS-';
+        $settings = self::get_settings();
+        $prefix   = $settings['quote_prefix'] ?: 'DEVIS-';
+        $start    = absint( $settings['quote_start'] ?? 1 );
+        $padding  = max( 1, absint( $settings['quote_padding'] ?? 3 ) );
+        $table    = self::invoices_table_name();
 
         // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $last = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
@@ -186,15 +197,15 @@ class Clielo_Invoices {
         ) );
         // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-        $seq = 1;
+        $seq = $start;
         if ( $last ) {
             $num = absint( substr( $last, strlen( $prefix ) ) );
-            if ( $num > 0 ) {
+            if ( $num >= $start ) {
                 $seq = $num + 1;
             }
         }
 
-        return $prefix . str_pad( $seq, 3, '0', STR_PAD_LEFT );
+        return $prefix . str_pad( $seq, $padding, '0', STR_PAD_LEFT );
     }
 
     public static function ajax_generate_quote_doc(): void {
@@ -233,25 +244,31 @@ class Clielo_Invoices {
         $base      = json_decode( $order->base_offer ?? '{}', true ) ?: [];
         $options   = json_decode( $order->selected_options ?? '[]', true ) ?: [];
 
+        // Prix personnalisés envoyés depuis la modale (mode hide_prices)
+        $custom_prices_raw = sanitize_text_field( wp_unslash( $_POST['custom_prices'] ?? '' ) );
+        $custom_prices     = $custom_prices_raw ? ( json_decode( $custom_prices_raw, true ) ?: [] ) : [];
+
         $service_name = get_the_title( (int) $order->post_id );
         $pack_name    = $base['name'] ?? '';
 
         $items = [];
         if ( $pack_name !== '' ) {
+            $pack_price = isset( $custom_prices['pack'] ) ? floatval( $custom_prices['pack'] ) : floatval( $base['price'] ?? 0 );
             $items[] = [
                 'service_name' => $service_name,
                 'description'  => $pack_name,
                 'quantity'     => 1,
-                'unit_price'   => floatval( $base['price'] ?? 0 ),
-                'total'        => floatval( $base['price'] ?? 0 ),
+                'unit_price'   => $pack_price,
+                'total'        => $pack_price,
             ];
         }
-        foreach ( $options as $opt ) {
+        foreach ( $options as $i => $opt ) {
+            $opt_price = isset( $custom_prices[ 'opt_' . $i ] ) ? floatval( $custom_prices[ 'opt_' . $i ] ) : floatval( $opt['price'] ?? 0 );
             $items[] = [
                 'description' => $opt['name'] ?? '',
                 'quantity'    => 1,
-                'unit_price'  => floatval( $opt['price'] ?? 0 ),
-                'total'       => floatval( $opt['price'] ?? 0 ),
+                'unit_price'  => $opt_price,
+                'total'       => $opt_price,
             ];
         }
 
@@ -393,9 +410,9 @@ class Clielo_Invoices {
         global $wpdb;
 
         $table = self::invoices_table_name();
-        $where = '';
+        $where = "WHERE invoice_type NOT IN ('quote', 'quote_request')";
         if ( $status && in_array( $status, [ self::STATUS_DRAFT, self::STATUS_PENDING, self::STATUS_VALIDATED, self::STATUS_PAID, self::STATUS_CANCELLED ], true ) ) {
-            $where = $wpdb->prepare( 'WHERE status = %s', $status );
+            $where .= $wpdb->prepare( ' AND status = %s', $status );
         }
 
         $limit = absint( $limit );
@@ -428,7 +445,7 @@ class Clielo_Invoices {
 
         $table  = self::invoices_table_name();
         // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table names are plugin-defined constants; queries use no user input.
-        $rows   = $wpdb->get_results( "SELECT status, COUNT(*) AS cnt FROM {$table} GROUP BY status" );
+        $rows   = $wpdb->get_results( "SELECT status, COUNT(*) AS cnt FROM {$table} WHERE invoice_type NOT IN ('quote', 'quote_request') GROUP BY status" );
         $counts = [ 'all' => 0 ];
 
         foreach ( [ self::STATUS_DRAFT, self::STATUS_PENDING, self::STATUS_VALIDATED, self::STATUS_PAID, self::STATUS_CANCELLED ] as $s ) {
@@ -550,7 +567,7 @@ class Clielo_Invoices {
     }
 
     public static function enqueue_admin_scripts( string $hook ): void {
-        if ( strpos( $hook, 'clielo-invoice' ) === false && strpos( $hook, 'clielo-clients' ) === false ) {
+        if ( strpos( $hook, 'clielo-invoice' ) === false && strpos( $hook, 'clielo-clients' ) === false && strpos( $hook, 'clielo-quote' ) === false ) {
             return;
         }
 
@@ -1060,6 +1077,10 @@ class Clielo_Invoices {
         $tax_rate      = floatval( $_POST['tax_rate'] ?? 20 );
         $notes         = sanitize_textarea_field( wp_unslash( $_POST['notes'] ?? '' ) );
         $save_status   = sanitize_text_field( wp_unslash( $_POST['save_status'] ?? self::STATUS_DRAFT ) );
+        $invoice_type  = sanitize_text_field( wp_unslash( $_POST['invoice_type'] ?? 'single' ) );
+        if ( ! in_array( $invoice_type, [ 'single', 'acompte', 'solde' ], true ) ) {
+            $invoice_type = 'single';
+        }
 
         // Construire les items
         $raw_items = wp_unslash( $_POST['items'] ?? [] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array items are sanitized individually in the foreach loop below.
@@ -1085,6 +1106,9 @@ class Clielo_Invoices {
             wp_send_json_error( [ 'message' => __( 'Ajoutez au moins un article.', 'clielo' ) ], 400 );
         }
 
+        if ( $client_type === 'wp' && ! clielo_is_premium() ) {
+            wp_send_json_error( [ 'message' => __( 'La facturation des clients WordPress nécessite le plan premium.', 'clielo' ) ], 403 );
+        }
         if ( $client_type === 'wp' && ! $client_id ) {
             wp_send_json_error( [ 'message' => __( 'Sélectionnez un client.', 'clielo' ) ], 400 );
         }
@@ -1113,6 +1137,7 @@ class Clielo_Invoices {
             'tax_amount'     => $tax_amount,
             'total'          => $total,
             'notes'          => $notes,
+            'invoice_type'   => $invoice_type,
             'created_at'     => current_time( 'mysql' ),
             'updated_at'     => current_time( 'mysql' ),
         ];
@@ -1159,6 +1184,10 @@ class Clielo_Invoices {
         $tax_rate      = floatval( $_POST['tax_rate'] ?? 20 );
         $notes         = sanitize_textarea_field( wp_unslash( $_POST['notes'] ?? '' ) );
         $save_status   = sanitize_text_field( wp_unslash( $_POST['save_status'] ?? self::STATUS_DRAFT ) );
+        $invoice_type  = sanitize_text_field( wp_unslash( $_POST['invoice_type'] ?? 'single' ) );
+        if ( ! in_array( $invoice_type, [ 'single', 'acompte', 'solde' ], true ) ) {
+            $invoice_type = 'single';
+        }
 
         $raw_items = wp_unslash( $_POST['items'] ?? [] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array items are sanitized individually in the foreach loop below.
         $items     = [];
@@ -1183,6 +1212,9 @@ class Clielo_Invoices {
             wp_send_json_error( [ 'message' => __( 'Ajoutez au moins un article.', 'clielo' ) ], 400 );
         }
 
+        if ( $client_type === 'wp' && ! clielo_is_premium() ) {
+            wp_send_json_error( [ 'message' => __( 'La facturation des clients WordPress nécessite le plan premium.', 'clielo' ) ], 403 );
+        }
         if ( $client_type === 'wp' && ! $client_id ) {
             wp_send_json_error( [ 'message' => __( 'Sélectionnez un client.', 'clielo' ) ], 400 );
         }
@@ -1209,6 +1241,7 @@ class Clielo_Invoices {
             'tax_amount'     => $tax_amount,
             'total'          => $total,
             'notes'          => $notes,
+            'invoice_type'   => $invoice_type,
             'updated_at'     => current_time( 'mysql' ),
         ];
 
@@ -1371,6 +1404,9 @@ class Clielo_Invoices {
             'invoice_prefix'  => sanitize_text_field( wp_unslash( $_POST['invoice_prefix'] ?? 'FACT-' ) ),
             'invoice_start'   => max( 1, absint( $_POST['invoice_start'] ?? 1 ) ),
             'invoice_padding' => max( 1, min( 8, absint( $_POST['invoice_padding'] ?? 3 ) ) ),
+            'quote_prefix'    => sanitize_text_field( wp_unslash( $_POST['quote_prefix'] ?? 'DEVIS-' ) ),
+            'quote_start'     => max( 1, absint( $_POST['quote_start'] ?? 1 ) ),
+            'quote_padding'   => max( 1, min( 8, absint( $_POST['quote_padding'] ?? 3 ) ) ),
             'tax_rate'        => floatval( $_POST['tax_rate'] ?? 20 ),
             'tax_notice'      => sanitize_textarea_field( wp_unslash( $_POST['tax_notice'] ?? '' ) ),
             'payment_terms'   => sanitize_textarea_field( wp_unslash( $_POST['payment_terms'] ?? '' ) ),
@@ -1400,8 +1436,8 @@ class Clielo_Invoices {
             wp_die( esc_html__( 'Facture introuvable.', 'clielo' ) );
         }
 
-        // Vérifier que la facture appartient à l'utilisateur
-        if ( (int) $invoice->client_id !== get_current_user_id() ) {
+        // Les admins peuvent voir toutes les factures
+        if ( ! current_user_can( 'manage_options' ) && (int) $invoice->client_id !== get_current_user_id() ) {
             wp_die( esc_html__( 'Accès non autorisé.', 'clielo' ) );
         }
 
@@ -1553,6 +1589,22 @@ class Clielo_Invoices {
                             <input type="number" id="clielo-inv-taxrate" value="<?php echo esc_attr( $s['tax_rate'] ); ?>" min="0" max="100" step="0.01" />
                         </div>
                     </div>
+                    <div class="clielo-inv-row" style="margin-top:12px;padding-top:12px;border-top:1px solid #eee">
+                        <div class="clielo-inv-field">
+                            <label><?php esc_html_e( 'Préfixe des devis', 'clielo' ); ?></label>
+                            <input type="text" id="clielo-inv-quote-prefix" value="<?php echo esc_attr( $s['quote_prefix'] ?? 'DEVIS-' ); ?>" placeholder="DEVIS-" />
+                        </div>
+                        <div class="clielo-inv-field">
+                            <label><?php esc_html_e( 'Premier numéro de devis', 'clielo' ); ?></label>
+                            <input type="number" id="clielo-inv-quote-start" value="<?php echo absint( $s['quote_start'] ?? 1 ); ?>" min="1" step="1" style="max-width:120px" />
+                            <p class="description" style="margin:4px 0 0;font-size:12px;color:#777"><?php esc_html_e( 'Utile si vous migrez depuis un autre système.', 'clielo' ); ?></p>
+                        </div>
+                        <div class="clielo-inv-field">
+                            <label><?php esc_html_e( 'Zéros de remplissage devis (digits)', 'clielo' ); ?></label>
+                            <input type="number" id="clielo-inv-quote-padding" value="<?php echo absint( $s['quote_padding'] ?? 3 ); ?>" min="1" max="8" step="1" style="max-width:80px" />
+                            <p class="description" style="margin:4px 0 0;font-size:12px;color:#777"><?php esc_html_e( '3 → DEVIS-001, 4 → DEVIS-0001', 'clielo' ); ?></p>
+                        </div>
+                    </div>
                     <div class="clielo-inv-field">
                         <label><?php esc_html_e( 'Mention TVA (affiché si taux = 0%)', 'clielo' ); ?></label>
                         <input type="text" id="clielo-inv-taxnotice" value="<?php echo esc_attr( $s['tax_notice'] ); ?>" placeholder="<?php esc_attr_e( 'TVA non applicable, article 293 B du CGI', 'clielo' ); ?>" style="width:100%" />
@@ -1649,6 +1701,9 @@ class Clielo_Invoices {
                     fd.append('invoice_prefix', document.getElementById('clielo-inv-prefix').value);
                     fd.append('invoice_start', document.getElementById('clielo-inv-start').value);
                     fd.append('invoice_padding', document.getElementById('clielo-inv-padding').value);
+                    fd.append('quote_prefix', document.getElementById('clielo-inv-quote-prefix').value);
+                    fd.append('quote_start', document.getElementById('clielo-inv-quote-start').value);
+                    fd.append('quote_padding', document.getElementById('clielo-inv-quote-padding').value);
                     fd.append('tax_rate', document.getElementById('clielo-inv-taxrate').value);
                     fd.append('tax_notice', document.getElementById('clielo-inv-taxnotice').value);
                     fd.append('payment_terms', document.getElementById('clielo-inv-terms').value);
@@ -1922,6 +1977,9 @@ class Clielo_Invoices {
         $color    = esc_attr( Clielo_Admin::get_color() );
         $nonce    = wp_create_nonce( 'clielo_nonce' );
         $page_url = admin_url( 'admin.php?page=clielo-invoices' );
+        $curr_data = Clielo_Admin::get_currency_data();
+        $curr_sym  = $curr_data['symbol'];
+        $curr_dec  = $curr_data['decimals'];
         ?>
         <div class="wrap clielo-dashboard">
             <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
@@ -1995,7 +2053,7 @@ class Clielo_Invoices {
                                     <?php endif; ?>
                                 </div>
                             </td>
-                            <td><strong><?php echo esc_html( number_format( (float) $inv->total, 2, ',', ' ' ) ); ?> &euro;</strong></td>
+                            <td><strong><?php echo esc_html( number_format( (float) $inv->total, 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></strong></td>
                             <td><?php echo esc_html( date_i18n( 'd/m/Y', strtotime( $inv->created_at ) ) ); ?></td>
                             <td>
                                 <a href="<?php echo esc_url( $view_url ); ?>" class="clielo-inv-act" style="color:<?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Voir', 'clielo' ); ?></a>
@@ -2105,6 +2163,9 @@ class Clielo_Invoices {
         $color       = esc_attr( Clielo_Admin::get_color() );
         $nonce       = wp_create_nonce( 'clielo_nonce' );
         $ext_clients = self::get_all_ext_clients();
+        $curr_data   = Clielo_Admin::get_currency_data();
+        $curr_sym    = $curr_data['symbol'];
+        $curr_dec    = $curr_data['decimals'];
 
         // Utilisateurs WP non-admin
         $wp_users = get_users( [ 'role__not_in' => [ 'administrator' ], 'orderby' => 'display_name', 'number' => 200 ] );
@@ -2119,6 +2180,7 @@ class Clielo_Invoices {
                 <!-- Client -->
                 <div class="clielo-newinv-section">
                     <h2><span class="dashicons dashicons-admin-users"></span> <?php esc_html_e( 'Client', 'clielo' ); ?></h2>
+                    <?php if ( clielo_is_premium() ) : ?>
                     <div class="clielo-newinv-radio">
                         <label><input type="radio" name="clielo_client_type" value="wp" checked /> <?php esc_html_e( 'Utilisateur WordPress', 'clielo' ); ?></label>
                         <label><input type="radio" name="clielo_client_type" value="ext" /> <?php esc_html_e( 'Client externe', 'clielo' ); ?></label>
@@ -2132,7 +2194,9 @@ class Clielo_Invoices {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="clielo-newinv-field" id="clielo-newinv-ext-client" style="display:none">
+                    <?php endif; ?>
+                    <input type="hidden" name="clielo_client_type" value="<?php echo clielo_is_premium() ? '' : 'ext'; ?>" id="clielo-newinv-client-type-hidden" <?php echo clielo_is_premium() ? 'style="display:none"' : ''; ?> />
+                    <div class="clielo-newinv-field" id="clielo-newinv-ext-client"<?php echo clielo_is_premium() ? ' style="display:none"' : ''; ?>>
                         <label><?php esc_html_e( 'Sélectionner un client externe', 'clielo' ); ?></label>
                         <select id="clielo-newinv-ext-id">
                             <option value=""><?php esc_html_e( '— Choisir —', 'clielo' ); ?></option>
@@ -2162,7 +2226,7 @@ class Clielo_Invoices {
                                 <td><input type="text" class="clielo-item-desc" placeholder="<?php esc_attr_e( 'Description du service', 'clielo' ); ?>" /></td>
                                 <td><input type="number" class="clielo-item-qty" value="1" min="1" step="1" /></td>
                                 <td><input type="number" class="clielo-item-price" value="0" min="0" step="0.01" /></td>
-                                <td class="clielo-item-total" style="text-align:right;font-weight:600">0,00 &euro;</td>
+                                <td class="clielo-item-total" style="text-align:right;font-weight:600">0,00 <?php echo esc_html( $curr_sym ); ?></td>
                                 <td><button type="button" class="clielo-items-rm">&times;</button></td>
                             </tr>
                         </tbody>
@@ -2170,9 +2234,9 @@ class Clielo_Invoices {
                     <button type="button" id="clielo-add-item" class="button">+ <?php esc_html_e( 'Ajouter un article', 'clielo' ); ?></button>
 
                     <div class="clielo-newinv-totals" style="margin-top:16px">
-                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="clielo-newinv-subtotal">0,00</span> &euro;</div>
-                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="clielo-newinv-taxrate-display"><?php echo esc_html( $settings['tax_rate'] ); ?></span>%) : <span id="clielo-newinv-tax">0,00</span> &euro;</div>
-                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="clielo-newinv-total">0,00</span> &euro;</strong></div>
+                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="clielo-newinv-subtotal">0,00</span> <?php echo esc_html( $curr_sym ); ?></div>
+                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="clielo-newinv-taxrate-display"><?php echo esc_html( $settings['tax_rate'] ); ?></span>%) : <span id="clielo-newinv-tax">0,00</span> <?php echo esc_html( $curr_sym ); ?></div>
+                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="clielo-newinv-total">0,00</span> <?php echo esc_html( $curr_sym ); ?></strong></div>
                     </div>
                 </div>
 
@@ -2182,6 +2246,14 @@ class Clielo_Invoices {
                     <div class="clielo-newinv-field" style="max-width:200px">
                         <label><?php esc_html_e( 'Taux TVA (%)', 'clielo' ); ?></label>
                         <input type="number" id="clielo-newinv-taxrate" value="<?php echo esc_attr( $settings['tax_rate'] ); ?>" min="0" max="100" step="0.01" />
+                    </div>
+                    <div class="clielo-newinv-field" style="max-width:280px">
+                        <label><?php esc_html_e( 'Type de facture', 'clielo' ); ?></label>
+                        <select id="clielo-newinv-type">
+                            <option value="single"><?php esc_html_e( 'Facture simple', 'clielo' ); ?></option>
+                            <option value="acompte"><?php esc_html_e( "Facture d'acompte", 'clielo' ); ?></option>
+                            <option value="solde"><?php esc_html_e( 'Facture de solde', 'clielo' ); ?></option>
+                        </select>
                     </div>
                     <div class="clielo-newinv-field">
                         <label><?php esc_html_e( 'Notes / Conditions', 'clielo' ); ?></label>
@@ -2258,15 +2330,17 @@ class Clielo_Invoices {
                         var status = this.dataset.status;
                         this.disabled = true;
 
-                        var clientType = document.querySelector('input[name="clielo_client_type"]:checked').value;
+                        var ctRadio = document.querySelector('input[name="clielo_client_type"]:checked');
+                        var clientType = ctRadio ? ctRadio.value : 'ext';
                         var fd = new FormData();
                         fd.append('action', 'clielo_invoice_save');
                         fd.append('nonce', nonce);
                         fd.append('client_type', clientType);
-                        fd.append('client_id', document.getElementById('clielo-newinv-client-id').value);
+                        fd.append('client_id', document.getElementById('clielo-newinv-client-id') ? document.getElementById('clielo-newinv-client-id').value : '');
                         fd.append('ext_client_id', document.getElementById('clielo-newinv-ext-id').value);
                         fd.append('tax_rate', document.getElementById('clielo-newinv-taxrate').value);
                         fd.append('notes', document.getElementById('clielo-newinv-notes').value);
+                        fd.append('invoice_type', document.getElementById('clielo-newinv-type').value);
                         fd.append('save_status', status);
 
                         var rows = document.querySelectorAll('.clielo-item-row');
@@ -2317,6 +2391,9 @@ class Clielo_Invoices {
         $color       = esc_attr( Clielo_Admin::get_color() );
         $nonce       = wp_create_nonce( 'clielo_nonce' );
         $ext_clients = self::get_all_ext_clients();
+        $curr_data   = Clielo_Admin::get_currency_data();
+        $curr_sym    = $curr_data['symbol'];
+        $curr_dec    = $curr_data['decimals'];
         $wp_users    = get_users( [ 'role__not_in' => [ 'administrator' ], 'orderby' => 'display_name', 'number' => 200 ] );
         $items       = json_decode( $invoice->items, true ) ?: [];
         $is_wp       = ! empty( $invoice->client_id );
@@ -2376,7 +2453,7 @@ class Clielo_Invoices {
                                 <td><input type="text" class="clielo-item-desc" value="<?php echo esc_attr( $item['description'] ?? '' ); ?>" /></td>
                                 <td><input type="number" class="clielo-item-qty" value="<?php echo esc_attr( $item['quantity'] ?? 1 ); ?>" min="1" step="1" /></td>
                                 <td><input type="number" class="clielo-item-price" value="<?php echo esc_attr( $item['unit_price'] ?? 0 ); ?>" min="0" step="0.01" /></td>
-                                <td class="clielo-item-total" style="text-align:right;font-weight:600"><?php echo esc_html( number_format( floatval( $item['total'] ?? 0 ), 2, ',', ' ' ) ); ?> &euro;</td>
+                                <td class="clielo-item-total" style="text-align:right;font-weight:600"><?php echo esc_html( number_format( floatval( $item['total'] ?? 0 ), 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></td>
                                 <td><button type="button" class="clielo-items-rm">&times;</button></td>
                             </tr>
                             <?php endforeach; ?>
@@ -2385,9 +2462,9 @@ class Clielo_Invoices {
                     <button type="button" id="clielo-add-item" class="button">+ <?php esc_html_e( 'Ajouter un article', 'clielo' ); ?></button>
 
                     <div class="clielo-newinv-totals" style="margin-top:16px">
-                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="clielo-newinv-subtotal"><?php echo esc_html( number_format( (float) $invoice->subtotal, 2, ',', '' ) ); ?></span> &euro;</div>
-                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="clielo-newinv-taxrate-display"><?php echo esc_html( $invoice->tax_rate ); ?></span>%) : <span id="clielo-newinv-tax"><?php echo esc_html( number_format( (float) $invoice->tax_amount, 2, ',', '' ) ); ?></span> &euro;</div>
-                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="clielo-newinv-total"><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', '' ) ); ?></span> &euro;</strong></div>
+                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="clielo-newinv-subtotal"><?php echo esc_html( number_format( (float) $invoice->subtotal, 2, ',', '' ) ); ?></span> <?php echo esc_html( $curr_sym ); ?></div>
+                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="clielo-newinv-taxrate-display"><?php echo esc_html( $invoice->tax_rate ); ?></span>%) : <span id="clielo-newinv-tax"><?php echo esc_html( number_format( (float) $invoice->tax_amount, 2, ',', '' ) ); ?></span> <?php echo esc_html( $curr_sym ); ?></div>
+                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="clielo-newinv-total"><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', '' ) ); ?></span> <?php echo esc_html( $curr_sym ); ?></strong></div>
                     </div>
                 </div>
 
@@ -2397,6 +2474,14 @@ class Clielo_Invoices {
                     <div class="clielo-newinv-field" style="max-width:200px">
                         <label><?php esc_html_e( 'Taux TVA (%)', 'clielo' ); ?></label>
                         <input type="number" id="clielo-newinv-taxrate" value="<?php echo esc_attr( $invoice->tax_rate ); ?>" min="0" max="100" step="0.01" />
+                    </div>
+                    <div class="clielo-newinv-field" style="max-width:280px">
+                        <label><?php esc_html_e( 'Type de facture', 'clielo' ); ?></label>
+                        <select id="clielo-newinv-type">
+                            <option value="single" <?php selected( $invoice->invoice_type, 'single' ); ?>><?php esc_html_e( 'Facture simple', 'clielo' ); ?></option>
+                            <option value="acompte" <?php selected( $invoice->invoice_type, 'acompte' ); ?>><?php esc_html_e( "Facture d'acompte", 'clielo' ); ?></option>
+                            <option value="solde" <?php selected( $invoice->invoice_type, 'solde' ); ?>><?php esc_html_e( 'Facture de solde', 'clielo' ); ?></option>
+                        </select>
                     </div>
                     <div class="clielo-newinv-field">
                         <label><?php esc_html_e( 'Notes / Conditions', 'clielo' ); ?></label>
@@ -2480,6 +2565,7 @@ class Clielo_Invoices {
                         fd.append('ext_client_id', document.getElementById('clielo-newinv-ext-id').value);
                         fd.append('tax_rate', document.getElementById('clielo-newinv-taxrate').value);
                         fd.append('notes', document.getElementById('clielo-newinv-notes').value);
+                        fd.append('invoice_type', document.getElementById('clielo-newinv-type').value);
                         fd.append('save_status', status);
 
                         var rows = document.querySelectorAll('.clielo-item-row');
@@ -2548,6 +2634,9 @@ class Clielo_Invoices {
             $invoice->ext_client_id ? (int) $invoice->ext_client_id : null
         );
         $nonce       = wp_create_nonce( 'clielo_nonce' );
+        $curr_data   = Clielo_Admin::get_currency_data();
+        $curr_sym    = $curr_data['symbol'];
+        $curr_dec    = $curr_data['decimals'];
         $badge_color = $colors[ $invoice->status ] ?? '#9ca3af';
         $status_text = $labels[ $invoice->status ] ?? $invoice->status;
         ?>
@@ -2568,7 +2657,9 @@ class Clielo_Invoices {
                 <div class="clielo-inv-header-right">
                     <h3><?php
                         $invoice_type_val = $invoice->invoice_type ?? 'single';
-                        if ( $invoice_type_val === 'acompte' ) {
+                        if ( $invoice_type_val === 'quote' || $invoice_type_val === 'quote_request' ) {
+                            esc_html_e( 'Devis', 'clielo' );
+                        } elseif ( $invoice_type_val === 'acompte' ) {
                             esc_html_e( "Facture d'acompte", 'clielo' );
                         } elseif ( $invoice_type_val === 'solde' ) {
                             esc_html_e( 'Facture de solde', 'clielo' );
@@ -2586,7 +2677,7 @@ class Clielo_Invoices {
                     <p>
                         <strong><?php echo esc_html( $invoice->invoice_number ); ?></strong><br />
                         <?php esc_html_e( 'Date', 'clielo' ); ?> : <?php echo esc_html( date_i18n( 'd/m/Y', strtotime( $invoice->created_at ) ) ); ?>
-                        <?php if ( $invoice->order_id ) : ?><br /><?php esc_html_e( 'Commande', 'clielo' ); ?> : #CMD-<?php echo esc_html( $invoice->order_id ); ?><?php endif; ?>
+                        <?php if ( $invoice->order_id && ! in_array( $invoice->invoice_type, [ 'quote', 'quote_request' ], true ) ) : ?><br /><?php esc_html_e( 'Commande', 'clielo' ); ?> : #CMD-<?php echo esc_html( $invoice->order_id ); ?><?php endif; ?>
                         <?php if ( $invoice->paid_at ) : ?><br /><?php esc_html_e( 'Payée le', 'clielo' ); ?> : <?php echo esc_html( date_i18n( 'd/m/Y', strtotime( $invoice->paid_at ) ) ); ?><?php endif; ?>
                     </p>
                 </div>
@@ -2650,8 +2741,8 @@ class Clielo_Invoices {
                             <td class="text-right" style="color:#aaa"><?php esc_html_e( 'Inclus', 'clielo' ); ?></td>
                             <td class="text-right" style="color:#aaa">—</td>
                             <?php else : ?>
-                            <td class="text-right"><?php echo esc_html( number_format( floatval( $item['unit_price'] ?? 0 ), 2, ',', ' ' ) ); ?> &euro;</td>
-                            <td class="text-right"><?php echo esc_html( number_format( floatval( $item['total'] ?? 0 ), 2, ',', ' ' ) ); ?> &euro;</td>
+                            <td class="text-right"><?php echo esc_html( number_format( floatval( $item['unit_price'] ?? 0 ), 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></td>
+                            <td class="text-right"><?php echo esc_html( number_format( floatval( $item['total'] ?? 0 ), 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></td>
                             <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
@@ -2663,20 +2754,20 @@ class Clielo_Invoices {
                 <?php if ( floatval( $invoice->tax_rate ) > 0 ) : ?>
                     <div class="clielo-inv-totals-row">
                         <span><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?></span>
-                        <span><?php echo esc_html( number_format( (float) $invoice->subtotal, 2, ',', ' ' ) ); ?> &euro;</span>
+                        <span><?php echo esc_html( number_format( (float) $invoice->subtotal, 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></span>
                     </div>
                     <div class="clielo-inv-totals-row">
                         <span><?php esc_html_e( 'TVA', 'clielo' ); ?> (<?php echo esc_html( $invoice->tax_rate ); ?>%)</span>
-                        <span><?php echo esc_html( number_format( (float) $invoice->tax_amount, 2, ',', ' ' ) ); ?> &euro;</span>
+                        <span><?php echo esc_html( number_format( (float) $invoice->tax_amount, 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></span>
                     </div>
                     <div class="clielo-inv-totals-row total-row">
                         <span><?php esc_html_e( 'Total TTC', 'clielo' ); ?></span>
-                        <span><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', ' ' ) ); ?> &euro;</span>
+                        <span><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></span>
                     </div>
                 <?php else : ?>
                     <div class="clielo-inv-totals-row total-row">
                         <span><?php esc_html_e( 'Total', 'clielo' ); ?></span>
-                        <span><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', ' ' ) ); ?> &euro;</span>
+                        <span><?php echo esc_html( number_format( (float) $invoice->total, 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></span>
                     </div>
                     <?php if ( ! empty( $s['tax_notice'] ) ) : ?>
                         <div class="clielo-inv-totals-row" style="font-size:11px;color:#888;font-style:italic;border-top:none;padding-top:4px">
@@ -2874,5 +2965,500 @@ class Clielo_Invoices {
         }
 
         update_option( 'clielo_fix_quote_invoices_v1', '1' );
+    }
+
+    /* ================================================================
+     *  AJAX — Devis manuels (gratuit)
+     * ================================================================ */
+
+    public static function ajax_save_quote(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Non autorisé.', 'clielo' ) ], 403 );
+        }
+
+        global $wpdb;
+
+        $client_type   = sanitize_text_field( wp_unslash( $_POST['client_type'] ?? 'ext' ) );
+        $client_id     = absint( $_POST['client_id'] ?? 0 );
+        $ext_client_id = absint( $_POST['ext_client_id'] ?? 0 );
+        $title         = sanitize_text_field( wp_unslash( $_POST['quote_title'] ?? '' ) );
+        $tax_rate      = floatval( $_POST['tax_rate'] ?? 20 );
+        $notes         = sanitize_textarea_field( wp_unslash( $_POST['notes'] ?? '' ) );
+        $validity      = sanitize_text_field( wp_unslash( $_POST['validity_date'] ?? '' ) );
+
+        if ( $client_type === 'wp' && ! clielo_is_premium() ) {
+            wp_send_json_error( [ 'message' => __( 'La facturation des clients WordPress nécessite le plan premium.', 'clielo' ) ], 403 );
+        }
+        if ( $client_type === 'wp' && ! $client_id ) {
+            wp_send_json_error( [ 'message' => __( 'Sélectionnez un client.', 'clielo' ) ], 400 );
+        }
+        if ( $client_type === 'ext' && ! $ext_client_id ) {
+            wp_send_json_error( [ 'message' => __( 'Sélectionnez un client externe.', 'clielo' ) ], 400 );
+        }
+
+        $raw_items = wp_unslash( $_POST['items'] ?? [] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $items     = [];
+        if ( is_array( $raw_items ) ) {
+            foreach ( $raw_items as $item ) {
+                $desc = sanitize_text_field( $item['description'] ?? '' );
+                if ( empty( $desc ) ) {
+                    continue;
+                }
+                $qty   = max( 1, absint( $item['quantity'] ?? 1 ) );
+                $price = floatval( $item['unit_price'] ?? 0 );
+                $items[] = [
+                    'description' => $desc,
+                    'quantity'    => $qty,
+                    'unit_price'  => $price,
+                    'total'       => round( $qty * $price, 2 ),
+                ];
+            }
+        }
+
+        if ( empty( $items ) ) {
+            wp_send_json_error( [ 'message' => __( 'Ajoutez au moins un article.', 'clielo' ) ], 400 );
+        }
+
+        $subtotal   = array_sum( array_column( $items, 'total' ) );
+        $tax_amount = round( $subtotal * $tax_rate / 100, 2 );
+        $total      = $subtotal + $tax_amount;
+
+        $quote_number = self::generate_quote_number();
+
+        $notes_full = $title !== '' ? $title . ( $notes !== '' ? "\n" . $notes : '' ) : $notes;
+        if ( $validity !== '' ) {
+            /* translators: %s: validity date */
+            $notes_full .= ( $notes_full !== '' ? "\n" : '' ) . sprintf( __( 'Valable jusqu\'au %s.', 'clielo' ), esc_html( $validity ) );
+        }
+
+        $table = self::invoices_table_name();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+        $inserted = $wpdb->insert(
+            $table,
+            [
+                'invoice_number' => $quote_number,
+                'order_id'       => null,
+                'client_id'      => $client_type === 'wp' ? $client_id : null,
+                'ext_client_id'  => $client_type === 'ext' ? $ext_client_id : null,
+                'status'         => self::STATUS_DRAFT,
+                'items'          => wp_json_encode( $items ),
+                'subtotal'       => $subtotal,
+                'tax_rate'       => $tax_rate,
+                'tax_amount'     => $tax_amount,
+                'total'          => $total,
+                'notes'          => $notes_full,
+                'invoice_type'   => 'quote',
+                'created_at'     => current_time( 'mysql' ),
+                'updated_at'     => current_time( 'mysql' ),
+            ]
+        );
+
+        if ( ! $inserted ) {
+            wp_send_json_error( [ 'message' => __( 'Erreur lors de la création du devis.', 'clielo' ) ], 500 );
+        }
+
+        wp_send_json_success( [ 'quote_id' => (int) $wpdb->insert_id, 'quote_number' => $quote_number ] );
+    }
+
+    public static function ajax_update_quote(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Non autorisé.', 'clielo' ) ], 403 );
+        }
+
+        global $wpdb;
+
+        $quote_id = absint( $_POST['quote_id'] ?? 0 );
+        if ( ! $quote_id ) {
+            wp_send_json_error( [ 'message' => __( 'Devis introuvable.', 'clielo' ) ], 400 );
+        }
+
+        $table = self::invoices_table_name();
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        $quote = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND invoice_type = 'quote' AND order_id IS NULL", $quote_id ) );
+        if ( ! $quote || $quote->status !== self::STATUS_DRAFT ) {
+            wp_send_json_error( [ 'message' => __( 'Seuls les brouillons peuvent être modifiés.', 'clielo' ) ], 400 );
+        }
+
+        $client_type   = sanitize_text_field( wp_unslash( $_POST['client_type'] ?? 'ext' ) );
+        $client_id     = absint( $_POST['client_id'] ?? 0 );
+        $ext_client_id = absint( $_POST['ext_client_id'] ?? 0 );
+        $title         = sanitize_text_field( wp_unslash( $_POST['quote_title'] ?? '' ) );
+        $tax_rate      = floatval( $_POST['tax_rate'] ?? 20 );
+        $notes         = sanitize_textarea_field( wp_unslash( $_POST['notes'] ?? '' ) );
+        $validity      = sanitize_text_field( wp_unslash( $_POST['validity_date'] ?? '' ) );
+        $new_status    = sanitize_text_field( wp_unslash( $_POST['new_status'] ?? self::STATUS_DRAFT ) );
+
+        if ( $client_type === 'wp' && ! clielo_is_premium() ) {
+            wp_send_json_error( [ 'message' => __( 'La facturation des clients WordPress nécessite le plan premium.', 'clielo' ) ], 403 );
+        }
+
+        $raw_items = wp_unslash( $_POST['items'] ?? [] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $items     = [];
+        if ( is_array( $raw_items ) ) {
+            foreach ( $raw_items as $item ) {
+                $desc = sanitize_text_field( $item['description'] ?? '' );
+                if ( empty( $desc ) ) {
+                    continue;
+                }
+                $qty   = max( 1, absint( $item['quantity'] ?? 1 ) );
+                $price = floatval( $item['unit_price'] ?? 0 );
+                $items[] = [
+                    'description' => $desc,
+                    'quantity'    => $qty,
+                    'unit_price'  => $price,
+                    'total'       => round( $qty * $price, 2 ),
+                ];
+            }
+        }
+
+        if ( empty( $items ) ) {
+            wp_send_json_error( [ 'message' => __( 'Ajoutez au moins un article.', 'clielo' ) ], 400 );
+        }
+
+        $subtotal   = array_sum( array_column( $items, 'total' ) );
+        $tax_amount = round( $subtotal * $tax_rate / 100, 2 );
+        $total      = $subtotal + $tax_amount;
+
+        $allowed_statuses = [ self::STATUS_DRAFT, self::STATUS_PENDING, self::STATUS_VALIDATED, self::STATUS_CANCELLED ];
+        if ( ! in_array( $new_status, $allowed_statuses, true ) ) {
+            $new_status = self::STATUS_DRAFT;
+        }
+
+        $notes_full = $title !== '' ? $title . ( $notes !== '' ? "\n" . $notes : '' ) : $notes;
+        if ( $validity !== '' ) {
+            /* translators: %s: validity date */
+            $notes_full .= ( $notes_full !== '' ? "\n" : '' ) . sprintf( __( 'Valable jusqu\'au %s.', 'clielo' ), esc_html( $validity ) );
+        }
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $wpdb->update(
+            $table,
+            [
+                'client_id'     => $client_type === 'wp' ? $client_id : null,
+                'ext_client_id' => $client_type === 'ext' ? $ext_client_id : null,
+                'status'        => $new_status,
+                'items'         => wp_json_encode( $items ),
+                'subtotal'      => $subtotal,
+                'tax_rate'      => $tax_rate,
+                'tax_amount'    => $tax_amount,
+                'total'         => $total,
+                'notes'         => $notes_full,
+                'updated_at'    => current_time( 'mysql' ),
+            ],
+            [ 'id' => $quote_id ]
+        );
+
+        wp_send_json_success( [ 'quote_id' => $quote_id ] );
+    }
+
+    public static function ajax_delete_quote(): void {
+        check_ajax_referer( 'clielo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Non autorisé.', 'clielo' ) ], 403 );
+        }
+
+        global $wpdb;
+
+        $quote_id = absint( $_POST['quote_id'] ?? 0 );
+        if ( ! $quote_id ) {
+            wp_send_json_error( [ 'message' => __( 'Devis introuvable.', 'clielo' ) ], 400 );
+        }
+
+        $table = self::invoices_table_name();
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        $quote = $wpdb->get_row( $wpdb->prepare( "SELECT id, status FROM {$table} WHERE id = %d AND invoice_type = 'quote' AND order_id IS NULL", $quote_id ) );
+        if ( ! $quote ) {
+            wp_send_json_error( [ 'message' => __( 'Devis introuvable.', 'clielo' ) ], 404 );
+        }
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $wpdb->delete( $table, [ 'id' => $quote_id ], [ '%d' ] );
+
+        wp_send_json_success();
+    }
+
+    /* ================================================================
+     *  PAGE ADMIN — Nouveau devis manuel (gratuit)
+     * ================================================================ */
+
+    public static function render_quote_new(): void {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        $settings    = self::get_settings();
+        $color       = esc_attr( Clielo_Admin::get_color() );
+        $nonce       = wp_create_nonce( 'clielo_nonce' );
+        $ext_clients = self::get_all_ext_clients();
+        $curr_data   = Clielo_Admin::get_currency_data();
+        $curr_sym    = $curr_data['symbol'];
+        $curr_dec    = $curr_data['decimals'];
+        $wp_users    = clielo_is_premium() ? get_users( [ 'role__not_in' => [ 'administrator' ], 'orderby' => 'display_name', 'number' => 200 ] ) : [];
+
+        $quote_id = absint( $_GET['quote_id'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $quote    = null;
+        $items    = [];
+        if ( $quote_id ) {
+            global $wpdb;
+            $table = self::invoices_table_name();
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $quote = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND invoice_type = 'quote' AND order_id IS NULL", $quote_id ) );
+            if ( $quote ) {
+                $items = json_decode( $quote->items, true ) ?: [];
+            }
+        }
+
+        $is_edit = $quote && $quote->status === self::STATUS_DRAFT;
+        $title   = $is_edit ? __( 'Modifier le devis', 'clielo' ) : __( 'Nouveau devis', 'clielo' );
+        ?>
+        <div class="wrap clielo-dashboard">
+            <h1 style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+                <span class="dashicons dashicons-media-text" style="font-size:28px;width:28px;height:28px;color:<?php echo esc_attr( $color ); ?>"></span>
+                <?php echo esc_html( $title ); ?>
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=clielo-quotes' ) ); ?>" style="font-size:13px;margin-left:8px;font-weight:400;color:#888;text-decoration:none">&#8592; <?php esc_html_e( 'Retour', 'clielo' ); ?></a>
+            </h1>
+
+            <div id="clielo-newquote-form">
+                <!-- Client -->
+                <div class="clielo-newinv-section">
+                    <h2><span class="dashicons dashicons-admin-users"></span> <?php esc_html_e( 'Client', 'clielo' ); ?></h2>
+                    <?php if ( clielo_is_premium() ) : ?>
+                    <div class="clielo-newinv-radio">
+                        <label><input type="radio" name="clielo_quote_client_type" value="wp" <?php checked( $is_edit && ! empty( $quote->client_id ) ); ?> /> <?php esc_html_e( 'Utilisateur WordPress', 'clielo' ); ?></label>
+                        <label><input type="radio" name="clielo_quote_client_type" value="ext" <?php checked( ! $is_edit || ! empty( $quote->ext_client_id ) ); ?> /> <?php esc_html_e( 'Client externe', 'clielo' ); ?></label>
+                    </div>
+                    <div class="clielo-newinv-field" id="clielo-newquote-wp-client" style="<?php echo ( $is_edit && ! empty( $quote->client_id ) ) ? '' : 'display:none'; ?>">
+                        <label><?php esc_html_e( 'Utilisateur WordPress', 'clielo' ); ?></label>
+                        <select id="clielo-newquote-client-id">
+                            <option value=""><?php esc_html_e( '— Choisir —', 'clielo' ); ?></option>
+                            <?php foreach ( $wp_users as $u ) : ?>
+                                <option value="<?php echo (int) $u->ID; ?>" <?php selected( $is_edit ? (int) $quote->client_id : 0, (int) $u->ID ); ?>>
+                                    <?php echo esc_html( $u->display_name . ' (' . $u->user_email . ')' ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php endif; ?>
+                    <div class="clielo-newinv-field" id="clielo-newquote-ext-client"<?php echo ( clielo_is_premium() && $is_edit && ! empty( $quote->client_id ) ) ? ' style="display:none"' : ''; ?>>
+                        <label><?php esc_html_e( 'Client externe', 'clielo' ); ?></label>
+                        <select id="clielo-newquote-ext-id">
+                            <option value=""><?php esc_html_e( '— Choisir —', 'clielo' ); ?></option>
+                            <?php foreach ( $ext_clients as $ec ) : ?>
+                                <option value="<?php echo (int) $ec->id; ?>" <?php selected( $is_edit ? (int) $quote->ext_client_id : 0, (int) $ec->id ); ?>>
+                                    <?php echo esc_html( $ec->name . ( $ec->company ? ' — ' . $ec->company : '' ) ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=clielo-clients' ) ); ?>" style="font-size:12px;margin-left:8px"><?php esc_html_e( 'Gérer les clients externes', 'clielo' ); ?></a>
+                    </div>
+                </div>
+
+                <!-- Objet -->
+                <div class="clielo-newinv-section">
+                    <h2><span class="dashicons dashicons-editor-textcolor"></span> <?php esc_html_e( 'Objet du devis', 'clielo' ); ?></h2>
+                    <div class="clielo-newinv-field">
+                        <label><?php esc_html_e( 'Intitulé (affiché dans les notes)', 'clielo' ); ?></label>
+                        <input type="text" id="clielo-newquote-title" value="<?php echo esc_attr( $is_edit ? $quote->notes : '' ); ?>" placeholder="<?php esc_attr_e( 'Ex : Création site web vitrine', 'clielo' ); ?>" style="max-width:500px" />
+                    </div>
+                    <div class="clielo-newinv-field" style="max-width:200px">
+                        <label><?php esc_html_e( 'Date de validité', 'clielo' ); ?></label>
+                        <input type="date" id="clielo-newquote-validity" />
+                    </div>
+                </div>
+
+                <!-- Articles -->
+                <div class="clielo-newinv-section">
+                    <h2><span class="dashicons dashicons-list-view"></span> <?php esc_html_e( 'Articles', 'clielo' ); ?></h2>
+                    <table class="clielo-items-table" id="clielo-quote-items-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50%"><?php esc_html_e( 'Description', 'clielo' ); ?></th>
+                                <th style="width:10%"><?php esc_html_e( 'Qté', 'clielo' ); ?></th>
+                                <th style="width:20%"><?php esc_html_e( 'Prix unitaire HT', 'clielo' ); ?></th>
+                                <th style="width:15%"><?php esc_html_e( 'Total HT', 'clielo' ); ?></th>
+                                <th style="width:5%"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="clielo-quote-items-body">
+                            <?php if ( empty( $items ) ) : ?>
+                            <tr class="clielo-qitem-row">
+                                <td><input type="text" class="clielo-qitem-desc" placeholder="<?php esc_attr_e( 'Description du service', 'clielo' ); ?>" /></td>
+                                <td><input type="number" class="clielo-qitem-qty" value="1" min="1" step="1" /></td>
+                                <td><input type="number" class="clielo-qitem-price" value="0" min="0" step="0.01" /></td>
+                                <td class="clielo-qitem-total" style="text-align:right;font-weight:600">0,00 <?php echo esc_html( $curr_sym ); ?></td>
+                                <td><button type="button" class="clielo-items-rm">&times;</button></td>
+                            </tr>
+                            <?php else : ?>
+                                <?php foreach ( $items as $it ) : ?>
+                                <tr class="clielo-qitem-row">
+                                    <td><input type="text" class="clielo-qitem-desc" value="<?php echo esc_attr( $it['description'] ?? '' ); ?>" /></td>
+                                    <td><input type="number" class="clielo-qitem-qty" value="<?php echo absint( $it['quantity'] ?? 1 ); ?>" min="1" step="1" /></td>
+                                    <td><input type="number" class="clielo-qitem-price" value="<?php echo esc_attr( number_format( (float) ( $it['unit_price'] ?? 0 ), 2, '.', '' ) ); ?>" min="0" step="0.01" /></td>
+                                    <td class="clielo-qitem-total" style="text-align:right;font-weight:600"><?php echo esc_html( number_format( (float) ( $it['total'] ?? 0 ), 2, ',', ' ' ) ); ?> <?php echo esc_html( $curr_sym ); ?></td>
+                                    <td><button type="button" class="clielo-items-rm">&times;</button></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                    <button type="button" id="clielo-add-qitem" class="button">+ <?php esc_html_e( 'Ajouter un article', 'clielo' ); ?></button>
+
+                    <div class="clielo-newinv-totals" style="margin-top:16px">
+                        <div><?php esc_html_e( 'Sous-total HT', 'clielo' ); ?> : <span id="clielo-newquote-subtotal">0,00</span> <?php echo esc_html( $curr_sym ); ?></div>
+                        <div><?php esc_html_e( 'TVA', 'clielo' ); ?> (<span id="clielo-newquote-taxrate-display"><?php echo esc_html( $settings['tax_rate'] ); ?></span>%) : <span id="clielo-newquote-tax">0,00</span> <?php echo esc_html( $curr_sym ); ?></div>
+                        <div><strong><?php esc_html_e( 'Total TTC', 'clielo' ); ?> : <span id="clielo-newquote-total">0,00</span> <?php echo esc_html( $curr_sym ); ?></strong></div>
+                    </div>
+                </div>
+
+                <!-- TVA et notes -->
+                <div class="clielo-newinv-section">
+                    <h2><span class="dashicons dashicons-editor-alignleft"></span> <?php esc_html_e( 'Détails', 'clielo' ); ?></h2>
+                    <div class="clielo-newinv-field" style="max-width:200px">
+                        <label><?php esc_html_e( 'Taux TVA (%)', 'clielo' ); ?></label>
+                        <input type="number" id="clielo-newquote-taxrate" value="<?php echo esc_attr( $is_edit ? $quote->tax_rate : $settings['tax_rate'] ); ?>" min="0" max="100" step="0.01" />
+                    </div>
+                    <div class="clielo-newinv-field">
+                        <label><?php esc_html_e( 'Notes / Conditions', 'clielo' ); ?></label>
+                        <textarea id="clielo-newquote-notes"><?php echo esc_textarea( $settings['payment_terms'] ); ?></textarea>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <button type="button" id="clielo-newquote-save" class="button button-primary" style="background:<?php echo esc_attr( $color ); ?>;border-color:<?php echo esc_attr( $color ); ?>">
+                    <?php echo $is_edit ? esc_html__( 'Enregistrer les modifications', 'clielo' ) : esc_html__( 'Créer le devis', 'clielo' ); ?>
+                </button>
+                <?php if ( $is_edit ) : ?>
+                    <button type="button" id="clielo-newquote-send" class="button" style="margin-left:8px"><?php esc_html_e( 'Marquer comme envoyé', 'clielo' ); ?></button>
+                <?php endif; ?>
+            </div>
+
+            <?php
+            ob_start();
+            $ajax_action = $is_edit ? 'clielo_update_quote' : 'clielo_save_quote';
+            $redirect    = admin_url( 'admin.php?page=clielo-quotes' );
+            ?>
+            (function(){
+                var ajaxUrl  = '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
+                var nonce    = '<?php echo esc_js( $nonce ); ?>';
+                var quoteId  = <?php echo $is_edit ? (int) $quote->id : 0; ?>;
+                var isPremium = <?php echo clielo_is_premium() ? 'true' : 'false'; ?>;
+
+                // Toggle client type (premium only)
+                if(isPremium){
+                    document.querySelectorAll('input[name="clielo_quote_client_type"]').forEach(function(r){
+                        r.addEventListener('change', function(){
+                            document.getElementById('clielo-newquote-wp-client').style.display = this.value==='wp' ? '' : 'none';
+                            document.getElementById('clielo-newquote-ext-client').style.display = this.value==='ext' ? '' : 'none';
+                        });
+                    });
+                }
+
+                // Calcul totaux
+                function recalcQ(){
+                    var subtotal = 0;
+                    document.querySelectorAll('.clielo-qitem-row').forEach(function(row){
+                        var qty   = parseFloat(row.querySelector('.clielo-qitem-qty').value) || 0;
+                        var price = parseFloat(row.querySelector('.clielo-qitem-price').value) || 0;
+                        var lt    = Math.round(qty * price * 100) / 100;
+                        row.querySelector('.clielo-qitem-total').textContent = lt.toFixed(2).replace('.',',') + ' €';
+                        subtotal += lt;
+                    });
+                    var rate  = parseFloat(document.getElementById('clielo-newquote-taxrate').value) || 0;
+                    var tax   = Math.round(subtotal * rate) / 100;
+                    var total = subtotal + tax;
+                    document.getElementById('clielo-newquote-subtotal').textContent = subtotal.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newquote-tax').textContent = tax.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newquote-total').textContent = total.toFixed(2).replace('.',',');
+                    document.getElementById('clielo-newquote-taxrate-display').textContent = rate;
+                }
+
+                document.addEventListener('input', function(e){
+                    if(e.target.classList.contains('clielo-qitem-qty') || e.target.classList.contains('clielo-qitem-price') || e.target.id === 'clielo-newquote-taxrate') recalcQ();
+                });
+
+                // Ajouter article
+                document.getElementById('clielo-add-qitem').addEventListener('click', function(){
+                    var row = document.createElement('tr');
+                    row.className = 'clielo-qitem-row';
+                    row.innerHTML = '<td><input type="text" class="clielo-qitem-desc" placeholder="<?php echo esc_js( __( 'Description du service', 'clielo' ) ); ?>" /></td>' +
+                        '<td><input type="number" class="clielo-qitem-qty" value="1" min="1" step="1" /></td>' +
+                        '<td><input type="number" class="clielo-qitem-price" value="0" min="0" step="0.01" /></td>' +
+                        '<td class="clielo-qitem-total" style="text-align:right;font-weight:600">0,00 €</td>' +
+                        '<td><button type="button" class="clielo-items-rm">&times;</button></td>';
+                    document.getElementById('clielo-quote-items-body').appendChild(row);
+                });
+
+                // Supprimer article
+                document.addEventListener('click', function(e){
+                    if(e.target.classList.contains('clielo-items-rm')){
+                        var rows = document.querySelectorAll('.clielo-qitem-row');
+                        if(rows.length > 1){ e.target.closest('tr').remove(); recalcQ(); }
+                    }
+                });
+
+                function buildFormData(extraStatus){
+                    var ctRadio = document.querySelector('input[name="clielo_quote_client_type"]:checked');
+                    var clientType = ctRadio ? ctRadio.value : 'ext';
+                    var fd = new FormData();
+                    fd.append('action', quoteId ? 'clielo_update_quote' : 'clielo_save_quote');
+                    fd.append('nonce', nonce);
+                    if(quoteId) fd.append('quote_id', quoteId);
+                    fd.append('client_type', clientType);
+                    fd.append('client_id', document.getElementById('clielo-newquote-client-id') ? document.getElementById('clielo-newquote-client-id').value : '');
+                    fd.append('ext_client_id', document.getElementById('clielo-newquote-ext-id').value);
+                    fd.append('quote_title', document.getElementById('clielo-newquote-title').value);
+                    fd.append('validity_date', document.getElementById('clielo-newquote-validity').value);
+                    fd.append('tax_rate', document.getElementById('clielo-newquote-taxrate').value);
+                    fd.append('notes', document.getElementById('clielo-newquote-notes').value);
+                    if(extraStatus) fd.append('new_status', extraStatus);
+                    document.querySelectorAll('.clielo-qitem-row').forEach(function(row, i){
+                        fd.append('items['+i+'][description]', row.querySelector('.clielo-qitem-desc').value);
+                        fd.append('items['+i+'][quantity]', row.querySelector('.clielo-qitem-qty').value);
+                        fd.append('items['+i+'][unit_price]', row.querySelector('.clielo-qitem-price').value);
+                    });
+                    return fd;
+                }
+
+                document.getElementById('clielo-newquote-save').addEventListener('click', function(){
+                    var btn = this;
+                    btn.disabled = true;
+                    fetch(ajaxUrl,{method:'POST',body:buildFormData(null),credentials:'same-origin'})
+                    .then(function(r){return r.json();})
+                    .then(function(res){
+                        btn.disabled = false;
+                        if(res.success){
+                            window.location.href = '<?php echo esc_url( $redirect ); ?>';
+                        } else {
+                            alert(res.data && res.data.message ? res.data.message : 'Erreur');
+                        }
+                    });
+                });
+
+                <?php if ( $is_edit ) : ?>
+                document.getElementById('clielo-newquote-send').addEventListener('click', function(){
+                    var btn = this;
+                    btn.disabled = true;
+                    fetch(ajaxUrl,{method:'POST',body:buildFormData('pending'),credentials:'same-origin'})
+                    .then(function(r){return r.json();})
+                    .then(function(res){
+                        btn.disabled = false;
+                        if(res.success){
+                            window.location.href = '<?php echo esc_url( $redirect ); ?>';
+                        } else {
+                            alert(res.data && res.data.message ? res.data.message : 'Erreur');
+                        }
+                    });
+                });
+                <?php endif; ?>
+
+                recalcQ();
+            })();
+            <?php
+            wp_add_inline_script( 'clielo-invoices-js', ob_get_clean() );
+            ?>
+        </div>
+        <?php
     }
 }
